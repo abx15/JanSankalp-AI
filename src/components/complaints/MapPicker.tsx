@@ -11,13 +11,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix Leaflet marker icon issue in Next.js
-const icon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+// icon will be defined inside the component
 
 interface MapPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
@@ -35,6 +29,13 @@ function LocationMarker({
     click(e) {
       onSelect(e.latlng.lat, e.latlng.lng);
     },
+  });
+
+  const icon = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
   });
 
   return position === null ? null : <Marker position={position} icon={icon} />;

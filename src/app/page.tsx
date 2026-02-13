@@ -14,6 +14,7 @@ import {
   BrainCircuit,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   AIAnimatedIcon,
   GovWaveBackground,
@@ -112,13 +113,15 @@ export default function Home() {
               <div className="absolute inset-0 blur-3xl bg-primary/20 rounded-full" />
               <AIAnimatedIcon />
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-4">
-              <Landmark className="w-4 h-4" />
-              Sushashan (सुशासन) through AI
+            <div className="w-56 h-56 md:w-72 md:h-72 lg:w-96 lg:h-96 bg-transparent rounded-3xl flex items-center justify-center p-2 group transition-transform hover:scale-105 relative">
+              <Image
+                src="/logojansanklp.png"
+                alt="JanSankalp AI"
+                fill
+                className="object-contain scale-110 group-hover:scale-125 transition-transform duration-700"
+                priority
+              />
             </div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight text-foreground leading-[1.1]">
-              JanSankalp <span className="text-primary italic">AI</span>
-            </h1>
           </motion.div>
 
           <motion.p
@@ -382,9 +385,15 @@ export default function Home() {
 
       <footer className="py-20 border-t bg-card text-center">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <Landmark className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-black">JanSankalp AI</span>
+          <div className="flex flex-col items-center justify-center gap-6 mb-8">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-transparent rounded-lg flex items-center justify-center overflow-hidden relative">
+              <Image
+                src="/logojansanklp.png"
+                alt="JanSankalp AI Logo"
+                fill
+                className="object-contain scale-110"
+              />
+            </div>
           </div>
           <p className="text-muted-foreground font-medium">
             © 2026 JanSankalp AI. Smart Governance for a Smarter India.

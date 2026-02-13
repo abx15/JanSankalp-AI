@@ -32,6 +32,12 @@ model User {
   emailVerified DateTime?
   role          Role        @default(CITIZEN)
   points        Int         @default(0)
+  phone         String?
+  address       String?
+  bio           String?
+  latitude      Float?
+  longitude     Float?
+  avatarUrl     String?
   complaints    Complaint[]
   assignedTasks Complaint[] @relation("AssignedTo")
   managedDept   Department? @relation("DeptHead")

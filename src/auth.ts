@@ -40,38 +40,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // Allow OAuth without verification for now (if added later)
             if (account?.provider !== "credentials") return true;
 
-            // @ts-ignore
             const existingUser = await prisma.user.findUnique({
                 where: { id: user.id },
             });
 
-            // Prevent login if email is not verified
             if (!existingUser?.emailVerified) return false;
 
             return true;
         },
         async session({ session, token }) {
             if (session.user) {
-                // @ts-ignore
-                session.user.role = token.role
-                // @ts-ignore
-                session.user.id = token.id
+                (session.user as any).role = token.role;
+                (session.user as any).id = token.id;
+                (session.user as any).points = token.points;
             }
             return session
         },
         async jwt({ token, user }) {
             if (user) {
-                // @ts-ignore
-                token.role = user.role
+                token.role = (user as any).role
                 token.id = user.id
+                token.points = (user as any).points
             } else if (token.id) {
-                // Refresh role from DB if needed
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    select: { role: true }
+                    select: { role: true, points: true }
                 });
                 if (dbUser) {
                     token.role = dbUser.role;
+                    token.points = (dbUser as any).points;
                 }
             }
             return token

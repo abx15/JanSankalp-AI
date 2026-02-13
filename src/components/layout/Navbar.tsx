@@ -9,6 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const NavItem = ({
   href,
@@ -84,16 +85,16 @@ export const Navbar = () => {
           <Link href="/" className="flex items-center gap-3 group">
             <motion.div
               layout
-              className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform"
+              className="w-10 h-10 md:w-14 md:h-14 bg-transparent rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform p-0.5 relative"
             >
-              <Landmark className="w-5 h-5" />
+              <Image
+                src="/logojansanklp.png"
+                alt="JanSankalp AI Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </motion.div>
-            <motion.span
-              layout
-              className="text-lg font-black tracking-tighter uppercase hidden sm:block bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70"
-            >
-              JanSankalp <span className="text-primary italic">AI</span>
-            </motion.span>
           </Link>
 
           {/* Desktop Nav - Dynamic Dock Appearance */}

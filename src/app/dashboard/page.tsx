@@ -22,12 +22,30 @@ import {
   MapPin,
   Loader2,
 } from "lucide-react";
-import { DepartmentChart, TrendChart } from "@/components/dashboard/Charts";
+import dynamic from "next/dynamic";
+
+const DepartmentChart = dynamic(
+  () => import("@/components/dashboard/DepartmentChart"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] w-full bg-muted/20 animate-pulse rounded-xl" />
+    ),
+  },
+);
+
+const TrendChart = dynamic(() => import("@/components/dashboard/TrendChart"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[200px] w-full bg-muted/20 animate-pulse rounded-xl" />
+  ),
+});
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from "date-fns";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -51,6 +69,10 @@ export default function DashboardPage() {
         setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
   if (role === "ADMIN") {
     return <AdminDashboard complaints={complaints} loading={loading} />;
@@ -166,6 +188,7 @@ function AdminDashboard({
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {" "}
             <TrendChart />
           </CardContent>
         </Card>
@@ -179,6 +202,7 @@ function AdminDashboard({
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {" "}
             <DepartmentChart />
           </CardContent>
         </Card>

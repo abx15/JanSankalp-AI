@@ -49,11 +49,18 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 border-r bg-card hidden md:flex flex-col">
         <div className="p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
-              J
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-transparent rounded-lg flex items-center justify-center overflow-hidden p-1">
+              <img
+                src="/logojansanklp.png"
+                alt="JanSankalp AI Logo"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "https://img.icons8.com/color/160/government.png";
+                }}
+              />
             </div>
-            <h1 className="text-xl font-bold text-primary">JanSankalp</h1>
           </div>
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             {role === "ADMIN" ? "Governance Hub" : "Citizen Portal"}
