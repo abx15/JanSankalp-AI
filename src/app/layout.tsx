@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jansankalp-ai.vercel.app"),
+  metadataBase: new URL("https://jansanklpai.vercel.app"),
   title: {
     default: "JanSankalp AI - Smart Governance for a Smarter India",
     template: "%s | JanSankalp AI",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://jansankalp-ai.vercel.app", // Adjust if domain changes
+    url: "https://jansanklpai.vercel.app", // Adjust if domain changes
     siteName: "JanSankalp AI",
     title: "JanSankalp AI - Smart Governance",
     description: "AI-powered civic intelligence platform for smart cities.",
