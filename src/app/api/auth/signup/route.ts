@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: Request) {
     try {
@@ -30,13 +32,20 @@ export async function POST(req: Request) {
             data: {
                 name,
                 email,
-                // @ts-ignore
                 password: hashedPassword,
                 role: "CITIZEN",
             },
         });
 
-        return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name } });
+        // Generate OTP and send email
+        const { token } = await generateVerificationToken(email);
+        await sendVerificationEmail(email, token);
+
+        return NextResponse.json({
+            success: true,
+            message: "Verification email sent",
+            email: user.email
+        });
     } catch (error) {
         console.error("Signup error:", error);
         return NextResponse.json(

@@ -57,7 +57,7 @@ export async function POST(req: Request) {
             location: { lat: latitude, lng: longitude },
         });
 
-        return NextResponse.json(complaint);
+        return NextResponse.json({ complaint });
     } catch (error) {
         console.error("COMPLAINT_SUBMIT_ERROR", error);
         return new NextResponse("Internal Error", { status: 500 });
