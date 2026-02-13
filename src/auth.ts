@@ -44,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 where: { id: user.id },
             });
 
-            if (!existingUser?.emailVerified) return false;
+            if (!(existingUser as any)?.emailVerified) return false;
 
             return true;
         },
@@ -62,7 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = user.id
                 token.points = (user as any).points
             } else if (token.id) {
-                const dbUser = await prisma.user.findUnique({
+                const dbUser = await (prisma as any).user.findUnique({
                     where: { id: token.id as string },
                     select: { role: true, points: true }
                 });

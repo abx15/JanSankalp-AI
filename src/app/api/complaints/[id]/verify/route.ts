@@ -10,7 +10,7 @@ export async function PATCH(
     try {
         const session = await auth();
 
-        if (!session || session.user.role !== "ADMIN") {
+        if (!session || !session.user || (session.user as any).role !== "ADMIN") {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
@@ -42,9 +42,17 @@ export async function PATCH(
             where: { id: params.id },
             data: {
                 status,
-                departmentId
-            },
-        });
+                departmentId,
+                emailVerified: new Date(),
+            }
+        } as any,
+            create: {
+                email: citizenEmail,
+                name: "Vikas Citizen",
+                password: hashedPassword,
+                role: "CITIZEN",
+                emailVerified: new Date(),
+            } as any);
 
         // Real-time notification to the user who filed the complaint
         if (complaint.authorId) {

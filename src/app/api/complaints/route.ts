@@ -9,11 +9,11 @@ export async function GET() {
     try {
         const session = await auth();
 
-        if (!session) {
+        if (!session || !session.user) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const isAdmin = session.user.role === "ADMIN";
+        const isAdmin = (session.user as any).role === "ADMIN";
 
         const complaints = await prisma.complaint.findMany({
             where: isAdmin ? {} : { authorId: session.user.id },
