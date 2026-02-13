@@ -30,7 +30,8 @@ export function generateComplaintReceipt(complaint: any) {
         ["Location", `${complaint.latitude}, ${complaint.longitude}`],
     ];
 
-    (doc as any).autoTable({
+    // @ts-ignore - jspdf-autotable extends jsPDF but types can be tricky in some environments
+    doc.autoTable({
         startY: 45,
         head: [["Field", "Details"]],
         body: data,
