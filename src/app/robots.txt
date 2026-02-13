@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /api/
 
-Sitemap: https://jansankalp-ai.vercel.app/sitemap.xml
+Sitemap: https://jansanklpai.vercel.app/sitemap.xml
