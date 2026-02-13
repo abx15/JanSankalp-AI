@@ -20,10 +20,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     where: { email: credentials.email as string },
                 })
 
+                // @ts-ignore
                 if (!user || !user.password) return null
 
                 const isPasswordValid = await bcrypt.compare(
                     credentials.password as string,
+                    // @ts-ignore
                     user.password
                 )
 
@@ -58,4 +60,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     pages: {
         signIn: "/auth/signin",
     },
+    secret: process.env.AUTH_SECRET,
 })
