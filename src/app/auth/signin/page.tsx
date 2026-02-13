@@ -37,7 +37,7 @@ export default function SignInPage() {
       callbackUrl,
     });
 
-    if (result?.error) {
+    if ((result as any)?.error) {
       setError("Invalid email or password");
     }
     setLoading(false);
