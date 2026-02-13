@@ -20,33 +20,34 @@ import {
   FloatingParticle,
 } from "@/components/ui/icons/GovIcons";
 import { ProcessFlow } from "@/components/home/ProcessFlow";
+import { AutomationEngine } from "@/components/home/AutomationEngine";
 
 const FEATURES = [
   {
     icon: <Globe className="w-6 h-6" />,
     title: "Multilingual Voice AI",
-    desc: "Speak or type in any language. Our AI understands and translates instantly using advanced Whisper models.",
+    desc: "Speak or type in any language. Our AI understands and translates instantly. (अपनी भाषा में बोलें, AI सब समझता है)",
     color: "blue",
   },
   {
     icon: <Shield className="w-6 h-6" />,
     title: "Eco-Verified Triage",
-    desc: "AI classifies issues and prevents duplicates, ensuring fast resolution and reducing officer workload.",
+    desc: "AI classifies issues and prevents duplicates, ensuring fast resolution. (AI शिकायतों को सही विभाग तक पहुँचाता है)",
     color: "green",
   },
   {
     icon: <Zap className="w-6 h-6" />,
     title: "Real-time Tracking",
-    desc: "Get instant updates as your complaint moves from report to resolution with automated status sync.",
+    desc: "Get instant updates as your complaint moves from report to resolution. (अपनी शिकायत की ताज़ा स्थिति जानें)",
     color: "orange",
   },
 ];
 
 const STATS = [
-  { label: "Issues Resolved", value: "15,000+" },
-  { label: "Active Cities", value: "12" },
-  { label: "Avg. Resolution Time", value: "24h" },
-  { label: "Citizen Satisfaction", value: "98%" },
+  { label: "Issues Resolved (समाधान)", value: "15,000+" },
+  { label: "Active Cities (शहर)", value: "12" },
+  { label: "Avg. Resolution (समय)", value: "24h" },
+  { label: "Satisfaction (संतुष्टि)", value: "98%" },
 ];
 
 const ENGINE_SPECS = [
@@ -89,7 +90,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background selection:bg-primary/10">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20 pb-12 px-6">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-28 pb-12 px-6">
         <GovWaveBackground />
         {[...Array(10)].map((_, i) => (
           <FloatingParticle key={i} delay={i * 0.5} />
@@ -113,7 +114,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-4">
               <Landmark className="w-4 h-4" />
-              Empowering Smart Governance
+              Sushashan (सुशासन) through AI
             </div>
             <h1 className="text-6xl md:text-8xl font-black tracking-tight text-foreground leading-[1.1]">
               JanSankalp <span className="text-primary italic">AI</span>
@@ -126,7 +127,7 @@ export default function Home() {
           >
             “Har Awaaz, Har Shehar –{" "}
             <span className="text-foreground font-bold">
-              Smart Governance with AI.
+              Digital Governance for a Smart India.
             </span>
             ”
           </motion.p>
@@ -136,10 +137,10 @@ export default function Home() {
             className="flex flex-wrap justify-center gap-4 text-sm font-bold"
           >
             {[
-              "Voice Reporting",
-              "Multilingual Support",
-              "AI Classification",
-              "Real-time Triage",
+              "Digital Reporting",
+              "Bilingual Support",
+              "Auto-Routing",
+              "Smart Triage",
             ].map((tag) => (
               <span
                 key={tag}
@@ -177,16 +178,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Process Flow Section */}
-      <section className="py-32 px-6 relative overflow-hidden">
+      {/* Automation Flow Section */}
+      <section className="py-32 px-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950/20">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-10">
             <h2 className="text-4xl md:text-5xl font-black mb-6">
-              Transparency in Action
+              How it Works:{" "}
+              <span className="text-primary italic">Automation in Action</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
-              From the moment you speak up to the final resolution, our
-              AI-driven process ensures nothing is lost in translation.
+              From your voice to the officer's desk – see how our AI engine
+              packages, routes, and resolves issues in real-time.
+            </p>
+          </div>
+          <AutomationEngine />
+        </div>
+      </section>
+
+      {/* Traditional Process Flow Section */}
+      <section className="py-32 px-6 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20 text-balance">
+            <h2 className="text-4xl md:text-5xl font-black mb-6 uppercase tracking-tighter">
+              Awasthi Se Mukti (आज़ादी अव्यवस्था से)
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
+              Bridging the gap between citizens and administration with
+              transparency and speed.
             </p>
           </div>
           <ProcessFlow />
