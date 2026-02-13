@@ -54,9 +54,16 @@ export default function ComplaintForm() {
 
   useEffect(() => {
     if (session?.user?.id) {
-      setFormData((prev) => ({ ...prev, authorId: session.user.id as string }));
+      setFormData((prev) => ({
+        ...prev,
+        authorId: session.user?.id as string,
+      }));
     }
   }, [session]);
+
+  const isAnalyzing =
+    (step === 1 && formData.description.length > 10) ||
+    (step === 2 && formData.imageUrl);
 
   const handleSubmit = async () => {
     if (!session) return;
@@ -83,21 +90,28 @@ export default function ComplaintForm() {
 
   if (!session) {
     return (
-      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden p-8 text-center">
+      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden p-8 text-center transition-all">
         <CardContent className="space-y-6 pt-6">
-          <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+          <motion.div
+            className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <Landmark className="w-10 h-10" />
-          </div>
-          <h2 className="text-2xl font-bold">Please Login to Report</h2>
-          <p className="text-muted-foreground">
-            To ensure all reports are verified and tracked, you must be signed
-            in to submit a complaint.
+          </motion.div>
+          <h2 className="text-2xl font-bold uppercase tracking-tight">
+            Please Login to Report
+          </h2>
+          <p className="text-muted-foreground max-w-sm mx-auto">
+            To ensure all reports are verified and tracked for the{" "}
+            <span className="text-primary font-bold">Reward System</span>, you
+            must be signed in.
           </p>
           <div className="flex gap-4 justify-center">
-            <Button asChild>
+            <Button asChild className="px-8 rounded-full">
               <Link href="/auth/signin">Sign In</Link>
             </Button>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="px-8 rounded-full">
               <Link href="/auth/signup">Sign Up</Link>
             </Button>
           </div>
@@ -113,31 +127,43 @@ export default function ComplaintForm() {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-2xl mx-auto"
       >
-        <Card className="text-center py-12 px-6 shadow-2xl border-t-4 border-t-green-500">
-          <CardContent className="space-y-4">
-            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+        <Card className="text-center py-12 px-6 shadow-2xl border-t-4 border-t-green-500 overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Landmark className="w-32 h-32" />
+          </div>
+          <CardContent className="space-y-4 relative z-10">
+            <motion.div
+              className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
+              initial={{ rotate: -45 }}
+              animate={{ rotate: 0 }}
+            >
               <CheckCircle2 className="w-12 h-12" />
-            </div>
-            <h2 className="text-3xl font-bold text-foreground">
-              Complaint Submitted!
+            </motion.div>
+            <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">
+              Report Filed Successfully!
             </h2>
             <p className="text-muted-foreground text-lg">
-              Thank you for contributing to your city's governance. Our AI is
-              analyzing your report for severity scoring.
+              Our <span className="text-primary font-bold">AI Hub</span> is now
+              routing your report to the local municipal terminal.
             </p>
-            <div className="bg-muted p-4 rounded-lg mt-6">
-              <p className="text-sm font-medium">
-                Tracking ID: #JS-
+            <div className="bg-muted p-4 rounded-2xl mt-6 border border-dashed border-primary/20">
+              <p className="text-sm font-mono font-bold text-primary">
+                TRACKING_ID: JS-
                 {Math.random().toString(36).substr(2, 9).toUpperCase()}
               </p>
             </div>
-            <Button
-              className="mt-8"
-              variant="outline"
-              onClick={() => window.location.reload()}
-            >
-              Submit Another Issue
-            </Button>
+            <div className="pt-6 flex gap-3 justify-center">
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => window.location.reload()}
+              >
+                Submit New Report
+              </Button>
+              <Button className="rounded-full" asChild>
+                <Link href="/dashboard">View My Reports</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -145,19 +171,28 @@ export default function ComplaintForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden">
-      <CardHeader className="bg-muted/30 pb-8">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2 text-primary font-bold">
-            <Landmark className="w-5 h-5" />
-            <span>JanSankalp AI</span>
+    <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden transition-all duration-500">
+      <CardHeader className="bg-muted/30 pb-8 relative overflow-hidden">
+        {/* Animated Background Micro-waves */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <motion.div
+            animate={{ x: [0, 100, 0] }}
+            transition={{ duration: 10, repeat: Infinity }}
+            className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--primary)_1px,_transparent_1px)] bg-[size:20px_20px]"
+          />
+        </div>
+
+        <div className="flex justify-between items-center mb-4 relative z-10">
+          <div className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-xs">
+            <Landmark className="w-4 h-4" />
+            <span>Gov Engine v1.0</span>
           </div>
           <div className="flex gap-1">
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
                 className={cn(
-                  "h-1.5 w-8 rounded-full transition-all",
+                  "h-1.5 w-8 rounded-full transition-all duration-500",
                   s === step
                     ? "bg-primary w-12"
                     : s < step
@@ -168,21 +203,43 @@ export default function ComplaintForm() {
             ))}
           </div>
         </div>
-        <CardTitle className="text-2xl font-bold">
-          {step === 1 && "Describe the Issue"}
-          {step === 2 && "Visual Proof & Category"}
-          {step === 3 && "Tag Location"}
+        <CardTitle className="text-3xl font-black tracking-tighter relative z-10">
+          {step === 1 && "ISSUE_DESCRIPTION"}
+          {step === 2 && "EVIDENCE_HUB"}
+          {step === 3 && "GEO_VECTORS"}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="relative z-10 font-medium">
           {step === 1 &&
-            "The more detail you provide, the better our AI can categorize it."}
+            "Talk to us in your local language. AI will handle the rest."}
           {step === 2 &&
-            "Attachments help officers verify and prioritize your report."}
-          {step === 3 && "Pin the exact location for faster resolution."}
+            "Photos help our AI verify the severity score automatically."}
+          {step === 3 && "Pinpointing the exact coordinate for rapid routing."}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="py-8">
+      <CardContent className="py-8 relative">
+        {/* Smart Detection Indicator */}
+        <AnimatePresence>
+          {isAnalyzing && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="mb-4 overflow-hidden"
+            >
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 flex items-center gap-3">
+                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">
+                  AI Hub:{" "}
+                  {step === 1
+                    ? "Analyzing context..."
+                    : "Scanning image for metadata..."}
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -193,19 +250,19 @@ export default function ComplaintForm() {
               className="space-y-4"
             >
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  What's the problem?
+                <label className="text-sm font-bold text-foreground uppercase tracking-wider flex justify-between">
+                  Issue Details <span>(ब्यौरा)</span>
                 </label>
                 <div className="relative group">
                   <Textarea
-                    placeholder="E.g., Major pothole on MG Road near the metro pillar..."
-                    className="min-h-[160px] text-lg p-4 transition-all focus:ring-2 focus:ring-primary/20"
+                    placeholder="E.g., Large pothole on the main road..."
+                    className="min-h-[160px] text-lg p-6 rounded-3xl transition-all focus:ring-4 focus:ring-primary/10 border-2 resize-none"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
                   />
-                  <div className="absolute right-4 bottom-4">
+                  <div className="absolute right-6 bottom-6 scale-125">
                     <VoiceRecorder
                       onTranscription={(text) =>
                         setFormData({ ...formData, description: text })
@@ -213,10 +270,12 @@ export default function ComplaintForm() {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground italic">
-                  Tip: You can speak in any language, our AI will automatically
-                  detect and translate it.
-                </p>
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-2xl border border-dashed border-muted-foreground/20">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
+                    AI Tip: Speaking in Hindi? We'll translate it automatically.
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -230,8 +289,8 @@ export default function ComplaintForm() {
               className="space-y-6"
             >
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Issue Category
+                <label className="text-sm font-bold text-foreground uppercase tracking-wider flex justify-between">
+                  Category <span>(श्रेणी)</span>
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {CATEGORIES.map((cat) => (
@@ -241,14 +300,16 @@ export default function ComplaintForm() {
                         setFormData({ ...formData, category: cat.id })
                       }
                       className={cn(
-                        "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2",
+                        "p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-2 group",
                         formData.category === cat.id
-                          ? "border-primary bg-primary/5 text-primary shadow-md"
-                          : "border-muted hover:border-primary/50 text-muted-foreground",
+                          ? "border-primary bg-primary/5 text-primary shadow-xl scale-[1.02]"
+                          : "border-muted hover:border-primary/30 text-muted-foreground",
                       )}
                     >
-                      <span className="text-2xl">{cat.icon}</span>
-                      <span className="text-[10px] uppercase font-bold tracking-wider">
+                      <span className="text-3xl group-hover:scale-110 transition-transform">
+                        {cat.icon}
+                      </span>
+                      <span className="text-[8px] uppercase font-black tracking-widest text-center h-4 flex items-center">
                         {cat.label}
                       </span>
                     </button>
@@ -256,15 +317,17 @@ export default function ComplaintForm() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Attached Photo
+                <label className="text-sm font-bold text-foreground uppercase tracking-wider">
+                  Visual Proof <span>(फोटो)</span>
                 </label>
-                <ImageUpload
-                  value={formData.imageUrl}
-                  onUpload={(url) =>
-                    setFormData({ ...formData, imageUrl: url })
-                  }
-                />
+                <div className="rounded-3xl border-2 border-dashed border-primary/20 p-2">
+                  <ImageUpload
+                    value={formData.imageUrl}
+                    onUpload={(url) =>
+                      setFormData({ ...formData, imageUrl: url })
+                    }
+                  />
+                </div>
               </div>
             </motion.div>
           )}
@@ -278,20 +341,26 @@ export default function ComplaintForm() {
               className="space-y-4"
             >
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm font-semibold text-foreground text-primary flex items-center gap-1">
-                    Mark the exact spot
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1">
+                    Geo-Location <span>(स्थान)</span>
                   </label>
-                  <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded italic">
-                    {formData.latitude.toFixed(4)},{" "}
-                    {formData.longitude.toFixed(4)}
+                  <span className="text-[10px] font-mono bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
+                    {formData.latitude.toFixed(6)},{" "}
+                    {formData.longitude.toFixed(6)}
                   </span>
                 </div>
-                <MapPickerWrapper
-                  onLocationSelect={(lat, lng) =>
-                    setFormData({ ...formData, latitude: lat, longitude: lng })
-                  }
-                />
+                <div className="rounded-3xl border-4 border-primary/5 overflow-hidden shadow-inner">
+                  <MapPickerWrapper
+                    onLocationSelect={(lat, lng) =>
+                      setFormData({
+                        ...formData,
+                        latitude: lat,
+                        longitude: lng,
+                      })
+                    }
+                  />
+                </div>
               </div>
             </motion.div>
           )}
