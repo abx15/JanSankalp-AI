@@ -13,14 +13,14 @@ async function main() {
             password: hashedPassword,
             role: "ADMIN",
             emailVerified: new Date(),
-        } as any,
+        },
         create: {
             email: adminEmail,
             name: "System Admin",
             password: hashedPassword,
             role: "ADMIN",
             emailVerified: new Date(),
-        } as any,
+        },
     });
 
     console.log("Admin user seeded:", admin.email);

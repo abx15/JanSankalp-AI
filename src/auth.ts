@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
+import { Role } from "@prisma/client"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -37,38 +38,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account }) {
-            // Allow OAuth without verification for now (if added later)
             if (account?.provider !== "credentials") return true;
 
             const existingUser = await prisma.user.findUnique({
                 where: { id: user.id },
             });
 
-            if (!(existingUser as any)?.emailVerified) return false;
+            if (!existingUser?.emailVerified) return false;
 
             return true;
         },
         async session({ session, token }) {
             if (session.user) {
-                (session.user as any).role = token.role;
-                (session.user as any).id = token.id;
-                (session.user as any).points = token.points;
+                session.user.role = token.role as Role;
+                session.user.id = token.id as string;
+                session.user.points = token.points as number;
             }
             return session
         },
         async jwt({ token, user }) {
             if (user) {
-                token.role = (user as any).role
+                token.role = user.role
                 token.id = user.id
-                token.points = (user as any).points
+                token.points = user.points
             } else if (token.id) {
-                const dbUser = await (prisma as any).user.findUnique({
+                const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     select: { role: true, points: true }
                 });
                 if (dbUser) {
-                    token.role = dbUser.role;
-                    token.points = (dbUser as any).points;
+                    token.role = dbUser.role as Role;
+                    token.points = dbUser.points as number;
                 }
             }
             return token

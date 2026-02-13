@@ -42,17 +42,9 @@ export async function PATCH(
             where: { id: params.id },
             data: {
                 status,
-                departmentId,
-                emailVerified: new Date(),
-            }
-        } as any,
-            create: {
-                email: citizenEmail,
-                name: "Vikas Citizen",
-                password: hashedPassword,
-                role: "CITIZEN",
-                emailVerified: new Date(),
-            } as any);
+                departmentId
+            },
+        });
 
         // Real-time notification to the user who filed the complaint
         if (complaint.authorId) {

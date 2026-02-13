@@ -13,7 +13,7 @@ export async function GET() {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const isAdmin = (session.user as any).role === "ADMIN";
+        const isAdmin = session.user.role === "ADMIN";
 
         const complaints = await prisma.complaint.findMany({
             where: isAdmin ? {} : { authorId: session.user.id },

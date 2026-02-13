@@ -5,6 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://jansankalp-ai.vercel.app"),
   title: {
     default: "JanSankalp AI - Smart Governance for a Smarter India",
     template: "%s | JanSankalp AI",

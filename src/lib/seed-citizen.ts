@@ -13,14 +13,14 @@ async function main() {
             password: hashedPassword,
             role: "CITIZEN",
             emailVerified: new Date(),
-        } as any,
+        },
         create: {
             email: citizenEmail,
             name: "Rahul Citizen",
             password: hashedPassword,
             role: "CITIZEN",
             emailVerified: new Date(),
-        } as any,
+        },
     });
 
     console.log("Citizen user seeded:", citizen.email);
