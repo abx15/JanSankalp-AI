@@ -21,6 +21,7 @@ import {
   TrendingUp,
   MapPin,
   Loader2,
+  ClipboardList,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -105,7 +106,9 @@ function AdminDashboard({
     },
     {
       label: "Resolved",
-      value: "85%",
+      value: complaints
+        .filter((c) => c.status === "RESOLVED")
+        .length.toString(),
       icon: CheckCircle,
       color: "text-green-600",
       trend: "+5%",
@@ -126,86 +129,206 @@ function AdminDashboard({
     },
   ];
 
+  const highPriority = complaints
+    .filter((c) => c.severity > 3 && c.status !== "RESOLVED")
+    .slice(0, 5);
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <RealTimeNotifications />
-      <div className="flex justify-between items-end">
+
+      {/* Header & Quick Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <h2 className="text-3xl font-black tracking-tight text-primary">
-            Governance Intelligence
+          <h2 className="text-4xl font-black tracking-tight text-primary">
+            Governance Dashboard
           </h2>
-          <p className="text-muted-foreground">
-            Real-time city-wide civic analytics powered by JanSankalp AI.
+          <p className="text-muted-foreground mt-1 font-medium">
+            Administrative oversight and real-time civic intelligence.
           </p>
         </div>
-        <div className="flex gap-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground bg-muted px-4 py-1.5 rounded-full border">
-          <span className="text-green-500 animate-pulse">●</span> Live
-          Monitoring Active
+        <div className="flex flex-wrap gap-3">
+          <Link href="/dashboard/complaints">
+            <Button className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20">
+              <ClipboardList className="w-4 h-4" /> Manage All
+            </Button>
+          </Link>
+          <Link href="/dashboard/map">
+            <Button
+              variant="outline"
+              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            >
+              <MapPin className="w-4 h-4" /> Spatial View
+            </Button>
+          </Link>
         </div>
       </div>
 
+      {/* Primary Stats */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card
             key={stat.label}
-            className="hover:shadow-xl transition-all border-none bg-card shadow-sm group"
+            className="hover:shadow-2xl transition-all border-none bg-card shadow-sm group rounded-3xl overflow-hidden relative"
           >
+            <div
+              className={`absolute top-0 left-0 w-1 h-full ${stat.color.replace("text", "bg")}`}
+            />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
                 {stat.label}
               </CardTitle>
               <stat.icon
-                className={`h-4 w-4 ${stat.color} group-hover:scale-110 transition-transform`}
+                className={`h-5 w-5 ${stat.color} group-hover:scale-110 transition-transform`}
               />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black tabular-nums tracking-tighter">
+              <div className="text-4xl font-black tabular-nums tracking-tighter">
                 {stat.value}
               </div>
-              <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
+              <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-2">
                 <span
-                  className={
+                  className={cn(
+                    "flex items-center font-black",
                     stat.trend.startsWith("+")
-                      ? "text-green-600 font-bold"
-                      : "text-red-600 font-bold"
-                  }
+                      ? "text-green-600"
+                      : "text-red-600",
+                  )}
                 >
+                  <ArrowUpRight
+                    className={cn(
+                      "w-3 h-3 mr-0.5",
+                      !stat.trend.startsWith("+") && "rotate-90",
+                    )}
+                  />
                   {stat.trend}
                 </span>{" "}
-                Increase this week
+                vs last month
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold">Issue Trends</CardTitle>
-            <CardDescription>
-              Daily complaint volume trajectory.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {" "}
-            <TrendChart />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3 border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold">
-              Dept. Performance
-            </CardTitle>
-            <CardDescription>
-              Efficiency by administrative sector.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {" "}
-            <DepartmentChart />
-          </CardContent>
-        </Card>
+      <div className="grid gap-8 lg:grid-cols-7">
+        {/* Charts Section */}
+        <div className="lg:col-span-4 space-y-8">
+          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white dark:bg-slate-900">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-black">
+                  Issue Trajectory
+                </CardTitle>
+                <CardDescription>Daily report volume analysis</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <TrendChart />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">
+                  Spatial Distribution
+                </CardTitle>
+                <CardDescription>Hotspots by region</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[200px] flex items-center justify-center bg-muted/20">
+                <div className="text-center space-y-2">
+                  <MapPin className="w-8 h-8 mx-auto text-primary opacity-20" />
+                  <p className="text-xs font-bold text-muted-foreground">
+                    Map Data Loading...
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">
+                  Category Audit
+                </CardTitle>
+                <CardDescription>Distribution across sectors</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <DepartmentChart />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Priority Triage Feed */}
+        <div className="lg:col-span-3">
+          <Card className="border-none shadow-xl rounded-3xl h-full bg-slate-900 text-white overflow-hidden ring-1 ring-white/10">
+            <CardHeader className="border-b border-white/5 pb-6">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-black flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-500" /> Priority
+                  Triage
+                </CardTitle>
+                <span className="text-[10px] font-black bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/20">
+                  REQUIRED ATTENTION
+                </span>
+              </div>
+              <CardDescription className="text-slate-400">
+                High severity issues requiring immediate resolution.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-white/5">
+                {highPriority.length === 0 ? (
+                  <div className="p-12 text-center text-slate-500">
+                    <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p className="font-bold">No high-priority issues</p>
+                  </div>
+                ) : (
+                  highPriority.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-6 hover:bg-white/5 transition-colors group"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div className="min-w-0">
+                          <p className="font-black text-sm truncate group-hover:text-primary transition-colors">
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1 font-medium">
+                            <MapPin className="w-3 h-3" /> {item.region}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 bg-red-500/10 text-red-500 px-2 py-0.5 rounded text-[10px] font-black border border-red-500/10">
+                          S{item.severity}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                          {format(new Date(item.createdAt), "MMM d, h:mm a")}
+                        </p>
+                        <Link href={`/dashboard/complaints?id=${item.id}`}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 text-[10px] font-black hover:bg-white/10 text-primary"
+                          >
+                            RESOLVE <ArrowUpRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+            <div className="p-6 border-t border-white/5 bg-white/5">
+              <Link href="/dashboard/complaints">
+                <Button className="w-full rounded-xl font-black text-xs bg-white text-slate-900 hover:bg-white/90">
+                  VIEW FULL COMMAND FEED
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

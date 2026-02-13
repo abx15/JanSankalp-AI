@@ -22,41 +22,77 @@ export default function DashboardMapView() {
   }, []);
 
   return (
-    <div className="h-[600px] w-full rounded-2xl overflow-hidden border shadow-2xl">
+    <div className="h-[calc(100vh-12rem)] w-full rounded-3xl overflow-hidden border shadow-2xl relative">
+      <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/20">
+        <h3 className="font-black text-xs uppercase tracking-widest mb-2 text-slate-500">
+          Legend
+        </h3>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-red-500 border-2 border-white shadow-sm" />
+            <span className="text-[10px] font-bold">High Severity (&gt;3)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-sm" />
+            <span className="text-[10px] font-bold">Standard Incident</span>
+          </div>
+        </div>
+      </div>
+
       <MapContainer
         center={[20.5937, 78.9629]}
         zoom={5}
-        className="h-full w-full"
+        className="h-full w-full bg-slate-100"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        {complaints.map((item) => (
-          <Marker
-            key={item.id}
-            position={[item.latitude, item.longitude]}
-            icon={icon}
-          >
-            <Popup className="rounded-xl overflow-hidden p-0">
-              <div className="w-48">
-                {item.imageUrl && (
-                  <img
-                    src={item.imageUrl}
-                    className="w-full h-24 object-cover"
-                    alt=""
-                  />
-                )}
-                <div className="p-3">
-                  <h4 className="font-bold text-sm mb-1">{item.title}</h4>
-                  <p className="text-[10px] text-muted-foreground line-clamp-2">
-                    {item.description}
-                  </p>
+        {complaints.map((item) => {
+          const isHighSeverity = item.severity > 3;
+          const customIcon = L.divIcon({
+            className: `bg-transparent`,
+            html: `<div class="w-4 h-4 rounded-full ${isHighSeverity ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-blue-500"} border-2 border-white shadow-md"></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          });
+
+          return (
+            <Marker
+              key={item.id}
+              position={[item.latitude, item.longitude]}
+              icon={customIcon}
+            >
+              <Popup className="rounded-xl overflow-hidden p-0 border-none shadow-xl">
+                <div className="w-64">
+                  {item.imageUrl && (
+                    <div className="relative h-32">
+                      <img
+                        src={item.imageUrl}
+                        className="w-full h-full object-cover"
+                        alt=""
+                      />
+                      <div
+                        className={`absolute top-2 right-2 px-2 py-1 rounded-lg text-[10px] font-black text-white ${isHighSeverity ? "bg-red-500" : "bg-blue-500"}`}
+                      >
+                        Severity: {item.severity}
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-4 bg-white">
+                    <h4 className="font-black text-sm mb-1">{item.title}</h4>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                      {item.category}
+                    </p>
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
