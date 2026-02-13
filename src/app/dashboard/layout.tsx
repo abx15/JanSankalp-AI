@@ -8,20 +8,29 @@ import {
   Bell,
   Search,
   Map as MapIcon,
+  Award,
+  ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
-const sidebarItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
+const adminItems = [
+  { icon: LayoutDashboard, label: "Governance", href: "/dashboard" },
   { icon: FileText, label: "Complaints", href: "/dashboard/complaints" },
   { icon: MapIcon, label: "Map View", href: "/dashboard/map" },
   { icon: Users, label: "Department", href: "/dashboard/department" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
 ];
 
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+const citizenItems = [
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: ClipboardList, label: "My Reports", href: "/dashboard/my-reports" },
+  { icon: Award, label: "Rewards", href: "/dashboard/rewards" },
+  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+];
 
 export default function DashboardLayout({
   children,
@@ -29,15 +38,25 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  // @ts-ignore
+  const role = session?.user?.role || "CITIZEN";
+  const sidebarItems = role === "ADMIN" ? adminItems : citizenItems;
 
   return (
     <div className="flex min-h-screen bg-muted/30">
       {/* Sidebar */}
       <aside className="w-64 border-r bg-card hidden md:flex flex-col">
         <div className="p-6">
-          <h1 className="text-xl font-bold text-primary">JanSankalp AI</h1>
-          <p className="text-xs text-muted-foreground">
-            Governance Intelligence
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
+              J
+            </div>
+            <h1 className="text-xl font-bold text-primary">JanSankalp</h1>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            {role === "ADMIN" ? "Governance Hub" : "Citizen Portal"}
           </p>
         </div>
         <nav className="flex-1 px-4 space-y-1">
@@ -46,9 +65,9 @@ export default function DashboardLayout({
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
                 pathname === item.href
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
@@ -79,7 +98,7 @@ export default function DashboardLayout({
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
             </button>
             <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold shadow-sm">
-              A
+              {session?.user?.name?.[0] || "U"}
             </div>
           </div>
         </header>

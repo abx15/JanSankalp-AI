@@ -3,6 +3,33 @@ import prisma from "@/lib/prisma";
 import { analyzeComplaint, detectAndTranslate } from "@/lib/ai-service";
 import { calculateSeverity, findNearbyDuplicates, getKeywordWeight } from "@/lib/intelligence";
 import { pusherServer } from "@/lib/pusher";
+import { auth } from "@/auth";
+
+export async function GET() {
+    try {
+        const session = await auth();
+
+        if (!session) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+
+        const isAdmin = session.user.role === "ADMIN";
+
+        const complaints = await prisma.complaint.findMany({
+            where: isAdmin ? {} : { authorId: session.user.id },
+            include: {
+                author: { select: { name: true } },
+                department: { select: { name: true } },
+            },
+            orderBy: { createdAt: "desc" }
+        });
+
+        return NextResponse.json({ complaints });
+    } catch (error) {
+        console.error("COMPLAINTS_GET_ERROR", error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+}
 
 export async function POST(req: Request) {
     try {
