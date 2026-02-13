@@ -1,7 +1,7 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,34 +12,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LogIn, Loader2 } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-export default function SignInPage() {
+export default function SignUpPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: true,
-      callbackUrl,
-    });
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    if (result?.error) {
-      setError("Invalid email or password");
+      const data = await res.json();
+
+      if (res.ok) {
+        router.push("/auth/signin");
+      } else {
+        setError(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -47,10 +54,10 @@ export default function SignInPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Sign In
+            Create Account
           </CardTitle>
           <CardDescription className="text-center">
-            Access the JanSankalp AI Dashboard
+            Join JanSankalp AI to report civic issues
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -61,10 +68,20 @@ export default function SignInPage() {
               </div>
             )}
             <div className="space-y-2">
+              <label className="text-sm font-medium">Name</label>
+              <Input
+                type="text"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Email</label>
               <Input
                 type="email"
-                placeholder="admin@jansankalp.ai"
+                placeholder="john@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -91,17 +108,17 @@ export default function SignInPage() {
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  Sign In <LogIn className="w-4 h-4" />
+                  Sign Up <UserPlus className="w-4 h-4" />
                 </>
               )}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Don't have an account?{" "}
+              Already have an account?{" "}
               <Link
-                href="/auth/signup"
+                href="/auth/signin"
                 className="text-primary font-semibold hover:underline"
               >
-                Sign Up
+                Sign In
               </Link>
             </p>
           </CardFooter>

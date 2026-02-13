@@ -24,6 +24,8 @@ import { VoiceRecorder } from "./VoiceRecorder";
 import { ImageUpload } from "./ImageUpload";
 import MapPickerWrapper from "./MapPickerWrapper";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 const CATEGORIES = [
   { id: "pothole", label: "Pothole", icon: "🕳️" },
@@ -35,6 +37,7 @@ const CATEGORIES = [
 ];
 
 export default function ComplaintForm() {
+  const { data: session } = useSession();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,12 +47,19 @@ export default function ComplaintForm() {
     imageUrl: "",
     latitude: 0,
     longitude: 0,
-    authorId: "temp-user-id", // Will be replaced by session ID
+    authorId: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
 
+  useEffect(() => {
+    if (session?.user?.id) {
+      setFormData((prev) => ({ ...prev, authorId: session.user.id as string }));
+    }
+  }, [session]);
+
   const handleSubmit = async () => {
+    if (!session) return;
     setLoading(true);
     try {
       const response = await fetch("/api/complaints", {
@@ -70,6 +80,31 @@ export default function ComplaintForm() {
       setLoading(false);
     }
   };
+
+  if (!session) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden p-8 text-center">
+        <CardContent className="space-y-6 pt-6">
+          <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+            <Landmark className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-bold">Please Login to Report</h2>
+          <p className="text-muted-foreground">
+            To ensure all reports are verified and tracked, you must be signed
+            in to submit a complaint.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button asChild>
+              <Link href="/auth/signin">Sign In</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/auth/signup">Sign Up</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (submitted) {
     return (

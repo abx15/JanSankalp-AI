@@ -28,6 +28,7 @@ model User {
   id            String      @id @default(cuid())
   name          String?
   email         String      @unique
+  password      String?
   role          Role        @default(CITIZEN)
   points        Int         @default(0)
   complaints    Complaint[]
