@@ -125,9 +125,8 @@ Developed with ❤️ by **abx15**.
 Feel free to connect or reach out for collaborations:
 
 - **GitHub**: [@abx15](https://github.com/abx15)
-- **Twitter/X**: [@your_handle](https://twitter.com/your_handle)
-- **LinkedIn**: [Your Name](https://linkedin.com/in/your_profile)
-- **Email**: your.email@example.com
+- **LinkedIn**: [Arun Kumar Bind](https://www.linkedin.com/in/arun-kumar-a3b047353/)
+- **Email**: [developerarunwork@gmail.com](mailto:[developerarunwork@gmail.com])
 
 ---
 
