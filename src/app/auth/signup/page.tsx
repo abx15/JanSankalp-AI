@@ -38,7 +38,7 @@ export default function SignUpPage() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push("/auth/signin");
+        router.push(`/verify?email=${email}`);
       } else {
         setError(data.error || "Something went wrong");
       }

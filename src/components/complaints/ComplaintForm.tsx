@@ -26,6 +26,8 @@ import MapPickerWrapper from "./MapPickerWrapper";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { generateComplaintReceipt } from "@/lib/pdf-service";
+import { FileDown } from "lucide-react";
 
 const CATEGORIES = [
   { id: "pothole", label: "Pothole", icon: "🕳️" },
@@ -51,6 +53,7 @@ export default function ComplaintForm() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [lastComplaint, setLastComplaint] = useState<any>(null);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -79,7 +82,11 @@ export default function ComplaintForm() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        setLastComplaint(data.complaint);
         setSubmitted(true);
+        // Automatically trigger download
+        generateComplaintReceipt(data.complaint);
       }
     } catch (error) {
       console.error("Submission failed:", error);
@@ -152,7 +159,16 @@ export default function ComplaintForm() {
                 {Math.random().toString(36).substr(2, 9).toUpperCase()}
               </p>
             </div>
-            <div className="pt-6 flex gap-3 justify-center">
+            <div className="pt-6 flex flex-wrap gap-3 justify-center">
+              <Button
+                variant="outline"
+                className="rounded-full gap-2"
+                onClick={() =>
+                  lastComplaint && generateComplaintReceipt(lastComplaint)
+                }
+              >
+                <FileDown className="w-4 h-4" /> Download Receipt
+              </Button>
               <Button
                 variant="outline"
                 className="rounded-full"
@@ -160,7 +176,7 @@ export default function ComplaintForm() {
               >
                 Submit New Report
               </Button>
-              <Button className="rounded-full" asChild>
+              <Button className="rounded-full font-bold" asChild>
                 <Link href="/dashboard">View My Reports</Link>
               </Button>
             </div>

@@ -36,6 +36,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }),
     ],
     callbacks: {
+        async signIn({ user, account }) {
+            // Allow OAuth without verification for now (if added later)
+            if (account?.provider !== "credentials") return true;
+
+            // @ts-ignore
+            const existingUser = await prisma.user.findUnique({
+                where: { id: user.id },
+            });
+
+            // Prevent login if email is not verified
+            if (!existingUser?.emailVerified) return false;
+
+            return true;
+        },
         async session({ session, user, token }) {
             if (session.user) {
                 // @ts-ignore
