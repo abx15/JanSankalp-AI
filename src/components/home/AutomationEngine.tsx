@@ -14,14 +14,17 @@ import {
 export const AutomationEngine = () => {
   return (
     <div className="relative w-full max-w-5xl mx-auto py-20 px-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 relative">
         {/* Connection Lines (Background) */}
         <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-y-1/2 -z-10" />
 
+        {/* Mobile Connection Lines */}
+        <div className="md:hidden absolute left-1/2 top-0 w-0.5 h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent -translate-x-1/2 -z-10" />
+
         {/* Node 1: Citizen Input */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 relative">
           <motion.div
-            className="w-20 h-20 rounded-2xl bg-card border-2 border-primary/20 flex items-center justify-center relative shadow-lg"
+            className="w-20 h-20 rounded-2xl bg-card border-2 border-primary/20 flex items-center justify-center relative shadow-lg z-10"
             whileInView={{
               scale: [1, 1.05, 1],
               borderColor: [
@@ -41,7 +44,7 @@ export const AutomationEngine = () => {
               transition={{ duration: 2, repeat: Infinity }}
             />
           </motion.div>
-          <div className="text-center">
+          <div className="text-center z-10">
             <h4 className="font-bold">Citizen Report</h4>
             <p className="text-xs text-muted-foreground mt-1">
               Multi-lingual Input
@@ -50,9 +53,9 @@ export const AutomationEngine = () => {
         </div>
 
         {/* Node 2: AI Processing */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 relative">
           <motion.div
-            className="w-20 h-20 rounded-2xl bg-primary/10 border-2 border-primary/40 flex items-center justify-center relative shadow-xl shadow-primary/5"
+            className="w-20 h-20 rounded-2xl bg-primary/10 border-2 border-primary/40 flex items-center justify-center relative shadow-xl shadow-primary/5 z-10"
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ duration: 6, repeat: Infinity }}
           >
@@ -67,7 +70,7 @@ export const AutomationEngine = () => {
               Parse()
             </motion.div>
           </motion.div>
-          <div className="text-center">
+          <div className="text-center z-10">
             <h4 className="font-bold">AI Hub</h4>
             <p className="text-xs text-muted-foreground mt-1">
               NLU & Translation
@@ -76,8 +79,8 @@ export const AutomationEngine = () => {
         </div>
 
         {/* Node 3: Geo-Triage */}
-        <div className="flex flex-col items-center gap-4">
-          <motion.div className="w-20 h-20 rounded-2xl bg-card border-2 border-primary/20 flex items-center justify-center relative shadow-lg">
+        <div className="flex flex-col items-center gap-4 relative">
+          <motion.div className="w-20 h-20 rounded-2xl bg-card border-2 border-primary/20 flex items-center justify-center relative shadow-lg z-10">
             <MapPin className="w-10 h-10 text-primary" />
             <motion.div
               className="absolute inset-0 flex items-center justify-center"
@@ -87,7 +90,7 @@ export const AutomationEngine = () => {
               <div className="w-12 h-12 rounded-full border border-primary/30" />
             </motion.div>
           </motion.div>
-          <div className="text-center">
+          <div className="text-center z-10">
             <h4 className="font-bold">Geo-Triage</h4>
             <p className="text-xs text-muted-foreground mt-1">
               Location Analysis
@@ -96,11 +99,11 @@ export const AutomationEngine = () => {
         </div>
 
         {/* Node 4: Resolve */}
-        <div className="flex flex-col items-center gap-4">
-          <motion.div className="w-20 h-20 rounded-2xl bg-green-500/10 border-2 border-green-500/40 flex items-center justify-center shadow-lg">
+        <div className="flex flex-col items-center gap-4 relative">
+          <motion.div className="w-20 h-20 rounded-2xl bg-green-500/10 border-2 border-green-500/40 flex items-center justify-center shadow-lg z-10">
             <ShieldCheck className="w-10 h-10 text-green-600" />
           </motion.div>
-          <div className="text-center">
+          <div className="text-center z-10">
             <h4 className="font-bold text-green-700">Officer Relay</h4>
             <p className="text-xs text-muted-foreground mt-1">
               Auto-Assignment
@@ -110,7 +113,7 @@ export const AutomationEngine = () => {
 
         {/* Moving Data Packet (Packet Animation) */}
         <motion.div
-          className="hidden md:flex absolute top-1/2 left-[10%] -translate-y-1/2 z-20 items-center justify-center w-8 h-8 rounded-lg bg-primary text-white shadow-lg"
+          className="absolute top-1/2 left-[10%] -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white shadow-lg"
           animate={{
             left: ["10%", "36%", "62%", "88%"],
             scale: [1, 1.2, 1, 1.2],

@@ -199,7 +199,7 @@ export default function Home() {
       <section className="py-32 px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20 text-balance">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 uppercase tracking-tighter">
+            <h2 className="text-3xl md:text-5xl font-black mb-6 uppercase tracking-tighter">
               Awasthi Se Mukti (आज़ादी अव्यवस्था से)
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
