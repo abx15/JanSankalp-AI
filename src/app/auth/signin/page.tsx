@@ -15,6 +15,7 @@ import {
 import { LogIn, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -46,9 +47,19 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign In
-          </CardTitle>
+          <div className="flex flex-col items-center justify-center gap-4 mb-2">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-transparent rounded-2xl flex items-center justify-center overflow-hidden relative">
+              <Image
+                src="/logojansanklp.png"
+                alt="JanSankalp AI Logo"
+                fill
+                className="object-contain scale-110"
+              />
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">
+              Sign In
+            </CardTitle>
+          </div>
           <CardDescription className="text-center">
             Access the JanSankalp AI Dashboard
           </CardDescription>

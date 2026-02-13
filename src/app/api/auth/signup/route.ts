@@ -34,7 +34,7 @@ export async function POST(req: Request) {
                 email,
                 password: hashedPassword,
                 role: "CITIZEN",
-            },
+            } as any,
         });
 
         // Generate OTP and send email

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const verificationToken = await prisma.verificationToken.findFirst({
+        const verificationToken = await (prisma as any).verificationToken.findFirst({
             where: {
                 email,
                 token,
@@ -50,10 +50,10 @@ export async function POST(req: Request) {
             where: { id: user.id },
             data: {
                 emailVerified: new Date(),
-            },
+            } as any,
         });
 
-        await prisma.verificationToken.delete({
+        await (prisma as any).verificationToken.delete({
             where: { id: verificationToken.id },
         });
 

@@ -60,13 +60,14 @@ export default function VerifyPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6">
-      <Link href="/" className="mb-8 flex items-center gap-3 group">
-        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform">
-          <Landmark className="w-6 h-6" />
+      <Link href="/" className="mb-8 flex flex-col items-center gap-4 group">
+        <div className="w-28 h-28 md:w-36 md:h-36 bg-transparent rounded-2xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
+          <img
+            src="/logojansanklp.png"
+            alt="JanSankalp AI Logo"
+            className="w-full h-full object-contain scale-110"
+          />
         </div>
-        <span className="text-2xl font-black uppercase tracking-tighter">
-          JanSankalp <span className="text-primary italic">AI</span>
-        </span>
       </Link>
 
       <Card className="w-full max-w-md border-0 shadow-2xl rounded-[2.5rem] overflow-hidden">
