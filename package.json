@@ -1,0 +1,53 @@
+{
+  "name": "jansankalp-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/client": "^5.13.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@tanstack/react-query": "^5.35.1",
+    "@types/leaflet": "^1.9.21",
+    "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.2.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.1.7",
+    "jspdf": "^4.1.0",
+    "jspdf-autotable": "^5.0.7",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.378.0",
+    "next": "14.2.3",
+    "next-auth": "^5.0.0-beta.30",
+    "next-themes": "^0.3.0",
+    "openai": "^4.44.0",
+    "prisma": "^5.13.0",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0-rc2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-leaflet": "^5.0.0",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} src/lib/seed-v2.ts"
+  }
+}

@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  OFFICER
+  ADMIN
+}
+
+enum ComplaintStatus {
+  PENDING
+  RESUMED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id            String      @id @default(cuid())
+  name          String?
+  email         String      @unique
+  role          Role        @default(CITIZEN)
+  points        Int         @default(0)
+  complaints    Complaint[]
+  assignedTasks Complaint[] @relation("AssignedTo")
+  managedDept   Department? @relation("DeptHead")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Complaint {
+  id                  String          @id @default(cuid())
+  title               String
+  description         String
+  originalText        String?
+  originalLanguage    String?
+  translatedText      String?
+  status              ComplaintStatus @default(PENDING)
+  severity            Int             @default(1) // 1-5
+  category            String
+  confidenceScore     Float?
+  imageUrl            String?
+  latitude            Float
+  longitude           Float
+  author              User            @relation(fields: [authorId], references: [id])
+  authorId            String
+  assignedTo          User?           @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedToId        String?
+  department          Department?     @relation(fields: [departmentId], references: [id])
+  departmentId        String?
+  remarks             Remark[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  duplicateOf         String?
+}
+
+model Department {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  head       User?       @relation("DeptHead", fields: [headId], references: [id])
+  headId     String?     @unique
+  complaints Complaint[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Remark {
+  id          String    @id @default(cuid())
+  text        String
+  authorName  String
+  authorRole  Role
+  imageUrl    String?
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+  complaintId String
+  createdAt   DateTime  @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String
+  details   String?
+  createdAt DateTime @default(now())
+}
