@@ -35,3 +35,6 @@ next-env.d.ts
 
 # prisma
 /prisma/generated-client
+
+# sensitive
+/src/lib/seed-admin.ts

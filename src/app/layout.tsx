@@ -12,6 +12,8 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Navbar } from "@/components/layout/Navbar";
+import { Toaster } from "sonner";
+import { NotificationListener } from "@/components/providers/NotificationListener";
 
 export default function RootLayout({
   children,
@@ -28,6 +30,8 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster position="top-right" richColors />
+            <NotificationListener />
             <Navbar />
             {children}
           </ThemeProvider>
