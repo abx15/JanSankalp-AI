@@ -129,7 +129,7 @@ export const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   className="w-9 h-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
@@ -227,7 +227,7 @@ export const Navbar = () => {
                     <Button
                       variant="destructive"
                       className="w-full rounded-xl font-bold py-5 h-auto text-base"
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ callbackUrl: "/" })}
                     >
                       <LogOut className="w-5 h-5 mr-2" /> Logout
                     </Button>
