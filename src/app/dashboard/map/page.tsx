@@ -1,8 +1,21 @@
 "use client";
 
 import DashboardMapViewWrapper from "@/components/dashboard/DashboardMapViewWrapper";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AdminMapViewPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    // @ts-ignore
+    if (status === "authenticated" && session?.user?.role !== "ADMIN") {
+      router.push("/dashboard");
+    }
+  }, [session, status, router]);
+
   return (
     <div className="space-y-6">
       <div>

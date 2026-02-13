@@ -5,9 +5,20 @@ import { Building2, Users, ArrowUpRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function DepartmentsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [departments, setDepartments] = useState<any[]>([]);
+
+  useEffect(() => {
+    // @ts-ignore
+    if (status === "authenticated" && session?.user?.role !== "ADMIN") {
+      router.push("/dashboard");
+    }
+  }, [session, status, router]);
 
   useEffect(() => {
     fetch("/api/departments")

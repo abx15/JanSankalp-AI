@@ -9,30 +9,17 @@ import {
   CheckCircle2,
   XCircle,
   Users,
-  CheckCircle,
-  X,
   Loader2,
   History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-export default function AdminComplaintsPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+export default function MyReportsPage() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // @ts-ignore
-    if (status === "authenticated" && session?.user?.role !== "ADMIN") {
-      router.push("/dashboard");
-    }
-  }, [session, status, router]);
 
   const fetchComplaints = async () => {
     try {
@@ -49,24 +36,6 @@ export default function AdminComplaintsPage() {
   useEffect(() => {
     fetchComplaints();
   }, []);
-
-  const handleUpdateStatus = async (id: string, status: string) => {
-    setUpdatingId(id);
-    try {
-      const res = await fetch(`/api/complaints/${id}/verify`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (res.ok) {
-        fetchComplaints();
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setUpdatingId(null);
-    }
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -88,10 +57,10 @@ export default function AdminComplaintsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-black tracking-tight">
-            Complaints Management
+            My Civic Reports
           </h1>
           <p className="text-muted-foreground">
-            Review and verify civic reports from across the city.
+            Tracking your personal contributions to city development.
           </p>
         </div>
       </div>
@@ -101,12 +70,16 @@ export default function AdminComplaintsPage() {
           <div className="text-center py-20">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-2" />
             <p className="text-muted-foreground font-bold">
-              Scanning city reports...
+              Retrieving your reports...
             </p>
           </div>
         ) : complaints.length === 0 ? (
           <div className="text-center py-20 bg-muted/20 rounded-xl border-2 border-dashed">
-            No complaints found.
+            <History className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-20" />
+            <p className="font-bold text-muted-foreground">
+              You haven't filed any reports yet.
+            </p>
+            <Button className="mt-4 rounded-full px-6">Report an Issue</Button>
           </div>
         ) : (
           complaints.map((item) => (
@@ -114,7 +87,8 @@ export default function AdminComplaintsPage() {
               key={item.id}
               className="overflow-hidden group hover:shadow-lg transition-all border-l-4"
               style={{
-                borderLeftColor: item.severity > 3 ? "#ef4444" : "#3b82f6",
+                borderLeftColor:
+                  item.status === "RESOLVED" ? "#22c55e" : "#3b82f6",
               }}
             >
               <div className="flex flex-col md:flex-row">
@@ -138,49 +112,6 @@ export default function AdminComplaintsPage() {
                         {item.status}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {updatingId === item.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      ) : (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 rounded-full gap-1 text-[10px] font-bold"
-                            onClick={() =>
-                              handleUpdateStatus(item.id, "IN_PROGRESS")
-                            }
-                            disabled={item.status === "IN_PROGRESS"}
-                          >
-                            <BadgeCheck className="w-3 h-3 text-blue-500" />{" "}
-                            Verify
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 rounded-full gap-1 text-[10px] font-bold"
-                            onClick={() =>
-                              handleUpdateStatus(item.id, "RESOLVED")
-                            }
-                            disabled={item.status === "RESOLVED"}
-                          >
-                            <CheckCircle className="w-3 h-3 text-green-500" />{" "}
-                            Resolve
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 rounded-full gap-1 text-[10px] font-bold text-destructive hover:bg-destructive/10"
-                            onClick={() =>
-                              handleUpdateStatus(item.id, "REJECTED")
-                            }
-                            disabled={item.status === "REJECTED"}
-                          >
-                            <X className="w-3 h-3" /> Reject
-                          </Button>
-                        </>
-                      )}
-                    </div>
                   </div>
                   <h3 className="text-xl font-bold mb-1 tracking-tight">
                     {item.title}
@@ -197,16 +128,12 @@ export default function AdminComplaintsPage() {
                       <Clock className="w-3 h-3" />
                       {format(new Date(item.createdAt), "PPp")}
                     </div>
-                    <div className="flex items-center gap-2 py-1">
-                      <div
-                        className="w-2 h-2 rounded-full animate-pulse"
-                        style={{
-                          backgroundColor:
-                            item.severity > 3 ? "#ef4444" : "#3b82f6",
-                        }}
-                      />
-                      Severity: {item.severity}
-                    </div>
+                    {item.department && (
+                      <div className="flex items-center gap-2 py-1 px-2 bg-primary/5 text-primary rounded">
+                        <Users className="w-3 h-3" />
+                        Dept: {item.department.name}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
