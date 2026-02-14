@@ -17,6 +17,7 @@ import {
   Cloud,
 } from "lucide-react";
 import { StepCard } from "@/components/how-it-works/StepCard";
+import { ProcessAnimation } from "@/components/how-it-works/ProcessAnimation";
 import { Footer } from "@/components/layout/Footer";
 
 const PROCESS_STEPS = [
@@ -506,6 +507,8 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
+
+      <ProcessAnimation />
 
       <Footer />
     </main>
