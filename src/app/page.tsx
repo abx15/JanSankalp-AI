@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/icons/GovIcons";
 import { ProcessFlow } from "@/components/home/ProcessFlow";
 import { AutomationEngine } from "@/components/home/AutomationEngine";
+import { Footer } from "@/components/layout/Footer";
 
 const FEATURES = [
   {
@@ -621,23 +622,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-20 border-t bg-card text-center">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col items-center justify-center gap-6 mb-8">
-            <div className="w-32 h-32 md:w-40 md:h-40 bg-transparent rounded-lg flex items-center justify-center overflow-hidden relative">
-              <Image
-                src="/logojansanklp.png"
-                alt="JanSankalp AI Logo"
-                fill
-                className="object-contain scale-110"
-              />
-            </div>
-          </div>
-          <p className="text-muted-foreground font-medium">
-            © 2026 JanSankalp AI. Smart Governance for a Smarter India.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
