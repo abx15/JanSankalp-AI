@@ -101,6 +101,15 @@ export const Navbar = () => {
             <NavItem href="/" active={pathname === "/"}>
               Home
             </NavItem>
+            <NavItem href="/about" active={pathname === "/about"}>
+              About
+            </NavItem>
+            <NavItem href="/features" active={pathname === "/features"}>
+              Features
+            </NavItem>
+            <NavItem href="/how-it-works" active={pathname === "/how-it-works"}>
+              How It Works
+            </NavItem>
             {session && (
               <NavItem href="/dashboard" active={pathname === "/dashboard"}>
                 Dashboard
@@ -191,6 +200,42 @@ export const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   Home
+                </Link>
+                <Link
+                  href="/about"
+                  className={cn(
+                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    pathname === "/about"
+                      ? "bg-primary text-white"
+                      : "hover:bg-primary/5",
+                  )}
+                  onClick={() => setIsOpen(false)}
+                >
+                  About
+                </Link>
+                <Link
+                  href="/features"
+                  className={cn(
+                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    pathname === "/features"
+                      ? "bg-primary text-white"
+                      : "hover:bg-primary/5",
+                  )}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link
+                  href="/how-it-works"
+                  className={cn(
+                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    pathname === "/how-it-works"
+                      ? "bg-primary text-white"
+                      : "hover:bg-primary/5",
+                  )}
+                  onClick={() => setIsOpen(false)}
+                >
+                  How It Works
                 </Link>
                 {session && (
                   <Link

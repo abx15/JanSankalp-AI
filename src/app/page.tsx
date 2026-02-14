@@ -12,6 +12,7 @@ import {
   Code2,
   Database,
   BrainCircuit,
+  CheckCircle2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -377,6 +378,243 @@ export default function Home() {
               <span className="font-bold text-lg">Community Oriented</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-24 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              Why Choose JanSankalp AI? (क्यों चुनें?)
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              The smart choice for modern civic engagement.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Proven Results</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                15,000+ complaints resolved with 98% satisfaction rate across 12
+                cities.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Lightning Fast</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Average resolution time of just 24 hours vs weeks in traditional
+                systems.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Precision AI</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                99% classification accuracy ensures your complaint reaches the
+                right department.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Continuous Improvement</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                AI learns from every complaint to get smarter and more efficient
+                over time.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              Frequently Asked Questions (सामान्य प्रश्न)
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Everything you need to know about JanSankalp AI.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="p-6 rounded-2xl bg-card border"
+            >
+              <h3 className="text-xl font-bold mb-3 flex items-start gap-3">
+                <MessageSquare className="w-6 h-6 text-primary shrink-0 mt-1" />
+                How do I file a complaint? (शिकायत कैसे दर्ज करें?)
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-9">
+                Simply use the complaint form on this page. You can type or use
+                voice input in any of 22+ Indian languages. Upload photos/videos
+                as evidence, and our AI will handle the rest.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-2xl bg-card border"
+            >
+              <h3 className="text-xl font-bold mb-3 flex items-start gap-3">
+                <Zap className="w-6 h-6 text-primary shrink-0 mt-1" />
+                How long does it take to resolve a complaint?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-9">
+                On average, complaints are resolved within 24 hours. Critical
+                issues are prioritized and addressed even faster. You'll receive
+                real-time updates throughout the process.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-2xl bg-card border"
+            >
+              <h3 className="text-xl font-bold mb-3 flex items-start gap-3">
+                <BarChart3 className="w-6 h-6 text-primary shrink-0 mt-1" />
+                Can I track my complaint status?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-9">
+                Yes! You'll receive SMS and email notifications at every stage.
+                You can also log in to your dashboard to see real-time status,
+                officer details, and estimated resolution time.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="p-6 rounded-2xl bg-card border"
+            >
+              <h3 className="text-xl font-bold mb-3 flex items-start gap-3">
+                <Shield className="w-6 h-6 text-primary shrink-0 mt-1" />
+                Is my data secure and private?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-9">
+                Absolutely. All data is encrypted (TLS 1.3 in transit, AES-256
+                at rest), and we follow strict GDPR compliance. Only authorized
+                personnel can access your complaint.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="p-6 rounded-2xl bg-card border"
+            >
+              <h3 className="text-xl font-bold mb-3 flex items-start gap-3">
+                <Globe className="w-6 h-6 text-primary shrink-0 mt-1" />
+                What types of complaints can I file?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-9">
+                You can report civic issues like potholes, water supply
+                problems, electricity failures, garbage collection, street
+                lights, and more. Our AI categorizes them automatically.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-24 px-6 bg-gradient-to-br from-primary to-primary/80 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.h2
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-black mb-6"
+          >
+            Ready to Transform Your City?
+          </motion.h2>
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-xl opacity-90 mb-8 leading-relaxed"
+          >
+            Join thousands of citizens using JanSankalp AI to make their voices
+            heard and drive real change in their communities.
+          </motion.p>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            <a
+              href="#report"
+              className="px-8 py-4 bg-white text-primary rounded-full font-bold text-lg shadow-xl hover:scale-105 transition-transform"
+            >
+              File a Complaint Now
+            </a>
+            <a
+              href="/how-it-works"
+              className="px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-colors"
+            >
+              Learn More
+            </a>
+          </motion.div>
         </div>
       </section>
 
