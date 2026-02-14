@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { FeatureCard } from "@/components/features/FeatureCard";
+import { Footer } from "@/components/layout/Footer";
 
 const FEATURES = [
   {
@@ -404,6 +405,8 @@ export default function FeaturesPage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }
