@@ -1,127 +1,170 @@
 import Link from "next/link";
-import { Landmark, Heart, Github, Linkedin, Mail } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  Heart,
+  Globe,
+  ExternalLink,
+  Shield,
+  Zap,
+} from "lucide-react";
+import Image from "next/image";
 
 export const Footer = () => {
   return (
-    <footer className="w-full border-t bg-card/50 backdrop-blur-sm">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+    <footer className="w-full border-t border-slate-200 bg-slate-50 text-slate-600 pt-16 pb-8 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none" />
+
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Section */}
-          <div className="text-center sm:text-left">
-            <div className="flex items-center gap-2 justify-center sm:justify-start mb-3 sm:mb-4">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center text-white shrink-0">
-                <Landmark className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="space-y-6">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/logo.png"
+                  alt="JanSankalp AI Logo"
+                  fill
+                  sizes="48px"
+                  className="object-contain transition-transform group-hover:scale-110"
+                />
               </div>
-              <span className="text-lg sm:text-xl font-black">
-                JanSankalp <span className="text-primary italic">AI</span>
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto sm:mx-0">
-              AI-powered civic intelligence platform for smart cities across
-              India.
+              <div className="flex flex-col">
+                <span className="text-xl font-black tracking-tight text-slate-900 leading-tight">
+                  JanSankalp <span className="text-primary italic">AI</span>
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">
+                  Smart Governance
+                </span>
+              </div>
+            </Link>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
+              Empowering India through AI-driven civic intelligence. Bridging
+              the gap between citizens and administration for a smarter
+              tomorrow.
             </p>
+            <div className="flex gap-4">
+              {[
+                {
+                  icon: Github,
+                  href: "https://github.com/abx15/JanSankalp-AI",
+                  label: "GitHub",
+                },
+                {
+                  icon: Linkedin,
+                  href: "https://www.linkedin.com/in/arun-kumar-a3b047353/",
+                  label: "LinkedIn",
+                },
+                {
+                  icon: Globe,
+                  href: "https://arun15dev.netlify.app/",
+                  label: "Portfolio",
+                },
+                {
+                  icon: Mail,
+                  href: "mailto:developerarunwork@gmail.com",
+                  label: "Email",
+                },
+              ].map((social, i) => (
+                <a
+                  key={i}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/30 hover:shadow-md transition-all"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Quick Links Section */}
-          <div className="text-center sm:text-left">
-            <h3 className="font-bold text-sm sm:text-base mb-3 sm:mb-4">
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-slate-900 font-bold mb-6 text-lg">
               Quick Links
             </h3>
-            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
-              <li>
-                <Link
-                  href="/"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-block"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-block"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/features"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-block"
-                >
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/how-it-works"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-block"
-                >
-                  How It Works
-                </Link>
-              </li>
+            <ul className="space-y-4 font-medium">
+              {[
+                { name: "Home", href: "/" },
+                { name: "About Us", href: "/about" },
+                { name: "Features", href: "/features" },
+                { name: "How It Works", href: "/how-it-works" },
+                { name: "Dashboard", href: "/dashboard" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-500 hover:text-primary transition-colors flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Connect Section */}
-          <div className="text-center sm:text-left sm:col-span-2 lg:col-span-1">
-            <h3 className="font-bold text-sm sm:text-base mb-3 sm:mb-4">
-              Connect
-            </h3>
-            <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4 justify-center sm:justify-start">
-              <a
-                href="https://github.com/abx15/JanSankalp-AI"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-colors shrink-0"
-                aria-label="GitHub"
-              >
-                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </a>
-              <a
-                href="https://linkedin.com/in/arunkumar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-colors shrink-0"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </a>
-              <a
-                href="mailto:arun@jansankalp.ai"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-colors shrink-0"
-                aria-label="Email"
-              >
-                <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </a>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Have questions? Reach out to us!
+          {/* Platform */}
+          <div>
+            <h3 className="text-slate-900 font-bold mb-6 text-lg">Platform</h3>
+            <ul className="space-y-4 font-medium">
+              {[
+                { name: "Help Center", icon: Globe },
+                { name: "Privacy Policy", icon: Shield },
+                { name: "Terms of Service", icon: ExternalLink },
+                { name: "API Docs", icon: Zap },
+              ].map((item) => (
+                <li key={item.name}>
+                  <button className="flex items-center gap-3 text-slate-500 hover:text-primary transition-colors group">
+                    <item.icon className="w-4 h-4 text-slate-300 group-hover:text-primary/70 transition-colors" />
+                    {item.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Support */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <h3 className="text-slate-900 font-bold mb-4 text-lg">Support</h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Facing an issue? Our team is available 24/7 for administrative
+              support.
             </p>
+            <Link
+              href="mailto:developerarunwork@gmail.com"
+              className="w-full py-3 bg-primary text-white rounded-xl font-bold text-center block hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+            >
+              Contact Support
+            </Link>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 sm:pt-8 border-t">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-              <span className="whitespace-nowrap">© 2026 JanSankalp AI</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="flex items-center gap-1 whitespace-nowrap">
-                Made for India{" "}
-                <Heart className="w-3 h-3 text-red-500 fill-red-500 inline" />
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span>Built by</span>
+        <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <span>© 2026 JanSankalp AI</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300" />
+            <span className="flex items-center gap-1">
+              Building for a Smarter Bharat{" "}
+              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+            </span>
+          </div>
+
+          <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-2 font-medium">
+              <span className="text-slate-400">crafted by</span>
               <a
                 href="https://github.com/abx15"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-primary hover:underline whitespace-nowrap"
+                className="font-black text-slate-700 hover:text-primary transition-colors"
               >
-                Arun Kumar
+                Arun Kumar Bind
               </a>
             </div>
           </div>
