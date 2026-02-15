@@ -57,6 +57,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Toaster } from "sonner";
 import { NotificationListener } from "@/components/providers/NotificationListener";
 
+import ClientEntry from "@/components/layout/ClientEntry";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,10 +74,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster position="top-right" richColors />
-            <NotificationListener />
-            <Navbar />
-            {children}
+            <ClientEntry>
+              <Toaster position="top-right" richColors />
+              <NotificationListener />
+              <Navbar />
+              {children}
+            </ClientEntry>
           </ThemeProvider>
         </AuthProvider>
       </body>
