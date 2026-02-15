@@ -76,7 +76,7 @@ function SignInForm() {
             <label className="text-sm font-medium">Email</label>
             <Input
               type="email"
-              placeholder="admin@jansankalp.ai"
+              placeholder="youremail@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
