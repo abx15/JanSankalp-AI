@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background selection:bg-primary/10">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-28 pb-12 px-6">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-24 md:pt-28 pb-10 md:pb-12 px-6">
         <GovWaveBackground />
         {[...Array(10)].map((_, i) => (
           <FloatingParticle key={i} delay={i * 0.5} />
@@ -120,6 +120,7 @@ export default function Home() {
                 src="/logojansanklp.png"
                 alt="JanSankalp AI"
                 fill
+                sizes="(max-width: 768px) 224px, (max-width: 1024px) 288px, 384px"
                 className="object-contain scale-110 group-hover:scale-125 transition-transform duration-700"
                 priority
               />
@@ -159,7 +160,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-muted/30 border-y backdrop-blur-sm relative z-20">
+      <section className="py-8 md:py-12 bg-muted/30 border-y backdrop-blur-sm relative z-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {STATS.map((stat, i) => (
@@ -184,7 +185,7 @@ export default function Home() {
       </section>
 
       {/* Automation Flow Section */}
-      <section className="py-32 px-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950/20">
+      <section className="py-20 md:py-32 px-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-4xl md:text-5xl font-black mb-6">
@@ -201,7 +202,7 @@ export default function Home() {
       </section>
 
       {/* Traditional Process Flow Section */}
-      <section className="py-32 px-6 relative overflow-hidden">
+      <section className="py-20 md:py-32 px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20 text-balance">
             <h2 className="text-3xl md:text-5xl font-black mb-6 uppercase tracking-tighter">
@@ -217,7 +218,7 @@ export default function Home() {
       </section>
 
       {/* Reporting Section (Glassmorphic) */}
-      <section className="relative py-24 px-6 z-30">
+      <section id="report" className="relative py-16 md:py-24 px-6 z-30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <span className="text-primary font-bold text-sm tracking-widest uppercase">
@@ -237,7 +238,7 @@ export default function Home() {
       </section>
 
       {/* Technical Engine Section */}
-      <section className="py-32 px-6 bg-slate-950 text-white overflow-hidden relative">
+      <section className="py-20 md:py-32 px-6 bg-slate-950 text-white overflow-hidden relative">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[120px] pointer-events-none" />
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div>
@@ -313,7 +314,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 px-6 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black mb-4">Core Capabilities</h2>
@@ -354,7 +355,7 @@ export default function Home() {
       </section>
 
       {/* Impact Section */}
-      <section className="py-24 px-6 bg-primary text-primary-foreground relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
@@ -386,7 +387,7 @@ export default function Home() {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section className="py-16 md:py-24 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-6">
@@ -469,7 +470,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-6">
@@ -574,7 +575,7 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-24 px-6 bg-gradient-to-br from-primary to-primary/80 text-white relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 bg-gradient-to-br from-primary to-primary/80 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />

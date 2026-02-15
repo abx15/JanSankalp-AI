@@ -88,9 +88,10 @@ export const Navbar = () => {
               className="w-10 h-10 md:w-14 md:h-14 bg-transparent rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform p-0.5 relative"
             >
               <Image
-                src="/logojansanklp.png"
+                src="/logo.png"
                 alt="JanSankalp AI Logo"
                 fill
+                sizes="(max-width: 768px) 40px, 56px"
                 className="object-contain"
                 priority
               />
@@ -187,13 +188,13 @@ export const Navbar = () => {
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="md:hidden mt-4 bg-background/60 backdrop-blur-3xl border border-white/20 rounded-[2rem] p-6 shadow-2xl pointer-events-auto"
+              className="md:hidden mt-2 bg-background/60 backdrop-blur-3xl border border-white/20 rounded-[1.5rem] p-4 shadow-2xl pointer-events-auto"
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
                 <Link
                   href="/"
                   className={cn(
-                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
                     pathname === "/"
                       ? "bg-primary text-white"
                       : "hover:bg-primary/5",
@@ -205,7 +206,7 @@ export const Navbar = () => {
                 <Link
                   href="/about"
                   className={cn(
-                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
                     pathname === "/about"
                       ? "bg-primary text-white"
                       : "hover:bg-primary/5",
@@ -217,7 +218,7 @@ export const Navbar = () => {
                 <Link
                   href="/features"
                   className={cn(
-                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
                     pathname === "/features"
                       ? "bg-primary text-white"
                       : "hover:bg-primary/5",
@@ -229,7 +230,7 @@ export const Navbar = () => {
                 <Link
                   href="/how-it-works"
                   className={cn(
-                    "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
                     pathname === "/how-it-works"
                       ? "bg-primary text-white"
                       : "hover:bg-primary/5",
@@ -242,7 +243,7 @@ export const Navbar = () => {
                   <Link
                     href="/dashboard"
                     className={cn(
-                      "text-xl font-black uppercase tracking-tight p-3 rounded-2xl transition-colors",
+                      "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
                       pathname === "/dashboard"
                         ? "bg-primary text-white"
                         : "hover:bg-primary/5",
@@ -253,11 +254,11 @@ export const Navbar = () => {
                   </Link>
                 )}
 
-                <div className="h-[1px] bg-foreground/10 w-full my-2" />
+                <div className="h-[1px] bg-foreground/10 w-full my-1" />
 
                 {session?.user ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-4 p-3 bg-primary/5 rounded-2xl">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3 p-2 bg-primary/5 rounded-xl">
                       <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
                         <User className="w-5 h-5" />
                       </div>
@@ -272,28 +273,28 @@ export const Navbar = () => {
                     </div>
                     <Button
                       variant="destructive"
-                      className="w-full rounded-xl font-bold py-5 h-auto text-base"
+                      className="w-full rounded-xl font-bold py-4 h-auto text-sm"
                       onClick={() => signOut({ callbackUrl: "/" })}
                     >
-                      <LogOut className="w-5 h-5 mr-2" /> Logout
+                      <LogOut className="w-4 h-4 mr-2" /> Logout
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-2 mt-1">
                     <Button
                       variant="outline"
-                      className="w-full rounded-xl font-bold py-5 h-auto text-lg border-2"
+                      className="flex-1 rounded-xl font-bold py-3 h-auto text-base border-2"
                       asChild
                       onClick={() => setIsOpen(false)}
                     >
                       <Link href="/auth/signin">Login</Link>
                     </Button>
                     <Button
-                      className="w-full rounded-xl font-bold py-5 h-auto text-lg shadow-lg shadow-primary/20"
+                      className="flex-1 rounded-xl font-bold py-3 h-auto text-base shadow-lg shadow-primary/20"
                       asChild
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/auth/signup">Create Account</Link>
+                      <Link href="/auth/signup">Join</Link>
                     </Button>
                   </div>
                 )}
