@@ -174,15 +174,17 @@ export default function AboutPage() {
             initial={{ y: 20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
-            className="p-10 rounded-[2.5rem] bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-2xl"
+            className="p-6 md:p-10 rounded-[2.5rem] bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-2xl"
           >
-            <div className="flex items-start gap-6">
+            <div className="flex flex-col md:flex-row items-start gap-6">
               <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
                 <Lightbulb className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-3xl font-black mb-4">Our Solution</h2>
-                <p className="text-white/90 text-lg leading-relaxed mb-4">
+                <h2 className="text-2xl md:text-3xl font-black mb-4">
+                  Our Solution
+                </h2>
+                <p className="text-white/90 text-base md:text-lg leading-relaxed mb-4">
                   JanSankalp AI uses advanced artificial intelligence to
                   automatically process, classify, and route complaints to the
                   right departments in real-time. With multilingual support,
@@ -197,7 +199,10 @@ export default function AboutPage() {
                     "Duplicate detection to prevent redundancy",
                     "Analytics dashboard for administrators",
                   ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 text-sm md:text-base"
+                    >
                       <span className="text-white mt-1">✓</span>
                       <span className="text-white/90">{feature}</span>
                     </li>

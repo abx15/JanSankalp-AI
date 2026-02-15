@@ -59,6 +59,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                   src="/logo.png"
                   alt="JanSankalp AI Logo"
                   fill
+                  sizes="(max-width: 768px) 128px, 160px"
                   className="object-contain drop-shadow-lg"
                   priority
                 />

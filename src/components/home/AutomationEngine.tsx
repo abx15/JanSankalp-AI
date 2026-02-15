@@ -111,7 +111,7 @@ export const AutomationEngine = () => {
           </div>
         </div>
 
-        {/* Moving Data Packet (Packet Animation) */}
+        {/* Desktop Moving Data Packet */}
         <motion.div
           className="absolute top-1/2 left-[10%] -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white shadow-lg"
           animate={{
@@ -132,6 +132,23 @@ export const AutomationEngine = () => {
           >
             <FileText className="w-4 h-4" />
           </motion.div>
+        </motion.div>
+
+        {/* Mobile Moving Data Packet (Vertical Flow) */}
+        <motion.div
+          className="absolute left-1/2 top-[5%] -translate-x-1/2 z-20 md:hidden flex items-center justify-center w-6 h-6 rounded-lg bg-primary text-white shadow-lg"
+          animate={{
+            top: ["5%", "30%", "55%", "80%"],
+            scale: [1, 1.1, 1, 1.1],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            times: [0, 0.33, 0.66, 1],
+            ease: "linear",
+          }}
+        >
+          <FileText className="w-3 h-3" />
         </motion.div>
       </div>
 
