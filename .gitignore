@@ -22,9 +22,46 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# Environment
 .env
+.env.*
+!.env.example
+
+# Seeded Data
+/prisma/seed-data.js
+/seed/
+seed.json
+seed.ts
+seed.js
+/src/lib/seed-v2.ts
+
+# Login Credentials
+LOGIN_DETAILS.md
+
+# Database
+*.sqlite
+*.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
 
 # vercel
 .vercel
