@@ -29,13 +29,58 @@ import Link from "next/link";
 import { generateComplaintReceipt } from "@/lib/pdf-service";
 import { FileDown } from "lucide-react";
 
+import { useDebounce } from "use-debounce";
+
 const CATEGORIES = [
-  { id: "pothole", label: "Pothole", icon: "🕳️" },
-  { id: "garbage", label: "Garbage", icon: "🗑️" },
-  { id: "water_leakage", label: "Water Leakage", icon: "💧" },
-  { id: "streetlight", label: "Streetlight", icon: "💡" },
-  { id: "road_damage", label: "Road Damage", icon: "🚧" },
-  { id: "drainage", label: "Drain Blockage", icon: "🌊" },
+  {
+    id: "pothole",
+    label: "Pothole",
+    icon: "🕳️",
+    department: "PWD",
+    priority: "High",
+  },
+  {
+    id: "garbage",
+    label: "Garbage",
+    icon: "🗑️",
+    department: "Municipal",
+    priority: "Low",
+  },
+  {
+    id: "water_leakage",
+    label: "Water Leakage",
+    icon: "💧",
+    department: "Water Dept",
+    priority: "Medium",
+  },
+  {
+    id: "streetlight",
+    label: "Streetlight",
+    icon: "💡",
+    department: "Electricity Dept",
+    priority: "Low",
+  },
+  {
+    id: "road_damage",
+    label: "Road Damage",
+    icon: "🚧",
+    department: "PWD",
+    priority: "Medium",
+  },
+  {
+    id: "drainage",
+    label: "Drain Blockage",
+    icon: "🌊",
+    department: "Municipal",
+    priority: "Medium",
+  },
+  {
+    id: "corruption",
+    label: "Corruption",
+    icon: "⚖️",
+    department: "Vigilance",
+    priority: "High",
+  },
 ];
 
 export default function ComplaintForm() {
@@ -51,6 +96,78 @@ export default function ComplaintForm() {
     longitude: 0,
     authorId: "",
   });
+
+  const [suggestion, setSuggestion] = useState<{
+    category: string;
+    department: string;
+    priority: string;
+  } | null>(null);
+
+  const [debouncedDescription] = useDebounce(formData.description, 300);
+
+  // Smart Suggestion Logic
+  useEffect(() => {
+    if (debouncedDescription.length < 5) {
+      setSuggestion(null);
+      return;
+    }
+
+    const text = debouncedDescription.toLowerCase();
+    let detected = null;
+
+    if (
+      text.includes("sadak") ||
+      text.includes("road") ||
+      text.includes("pothole") ||
+      text.includes("khadda")
+    ) {
+      detected = CATEGORIES.find(
+        (c) => c.id === "pothole" || c.id === "road_damage",
+      );
+    } else if (
+      text.includes("garbage") ||
+      text.includes("koora") ||
+      text.includes("kuncha") ||
+      text.includes("trash")
+    ) {
+      detected = CATEGORIES.find((c) => c.id === "garbage");
+    } else if (
+      text.includes("water") ||
+      text.includes("pani") ||
+      text.includes("leakage") ||
+      text.includes("nal")
+    ) {
+      detected = CATEGORIES.find((c) => c.id === "water_leakage");
+    } else if (
+      text.includes("light") ||
+      text.includes("bijli") ||
+      text.includes("electricity") ||
+      text.includes("power")
+    ) {
+      detected = CATEGORIES.find((c) => c.id === "streetlight");
+    } else if (
+      text.includes("bribe") ||
+      text.includes("risha") ||
+      text.includes("corruption") ||
+      text.includes("paisa")
+    ) {
+      detected = CATEGORIES.find((c) => c.id === "corruption");
+    }
+
+    if (detected) {
+      setSuggestion({
+        category: detected.label,
+        department: detected.department,
+        priority: detected.priority,
+      });
+      // Optionally auto-set category if user hasn't picked one
+      if (!formData.category) {
+        setFormData((prev) => ({ ...prev, category: detected!.id }));
+      }
+    } else {
+      setSuggestion(null);
+    }
+  }, [debouncedDescription, formData.category]);
 
   const [submitted, setSubmitted] = useState(false);
   const [lastComplaint, setLastComplaint] = useState<any>(null);
@@ -72,21 +189,31 @@ export default function ComplaintForm() {
     if (!session) return;
     setLoading(true);
     try {
+      // Generate Ticket ID like JSK-YYYY-XXXXX
+      const ticketId = `JSK-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+
       const response = await fetch("/api/complaints", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          ticketId,
           title: formData.description.slice(0, 40) + "...",
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setLastComplaint(data.complaint);
+        const complaintWithAuthor = {
+          ...data.complaint,
+          author: {
+            name: session.user?.name || "Registered Citizen",
+          },
+        };
+        setLastComplaint(complaintWithAuthor);
         setSubmitted(true);
         // Automatically trigger download
-        generateComplaintReceipt(data.complaint);
+        generateComplaintReceipt(complaintWithAuthor);
       }
     } catch (error) {
       console.error("Submission failed:", error);
@@ -155,8 +282,7 @@ export default function ComplaintForm() {
             </p>
             <div className="bg-muted p-4 rounded-2xl mt-6 border border-dashed border-primary/20">
               <p className="text-sm font-mono font-bold text-primary">
-                TRACKING_ID: JS-
-                {Math.random().toString(36).substr(2, 9).toUpperCase()}
+                TICKET_ID: {lastComplaint?.ticketId || "JSK-XXXX-XXXXX"}
               </p>
             </div>
             <div className="pt-6 flex flex-wrap gap-3 justify-center">
@@ -278,6 +404,40 @@ export default function ComplaintForm() {
                       setFormData({ ...formData, description: e.target.value })
                     }
                   />
+
+                  {/* Suggestion Overlay */}
+                  <AnimatePresence>
+                    {suggestion && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="absolute left-6 right-6 bottom-20 bg-primary/95 text-white backdrop-blur-md p-4 rounded-2xl shadow-2xl z-50 pointer-events-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">
+                            {
+                              CATEGORIES.find(
+                                (c) => c.label === suggestion.category,
+                              )?.icon
+                            }
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-[10px] font-black uppercase tracking-widest opacity-70">
+                              AI Suggestion
+                            </div>
+                            <div className="text-sm font-bold truncate">
+                              {suggestion.category} • {suggestion.department}
+                            </div>
+                          </div>
+                          <div className="px-3 py-1 bg-white/20 rounded-full text-[8px] font-black uppercase tracking-tighter self-start mt-1">
+                            {suggestion.priority} Priority
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="absolute right-6 bottom-6 scale-125">
                     <VoiceRecorder
                       onTranscription={(text) =>

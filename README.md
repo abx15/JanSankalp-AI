@@ -11,6 +11,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT4-412991?style=for-the-badge&logo=openai)](https://openai.com/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-green?style=for-the-badge&logo=vercel)](https://jansanklpai.vercel.app/)
 
   <p align="center">
     <a href="#-overview">Overview</a> •
@@ -118,7 +119,7 @@ Our comprehensive API documentation provides everything developers need to integ
 
 ---
 
-## �💻 Installation
+## �� Installation
 
 Follow these steps to set up the project locally:
 
