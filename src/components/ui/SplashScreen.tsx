@@ -35,9 +35,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
           {/* Animated Particles/Streaks (Simple CSS implementation for performance) */}
           <div className="absolute inset-0 overflow-hidden opacity-20">
-            <div className="absolute top-[10%] left-[20%] w-1 h-20 bg-gradient-to-b from-transparent to-blue-400 opacity-50 rotate-45 animate-ping duration-[3000ms]" />
-            <div className="absolute top-[60%] right-[20%] w-1 h-32 bg-gradient-to-b from-transparent to-orange-400 opacity-50 -rotate-12 animate-pulse duration-[4000ms]" />
-            <div className="absolute bottom-[20%] left-[40%] w-2 h-2 bg-white rounded-full opacity-30 animate-bounce duration-[5000ms]" />
+            <div className="absolute top-[10%] left-[20%] w-1 h-20 bg-gradient-to-b from-transparent to-blue-400 opacity-50 rotate-45 animate-ping duration-&lsqb;3000ms&rsqb;" />
+            <div className="absolute top-[60%] right-[20%] w-1 h-32 bg-gradient-to-b from-transparent to-orange-400 opacity-50 -rotate-12 animate-pulse duration-&lsqb;4000ms&rsqb;" />
+            <div className="absolute bottom-[20%] left-[40%] w-2 h-2 bg-white rounded-full opacity-30 animate-bounce duration-&lsqb;5000ms&rsqb;" />
           </div>
 
           <div className="relative z-10 flex flex-col items-center">

@@ -28,6 +28,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { generateComplaintReceipt } from "@/lib/pdf-service";
 import { FileDown } from "lucide-react";
+import { SimplePDFDownloader as PDFDownloader } from "@/components/ui/SimplePDFDownloader";
 
 import { useDebounce } from "use-debounce";
 
@@ -212,8 +213,6 @@ export default function ComplaintForm() {
         };
         setLastComplaint(complaintWithAuthor);
         setSubmitted(true);
-        // Automatically trigger download
-        generateComplaintReceipt(complaintWithAuthor);
       }
     } catch (error) {
       console.error("Submission failed:", error);
@@ -286,15 +285,10 @@ export default function ComplaintForm() {
               </p>
             </div>
             <div className="pt-6 flex flex-wrap gap-3 justify-center">
-              <Button
-                variant="outline"
-                className="rounded-full gap-2"
-                onClick={() =>
-                  lastComplaint && generateComplaintReceipt(lastComplaint)
-                }
-              >
-                <FileDown className="w-4 h-4" /> Download Receipt
-              </Button>
+              <PDFDownloader 
+                complaint={lastComplaint}
+                className="rounded-full"
+              />
               <Button
                 variant="outline"
                 className="rounded-full"
