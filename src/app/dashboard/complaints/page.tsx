@@ -20,6 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
+import NextImage from "next/image";
 
 export default function AdminComplaintsPage() {
   const { data: session, status } = useSession();
@@ -111,6 +113,10 @@ export default function AdminComplaintsPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
+      <RealTimeNotifications
+        userId={session?.user?.id}
+        onNewComplaint={fetchComplaints}
+      />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-primary">
@@ -160,11 +166,14 @@ export default function AdminComplaintsPage() {
                 <div className="flex flex-col lg:flex-row">
                   {item.imageUrl && (
                     <div className="w-full lg:w-80 h-64 lg:h-auto overflow-hidden relative">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
+                      <div className="relative h-full w-full rounded-2xl overflow-hidden border border-primary/10 shadow-inner group-hover:scale-[1.02] transition-transform duration-500">
+                        <NextImage
+                          src={item.imageUrl}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                       <div className="absolute top-4 left-4">
                         <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
                           <div

@@ -43,6 +43,7 @@ const TrendChart = dynamic(() => import("@/components/dashboard/TrendChart"), {
   ),
 });
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
+import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -90,6 +91,7 @@ export default function DashboardPage() {
         complaints={complaints}
         loading={loading}
         refresh={fetchComplaints}
+        session={session}
       />
     );
   }
@@ -108,10 +110,12 @@ function AdminDashboard({
   complaints,
   loading,
   refresh,
+  session,
 }: {
   complaints: any[];
   loading: boolean;
   refresh: () => void;
+  session: any;
 }) {
   const stats = [
     {
@@ -152,7 +156,10 @@ function AdminDashboard({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <RealTimeNotifications onNewComplaint={refresh} />
+      <RealTimeNotifications
+        userId={session?.user?.id}
+        onNewComplaint={refresh}
+      />
 
       {/* Header & Quick Actions */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -381,7 +388,7 @@ function CitizenDashboard({
             Jai Hind, {session?.user?.name || "Citizen"}!
           </h2>
           <p className="text-muted-foreground">
-            Thank you for contributing to your city's progress.
+            Thank you for contributing to your city&apos;s progress.
           </p>
         </div>
         <div className="flex items-center gap-3 p-2 bg-primary/5 rounded-2xl border border-primary/10">
@@ -493,11 +500,12 @@ function CitizenDashboard({
                     key={complaint.id}
                     className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 hover:bg-muted/40 transition-colors border border-transparent hover:border-primary/10"
                   >
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative">
                       {complaint.imageUrl ? (
-                        <img
+                        <NextImage
                           src={complaint.imageUrl}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                           alt=""
                         />
                       ) : (

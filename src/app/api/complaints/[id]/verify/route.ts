@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { pusherServer } from "@/lib/pusher";
+import { sendStatusUpdateEmail } from "@/lib/email-service";
 
 export async function PATCH(
     req: Request,
@@ -54,6 +55,21 @@ export async function PATCH(
                 type: "update",
                 status
             });
+
+            // Async Email Notification
+            if (complaint.author?.email) {
+                try {
+                    await sendStatusUpdateEmail(
+                        complaint.author.email,
+                        complaint.author.name || "Citizen",
+                        complaint.ticketId,
+                        status,
+                        complaint.title
+                    );
+                } catch (emailError) {
+                    console.error("STATUS_UPDATE_EMAIL_ERROR", emailError);
+                }
+            }
         }
 
         return NextResponse.json(updatedComplaint);
