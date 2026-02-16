@@ -17,6 +17,7 @@
     <a href="#-key-features">Features</a> •
     <a href="#-how-it-works">How It Works</a> •
     <a href="#-tech-stack">Tech Stack</a> •
+    <a href="#-api-documentation">API Documentation</a> •
     <a href="#-installation">Installation</a> •
     <a href="#-license">License</a>
   </p>
@@ -87,7 +88,37 @@ We've simplified the complex process of governance into 4 automated steps:
 
 ---
 
-## 💻 Installation
+## � API Documentation
+
+Our comprehensive API documentation provides everything developers need to integrate with JanSankalp AI:
+
+### 🔗 **Quick Links**
+- **[📘 API Reference](docs/API_DOCUMENTATION.md)** - Complete REST API documentation with endpoints, authentication, and examples
+- **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - System architecture, tech stack, and design patterns
+- **[🗄️ Database Schema](docs/DATABASE_SCHEMA.md)** - Complete database structure and relationships
+- **[🚀 Setup Guide](docs/SETUP_GUIDE.md)** - Step-by-step development environment setup
+- **[🔒 Security Guidelines](docs/SECURITY_GUIDELINES.md)** - Security best practices and guidelines
+- **[📦 Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Production deployment instructions
+
+### 🚀 **Getting Started with the API**
+
+1. **Authentication**: All API endpoints use JWT Bearer tokens
+2. **Base URL**: `http://localhost:3000/api` (development) or `https://yourdomain.com/api` (production)
+3. **Content-Type**: `application/json` for all requests
+4. **Rate Limiting**: Implemented for production environments
+
+### 📖 **Key API Endpoints**
+- **Authentication**: `/api/auth/*` - User authentication and session management
+- **Complaints**: `/api/complaints/*` - CRUD operations for civic complaints
+- **AI Processing**: `/api/ai/*` - AI-powered classification and analysis
+- **Departments**: `/api/departments/*` - Municipal department management
+- **Users**: `/api/user/*` - User profile and management
+
+> **💡 Tip**: Check the complete [API Documentation](docs/API_DOCUMENTATION.md) for detailed request/response examples, error codes, and advanced features.
+
+---
+
+## �💻 Installation
 
 Follow these steps to set up the project locally:
 
