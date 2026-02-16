@@ -57,6 +57,7 @@ model VerificationToken {
 
 model Complaint {
   id                  String          @id @default(cuid())
+  ticketId            String          @unique
   title               String
   description         String
   originalText        String?

@@ -11,6 +11,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT4-412991?style=for-the-badge&logo=openai)](https://openai.com/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-green?style=for-the-badge&logo=vercel)](https://jansanklpai.vercel.app/)
 
   <p align="center">
     <a href="#-overview">Overview</a> •
@@ -103,7 +104,7 @@ Our comprehensive API documentation provides everything developers need to integ
 ### 🚀 **Getting Started with the API**
 
 1. **Authentication**: All API endpoints use JWT Bearer tokens
-2. **Base URL**: `http://localhost:3000/api` (development) or `https://yourdomain.com/api` (production)
+2. **Base URL**: `http://localhost:3000/api` (development) or `https://jansanklpai.vercel.app/api` (production)
 3. **Content-Type**: `application/json` for all requests
 4. **Rate Limiting**: Implemented for production environments
 
@@ -118,7 +119,7 @@ Our comprehensive API documentation provides everything developers need to integ
 
 ---
 
-## �💻 Installation
+## �� Installation
 
 Follow these steps to set up the project locally:
 

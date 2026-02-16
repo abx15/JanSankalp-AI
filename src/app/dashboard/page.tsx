@@ -22,6 +22,7 @@ import {
   MapPin,
   Loader2,
   ClipboardList,
+  FileDown,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -47,11 +48,24 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from "date-fns";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
+import { generateComplaintReceipt } from "@/lib/pdf-service";
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchComplaints = async () => {
+    try {
+      const res = await fetch("/api/complaints");
+      const data = await res.json();
+      setComplaints(data.complaints || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // @ts-ignore
   const role = session?.user?.role || "CITIZEN";
@@ -59,24 +73,25 @@ export default function DashboardPage() {
   const points = session?.user?.points || 0;
 
   useEffect(() => {
-    fetch("/api/complaints")
-      .then((res) => res.json())
-      .then((data) => {
-        setComplaints(data.complaints || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+    if (sessionStatus === "authenticated") {
+      fetchComplaints();
+    } else if (sessionStatus === "unauthenticated") {
+      setLoading(false);
+    }
+  }, [sessionStatus]);
 
   if (loading) {
     return <DashboardSkeleton />;
   }
 
   if (role === "ADMIN") {
-    return <AdminDashboard complaints={complaints} loading={loading} />;
+    return (
+      <AdminDashboard
+        complaints={complaints}
+        loading={loading}
+        refresh={fetchComplaints}
+      />
+    );
   }
 
   return (
@@ -92,9 +107,11 @@ export default function DashboardPage() {
 function AdminDashboard({
   complaints,
   loading,
+  refresh,
 }: {
   complaints: any[];
   loading: boolean;
+  refresh: () => void;
 }) {
   const stats = [
     {
@@ -135,7 +152,7 @@ function AdminDashboard({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <RealTimeNotifications />
+      <RealTimeNotifications onNewComplaint={refresh} />
 
       {/* Header & Quick Actions */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -148,6 +165,13 @@ function AdminDashboard({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <Button
+            onClick={refresh}
+            variant="outline"
+            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+          >
+            <History className="w-4 h-4" /> Refresh
+          </Button>
           <Link href="/dashboard/complaints">
             <Button className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20">
               <ClipboardList className="w-4 h-4" /> Manage All
@@ -506,6 +530,16 @@ function CitizenDashboard({
                           )}
                         </span>
                       </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl h-8 text-[10px] font-black uppercase tracking-widest gap-2 bg-background shadow-sm hover:bg-primary hover:text-white transition-all"
+                        onClick={() => generateComplaintReceipt(complaint)}
+                      >
+                        <FileDown className="w-3.5 h-3.5" /> Receipt
+                      </Button>
                     </div>
                   </div>
                 ))
