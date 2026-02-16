@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
@@ -51,9 +52,11 @@ export default function DashboardLayout({
         <div className="p-6">
           <div className="flex items-center justify-center mb-2">
             <div className="w-20 h-20 md:w-24 md:h-24 bg-transparent rounded-lg flex items-center justify-center overflow-hidden p-1">
-              <img
+              <Image
                 src="/logojansanklp.png"
                 alt="JanSankalp AI Logo"
+                width={96}
+                height={96}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =

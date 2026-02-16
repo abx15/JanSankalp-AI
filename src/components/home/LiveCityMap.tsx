@@ -120,7 +120,7 @@ export const LiveCityMap = () => {
           Dynamic Civic Activity
         </h2>
         <p className="text-slate-500 max-w-xl mx-auto font-medium">
-          Watching the "Civic Operating System" respond to citizens across India
+          Watching the &ldquo;Civic Operating System&rdquo; respond to citizens across India
           in real-time.
         </p>
       </div>

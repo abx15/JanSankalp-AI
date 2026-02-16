@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Image as ImageIcon, X, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageKitProvider, IKUpload } from "imagekitio-next";
+import Image from "next/image";
 
 interface ImageUploadProps {
   onUpload: (url: string) => void;
@@ -61,9 +62,11 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
       <div className="space-y-4 w-full">
         {value ? (
           <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden border-4 border-white shadow-xl">
-            <img
+            <Image
               src={value}
               alt="Complaint Attachment"
+              width={800}
+              height={450}
               className="w-full h-full object-cover"
             />
             <Button

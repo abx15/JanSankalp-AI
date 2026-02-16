@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import Image from "next/image";
 
 const icon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -67,10 +68,12 @@ export default function DashboardMapView() {
                 <div className="w-64">
                   {item.imageUrl && (
                     <div className="relative h-32">
-                      <img
+                      <Image
                         src={item.imageUrl}
+                        width={256}
+                        height={128}
                         className="w-full h-full object-cover"
-                        alt=""
+                        alt="Complaint image"
                       />
                       <div
                         className={`absolute top-2 right-2 px-2 py-1 rounded-lg text-[10px] font-black text-white ${isHighSeverity ? "bg-red-500" : "bg-blue-500"}`}

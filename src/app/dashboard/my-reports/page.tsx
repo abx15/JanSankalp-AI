@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { SimplePDFDownloader as PDFDownloader } from "@/components/ui/SimplePDFDownloader";
 import { cn } from "@/lib/utils";
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 import { useSession } from "next-auth/react";
@@ -156,14 +157,10 @@ export default function MyReportsPage() {
                         {item.status}
                       </div>
                     </div>
-                    <Button
-                      variant="default"
-                      size="sm"
+                    <PDFDownloader 
+                      complaint={item}
                       className="rounded-xl gap-2 text-[10px] font-black uppercase tracking-widest h-10 shadow-lg shadow-primary/20"
-                      onClick={() => generateComplaintReceipt(item)}
-                    >
-                      <FileDown className="w-4 h-4" /> Download Receipt
-                    </Button>
+                    />
                   </div>
                   <h3 className="text-xl font-bold mb-1 tracking-tight">
                     {item.title}
