@@ -205,8 +205,8 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
-                From your voice to the officer's desk – see how our AI engine
-                packages, routes, and resolves issues in real-time.
+                From your voice to the officer&apos;s desk – see how our AI
+                engine packages, routes, and resolves issues in real-time.
               </p>
             </div>
             <AutomationEngine />
@@ -296,14 +296,14 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
               <div className="font-mono text-sm text-primary/80 space-y-2">
-                <p className="text-slate-500">// AI Triage Pipeline</p>
+                <p className="text-slate-500">{"// AI Triage Pipeline"}</p>
                 <p>const report = await processVoice(citizenAudio);</p>
                 <p>const embedding = AI.cluster(report.location);</p>
                 <p className="text-green-400">
                   if (embedding.isDuplicate()) {"{"}
                 </p>
                 <p className="pl-4">
-                  Citizen.notify("Similar issue nearby tagged!");
+                  Citizen.notify(&quot;Similar issue nearby tagged!&quot;);
                 </p>
                 <p>
                   {"}"} else {"{"}
@@ -539,7 +539,7 @@ export default function Home() {
                 </h3>
                 <p className="text-muted-foreground leading-relaxed pl-9">
                   On average, complaints are resolved within 24 hours. Critical
-                  issues are prioritized and addressed even faster. You'll
+                  issues are prioritized and addressed even faster. You&apos;ll
                   receive real-time updates throughout the process.
                 </p>
               </motion.div>
@@ -556,7 +556,7 @@ export default function Home() {
                   Can I track my complaint status?
                 </h3>
                 <p className="text-muted-foreground leading-relaxed pl-9">
-                  Yes! You'll receive SMS and email notifications at every
+                  Yes! You&apos;ll receive SMS and email notifications at every
                   stage. You can also log in to your dashboard to see real-time
                   status, officer details, and estimated resolution time.
                 </p>

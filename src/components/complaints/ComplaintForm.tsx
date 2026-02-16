@@ -449,7 +449,8 @@ export default function ComplaintForm() {
                 <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-2xl border border-dashed border-muted-foreground/20">
                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
-                    AI Tip: Speaking in Hindi? We'll translate it automatically.
+                    AI Tip: Speaking in Hindi? We&apos;ll translate it
+                    automatically.
                   </p>
                 </div>
               </div>
