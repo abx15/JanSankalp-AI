@@ -11,7 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Landmark, ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck, Loader2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { Suspense } from "react";
@@ -70,7 +71,7 @@ function VerifyForm() {
           Verify Email
         </CardTitle>
         <CardDescription className="text-base">
-          We've sent a 6-digit code to <br />
+          We&apos;ve sent a 6-digit code to <br />
           <span className="font-bold text-foreground">{email}</span>
         </CardDescription>
       </CardHeader>
@@ -109,7 +110,7 @@ function VerifyForm() {
             </Button>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Didn't receive the code?{" "}
+                Didn&apos;t receive the code?{" "}
                 <button
                   type="button"
                   className="text-primary font-bold hover:underline"
@@ -137,11 +138,12 @@ export default function VerifyPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6">
       <Link href="/" className="mb-8 flex flex-col items-center gap-4 group">
-        <div className="w-28 h-28 md:w-36 md:h-36 bg-transparent rounded-2xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
-          <img
+        <div className="w-28 h-28 md:w-36 md:h-36 bg-transparent rounded-2xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform relative">
+          <Image
             src="/logojansanklp.png"
             alt="JanSankalp AI Logo"
-            className="w-full h-full object-contain scale-110"
+            fill
+            className="object-contain scale-110"
           />
         </div>
       </Link>
