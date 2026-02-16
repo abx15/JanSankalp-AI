@@ -4,16 +4,25 @@ import { analyzeComplaint, detectAndTranslate } from "@/lib/ai-service";
 import { calculateSeverity, findNearbyDuplicates, getKeywordWeight } from "@/lib/intelligence";
 import { pusherServer } from "@/lib/pusher";
 import { auth } from "@/auth";
+import { sendComplaintConfirmationEmail } from "@/lib/email-service";
 
 export async function GET() {
     try {
         const session = await auth();
 
         if (!session || !session.user) {
+            console.log("COMPLAINTS_GET_UNAUTHORIZED");
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const isAdmin = session.user.role === "ADMIN";
+        const role = session.user.role;
+        const isAdmin = role === "ADMIN";
+
+        console.log("COMPLAINTS_GET_REQUEST", {
+            userId: session.user.id,
+            role,
+            isAdmin
+        });
 
         const complaints = await prisma.complaint.findMany({
             where: isAdmin ? {} : { authorId: session.user.id },
@@ -24,6 +33,7 @@ export async function GET() {
             orderBy: { createdAt: "desc" }
         });
 
+        console.log(`COMPLAINTS_GET_SUCCESS: Found ${complaints.length} complaints`);
         return NextResponse.json({ complaints });
     } catch (error) {
         console.error("COMPLAINTS_GET_ERROR", error);
@@ -34,17 +44,33 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
+        console.log("RECEIVED_COMPLAINT_BODY:", body);
         const { title, description, imageUrl, latitude, longitude, authorId } = body;
 
+        if (!authorId) {
+            console.error("MISSING_AUTHOR_ID");
+            return new NextResponse("Missing authorId", { status: 400 });
+        }
+
+        // 0. Generate Unique Ticket ID: JSK-YYYY-XXXXX
+        const ticketId = `JSK-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+        console.log("GENERATED_TICKET_ID:", ticketId);
+
         // 1. Language Detection & Translation
+        console.log("STARTING_AI_TRANSLATION...");
         const { originalLanguage, translatedText } = await detectAndTranslate(description);
+        console.log("AI_TRANSLATION_DONE:", { originalLanguage, translatedText });
 
         // 2. AI Image/Text Classification
+        console.log("STARTING_AI_ANALYSIS...");
         const aiAnalysis = await analyzeComplaint(translatedText, imageUrl);
+        console.log("AI_ANALYSIS_DONE:", aiAnalysis);
 
         // 3. Duplicate Detection
+        console.log("CHECKING_DUPLICATES...");
         const duplicates = await findNearbyDuplicates(latitude, longitude, aiAnalysis.category);
         const duplicateOf = duplicates.length > 0 ? duplicates[0].id : null;
+        console.log("DUPLICATES_CHECK_DONE:", { count: duplicates.length, duplicateOf });
 
         // 4. Refined Severity Scoring
         const kwWeight = getKeywordWeight(translatedText);
@@ -54,9 +80,12 @@ export async function POST(req: Request) {
             kwWeight,
             duplicates.length
         );
+        console.log("SEVERITY_CALCULATED:", finalSeverity);
 
+        console.log("SAVING_TO_PRISMA...");
         const complaint = await prisma.complaint.create({
             data: {
+                ticketId,
                 title: aiAnalysis.category + " reported",
                 description,
                 originalText: description,
@@ -69,24 +98,50 @@ export async function POST(req: Request) {
                 latitude,
                 longitude,
                 authorId,
-                duplicateOf,
-            },
+                duplicateOf: duplicateOf,
+            } as any,
             include: {
-                author: { select: { name: true } },
+                author: { select: { name: true, email: true } },
             }
         });
+        console.log("PRISMA_SAVE_SUCCESS:", complaint.id);
 
         // 5. Real-time Notification for Officers/Admins
-        await pusherServer.trigger("governance-channel", "new-complaint", {
-            id: complaint.id,
-            category: complaint.category,
-            severity: complaint.severity,
-            location: { lat: latitude, lng: longitude },
-        });
+        try {
+            console.log("TRIGGERING_PUSHER...");
+            await pusherServer.trigger("governance-channel", "new-complaint", {
+                id: complaint.id,
+                ticketId: complaint.ticketId,
+                category: complaint.category,
+                severity: complaint.severity,
+                location: { lat: latitude, lng: longitude },
+                authorName: complaint.author?.name
+            });
+            console.log("PUSHER_TRIGGER_SUCCESS");
+        } catch (pusherError) {
+            console.error("PUSHER_ERROR_CONTINUING:", pusherError);
+        }
+
+        // 6. Async Email Trigger
+        if (complaint.author?.email) {
+            try {
+                console.log("SENDING_EMAIL...");
+                await sendComplaintConfirmationEmail(
+                    complaint.author.email,
+                    complaint.author.name || "Citizen",
+                    complaint.ticketId,
+                    complaint.category,
+                    `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+                );
+                console.log("EMAIL_SEND_SUCCESS");
+            } catch (emailError) {
+                console.error("EMAIL_ERROR_CONTINUING:", emailError);
+            }
+        }
 
         return NextResponse.json({ complaint });
     } catch (error) {
-        console.error("COMPLAINT_SUBMIT_ERROR", error);
+        console.error("COMPLAINT_SUBMIT_ERROR_DETAIL:", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
