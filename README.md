@@ -104,7 +104,7 @@ Our comprehensive API documentation provides everything developers need to integ
 ### 🚀 **Getting Started with the API**
 
 1. **Authentication**: All API endpoints use JWT Bearer tokens
-2. **Base URL**: `http://localhost:3000/api` (development) or `https://yourdomain.com/api` (production)
+2. **Base URL**: `http://localhost:3000/api` (development) or `https://jansanklpai.vercel.app/api` (production)
 3. **Content-Type**: `application/json` for all requests
 4. **Rate Limiting**: Implemented for production environments
 
