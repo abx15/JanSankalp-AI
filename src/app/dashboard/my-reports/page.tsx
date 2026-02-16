@@ -18,9 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
+import { useSession } from "next-auth/react";
 import { generateComplaintReceipt } from "@/lib/pdf-service";
+import Image from "next/image";
 
 export default function MyReportsPage() {
+  const { data: session } = useSession();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +69,10 @@ export default function MyReportsPage() {
 
   return (
     <div className="space-y-6">
+      <RealTimeNotifications
+        userId={session?.user?.id}
+        onNewComplaint={fetchComplaints}
+      />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight">
@@ -98,7 +106,7 @@ export default function MyReportsPage() {
           <div className="text-center py-20 bg-muted/20 rounded-xl border-2 border-dashed">
             <History className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-20" />
             <p className="font-bold text-muted-foreground">
-              You haven't filed any reports yet.
+              You haven&apos;t filed any reports yet.
             </p>
             <Button className="mt-4 rounded-full px-6">Report an Issue</Button>
           </div>
@@ -106,7 +114,7 @@ export default function MyReportsPage() {
           <div className="text-center py-20 bg-muted/20 rounded-xl border-2 border-dashed">
             <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-20" />
             <p className="font-bold text-muted-foreground">
-              No reports match your search: "{searchQuery}"
+              No reports match your search: &quot;{searchQuery}&quot;
             </p>
             <Button
               variant="outline"
@@ -128,11 +136,12 @@ export default function MyReportsPage() {
             >
               <div className="flex flex-col md:flex-row">
                 {item.imageUrl && (
-                  <div className="w-full md:w-64 h-48 md:h-auto overflow-hidden">
-                    <img
+                  <div className="w-full md:w-64 h-48 md:h-auto overflow-hidden relative">
+                    <Image
                       src={item.imageUrl}
                       alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 )}
