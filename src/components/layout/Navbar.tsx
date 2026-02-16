@@ -150,7 +150,7 @@ export const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="rounded-full font-bold text-xs h-9 px-4 hovr:bg-primary/5"
+                  className="rounded-full font-bold text-xs h-9 px-4 hover:bg-primary/5"
                   asChild
                 >
                   <Link href="/auth/signin">Login</Link>

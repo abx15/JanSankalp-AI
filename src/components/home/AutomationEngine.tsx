@@ -169,8 +169,8 @@ export const AutomationEngine = () => {
               <span className="text-primary italic">Every time.</span>
             </h3>
             <p className="text-muted-foreground leading-relaxed">
-              When a report is filed, our system doesn't wait for humans. It
-              immediately <strong>packs the metadata</strong>, performs a{" "}
+              When a report is filed, our system doesn&apos;t wait for humans.
+              It immediately <strong>packs the metadata</strong>, performs a{" "}
               <strong>vector search</strong> for nearby duplicates, and routes
               the ticket to the specific terminal of the responsible officer.
             </p>
