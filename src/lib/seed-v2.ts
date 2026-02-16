@@ -52,6 +52,45 @@ async function main() {
         },
     });
 
+    // Seed Sample Complaints
+    const wasteDept = await prisma.department.findUnique({ where: { name: "Waste Management" } });
+    const roadDept = await prisma.department.findUnique({ where: { name: "Roads & Infrastructure" } });
+
+    const sampleComplaints = [
+        {
+            ticketId: `JSK-2026-10001`,
+            title: "Garbage Pile near Main Market",
+            description: "Huge pile of garbage accumulated near the market area for over a week.",
+            category: "Garbage",
+            severity: 4,
+            latitude: 12.9716,
+            longitude: 77.5946,
+            status: "PENDING" as any,
+            authorId: citizen.id,
+            departmentId: wasteDept?.id,
+        },
+        {
+            ticketId: `JSK-2026-10002`,
+            title: "Pothole on MG Road",
+            description: "Deep pothole causing traffic issues near the metro station.",
+            category: "Road damage",
+            severity: 5,
+            latitude: 12.9756,
+            longitude: 77.5926,
+            status: "IN_PROGRESS" as any,
+            authorId: citizen.id,
+            departmentId: roadDept?.id,
+        }
+    ];
+
+    for (const complaint of sampleComplaints) {
+        await prisma.complaint.upsert({
+            where: { ticketId: complaint.ticketId },
+            update: {},
+            create: complaint,
+        });
+    }
+
     console.log("Seeding complete.");
 }
 
