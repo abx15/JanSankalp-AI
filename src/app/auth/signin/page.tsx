@@ -92,6 +92,14 @@ function SignInForm() {
               required
             />
           </div>
+          <div className="text-right">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-primary hover:underline"
+            >
+              Forgot your password?
+            </Link>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button
