@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get OTP data from temporary storage
-    global.otpStorage = global.otpStorage || new Map();
-    const storedOTPData = global.otpStorage.get(email);
+    (global as any).otpStorage = (global as any).otpStorage || new Map();
+    const storedOTPData = (global as any).otpStorage.get(email);
 
     if (!storedOTPData || !storedOTPData.verified || storedOTPData.resetToken !== resetToken) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Check if OTP has expired (extra security)
     if (new Date() > storedOTPData.expiresAt) {
-      global.otpStorage.delete(email);
+      (global as any).otpStorage.delete(email);
       return NextResponse.json(
         { error: 'Reset token has expired. Please start over' },
         { status: 400 }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Clean up OTP data
-    global.otpStorage.delete(email);
+    (global as any).otpStorage.delete(email);
 
     return NextResponse.json({
       message: 'Password reset successfully',
