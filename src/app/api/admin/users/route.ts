@@ -138,55 +138,6 @@ export async function POST(request: NextRequest) {
         });
         break;
 
-      case 'block':
-        // Don't allow blocking of admins
-        const userToBlock = await prisma.user.findUnique({
-          where: { id: userId }
-        });
-
-        if (userToBlock?.role === 'ADMIN') {
-          return NextResponse.json(
-            { error: 'Cannot block admin users' },
-            { status: 400 }
-          );
-        }
-
-        // Block user by changing email to blocked format
-        updatedUser = await prisma.user.update({
-          where: { id: userId },
-          data: { 
-            email: `blocked_${Date.now()}_${userToBlock?.email || 'unknown'}`,
-            emailVerified: null
-          }
-        });
-        break;
-
-      case 'unblock':
-        // Find user by original email (stored in blocked format)
-        const blockedUser = await prisma.user.findFirst({
-          where: { 
-            email: { startsWith: 'blocked_' }
-          }
-        });
-
-        if (!blockedUser) {
-          return NextResponse.json(
-            { error: 'User not found or not blocked' },
-            { status: 404 }
-          );
-        }
-
-        // Extract original email from blocked format
-        const originalEmail = blockedUser.email.split('_').slice(2).join('_');
-        
-        updatedUser = await prisma.user.update({
-          where: { id: blockedUser.id },
-          data: { 
-            email: originalEmail
-          }
-        });
-        break;
-
       case 'delete':
         // Don't allow deletion of admins
         const userToDelete = await prisma.user.findUnique({
