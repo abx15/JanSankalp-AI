@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function VerifyOTPPage() {
+function VerifyOTPForm() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -65,7 +65,7 @@ export default function VerifyOTPPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email || "" }),
+        body: JSON.stringify({ email: email || "", otp }),
       });
 
       const data = await response.json();
@@ -227,5 +227,13 @@ export default function VerifyOTPPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyOTPPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+      <VerifyOTPForm />
+    </Suspense>
   );
 }

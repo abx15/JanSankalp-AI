@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get OTP from temporary storage
-    global.otpStorage = global.otpStorage || new Map();
-    const storedOTPData = global.otpStorage.get(email);
+    (global as any).otpStorage = (global as any).otpStorage || new Map();
+    const storedOTPData = (global as any).otpStorage.get(email);
 
     if (!storedOTPData) {
       return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Check if OTP has expired
     if (new Date() > storedOTPData.expiresAt) {
-      global.otpStorage.delete(email);
+      (global as any).otpStorage.delete(email);
       return NextResponse.json(
         { error: 'OTP has expired. Please request a new one' },
         { status: 400 }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     // Mark OTP as verified
     storedOTPData.verified = true;
     storedOTPData.resetToken = resetToken;
-    global.otpStorage.set(email, storedOTPData);
+    (global as any).otpStorage.set(email, storedOTPData);
 
     return NextResponse.json({
       message: 'OTP verified successfully',

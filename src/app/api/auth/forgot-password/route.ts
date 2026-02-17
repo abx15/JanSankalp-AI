@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
 
     // Store OTP in a temporary storage (in production, use Redis or database)
     // For now, we'll use a simple approach with a global variable (not recommended for production)
-    global.otpStorage = global.otpStorage || new Map();
-    global.otpStorage.set(email, {
+    (global as any).otpStorage = (global as any).otpStorage || new Map();
+    (global as any).otpStorage.set(email, {
       otp,
       expiresAt,
       userId: user.id,
