@@ -10,6 +10,7 @@ import {
   Map as MapIcon,
   Award,
   ClipboardList,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,6 +21,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 const adminItems = [
   { icon: LayoutDashboard, label: "Governance", href: "/dashboard" },
+  { icon: Shield, label: "Users", href: "/dashboard/users" },
   { icon: FileText, label: "Complaints", href: "/dashboard/complaints" },
   { icon: MapIcon, label: "Map View", href: "/dashboard/map" },
   { icon: Users, label: "Department", href: "/dashboard/department" },
