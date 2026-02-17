@@ -1,0 +1,314 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Search, Users, Shield, UserCheck, Mail, Phone, MapPin, Calendar, Filter } from "lucide-react";
+import { useSession } from "next-auth/react";
+
+interface User {
+  id: string;
+  name: string | null;
+  email: string;
+  role: "ADMIN" | "OFFICER" | "CITIZEN";
+  emailVerified: Date | null;
+  phone: string | null;
+  address: string | null;
+  points: number;
+  createdAt: string;
+  _count: {
+    complaints: number;
+  };
+}
+
+export default function UsersPage() {
+  const { data: session } = useSession();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [verificationFilter, setVerificationFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (session?.user?.role !== "ADMIN") {
+      return;
+    }
+    fetchUsers();
+  }, [session]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/admin/users");
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    const matchesVerification = verificationFilter === "all" ||
+                              (verificationFilter === "verified" && user.emailVerified) ||
+                              (verificationFilter === "unverified" && !user.emailVerified);
+    
+    return matchesSearch && matchesRole && matchesVerification;
+  });
+
+  const getRoleBadge = (role: string) => {
+    const variants = {
+      ADMIN: "destructive",
+      OFFICER: "default", 
+      CITIZEN: "secondary"
+    };
+    return variants[role as keyof typeof variants] || "secondary";
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "ADMIN": return <Shield className="w-4 h-4" />;
+      case "OFFICER": return <UserCheck className="w-4 h-4" />;
+      default: return <Users className="w-4 h-4" />;
+    }
+  };
+
+  if (session?.user?.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="pt-6 text-center">
+            <Shield className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-lg font-semibold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground">You need admin privileges to view this page.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Users Management</h1>
+          <p className="text-muted-foreground">Manage and monitor all registered users</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Users className="w-4 h-4" />
+          <span>{users.length} total users</span>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                <p className="text-2xl font-bold">{users.length}</p>
+              </div>
+              <Users className="w-8 h-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Admins</p>
+                <p className="text-2xl font-bold">{users.filter(u => u.role === "ADMIN").length}</p>
+              </div>
+              <Shield className="w-8 h-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Officers</p>
+                <p className="text-2xl font-bold">{users.filter(u => u.role === "OFFICER").length}</p>
+              </div>
+              <UserCheck className="w-8 h-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Citizens</p>
+                <p className="text-2xl font-bold">{users.filter(u => u.role === "CITIZEN").length}</p>
+              </div>
+              <Users className="w-8 h-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search users by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Filter by role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="OFFICER">Officer</SelectItem>
+                <SelectItem value="CITIZEN">Citizen</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={verificationFilter} onValueChange={setVerificationFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <Mail className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Email status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="verified">Verified</SelectItem>
+                <SelectItem value="unverified">Unverified</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Users Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Users List</CardTitle>
+          <CardDescription>
+            Showing {filteredUsers.length} of {users.length} users
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-2 text-muted-foreground">Loading users...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Points</TableHead>
+                    <TableHead>Complaints</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Joined</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            {getRoleIcon(user.role)}
+                          </div>
+                          <div>
+                            <div className="font-medium">{user.name || "Unknown"}</div>
+                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getRoleBadge(user.role)}>
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          {user.phone && (
+                            <div className="flex items-center gap-1 text-sm">
+                              <Phone className="w-3 h-3" />
+                              {user.phone}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1 text-sm">
+                            <Mail className="w-3 h-3" />
+                            {user.emailVerified ? "Verified" : "Not Verified"}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {user.address ? (
+                          <div className="flex items-center gap-1 text-sm max-w-48 truncate">
+                            <MapPin className="w-3 h-3" />
+                            {user.address}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No address</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{user.points}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{user._count.complaints}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={user.emailVerified ? "default" : "secondary"}>
+                          {user.emailVerified ? "Active" : "Pending"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              
+              {filteredUsers.length === 0 && (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No users found</h3>
+                  <p className="text-muted-foreground">
+                    {searchTerm || roleFilter !== "all" || verificationFilter !== "all"
+                      ? "Try adjusting your filters"
+                      : "No users have registered yet"}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
