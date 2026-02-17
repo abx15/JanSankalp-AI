@@ -51,7 +51,15 @@ export default function ForgotPasswordPage() {
           router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`);
         }, 2000);
       } else {
-        setError(data.error || "Something went wrong");
+        if (data.needsRegistration) {
+          setError(`${data.error}. ${data.suggestion}`);
+          // Add a link to register page
+          setTimeout(() => {
+            router.push('/auth/signup');
+          }, 3000);
+        } else {
+          setError(data.error || "Something went wrong");
+        }
       }
     } catch (error) {
       setError("Network error. Please try again.");
@@ -83,14 +91,29 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md text-center">
-                {error}
-              </div>
-            )}
             {message && (
               <div className="bg-green-50 text-green-700 text-sm p-3 rounded-md text-center">
                 {message}
+                {message.includes('Development OTP') && (
+                  <div className="mt-2 text-xs">
+                    <strong>For Testing:</strong> Use the OTP shown above
+                  </div>
+                )}
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md text-center">
+                {error}
+                {error.includes('register') && (
+                  <div className="mt-2">
+                    <Link
+                      href="/auth/signup"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      Create an account →
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
             <div className="space-y-2">
@@ -104,6 +127,42 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
               />
             </div>
+            
+            {/* Development testing section */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <p className="text-xs text-blue-700 font-medium mb-2">🧪 Development Testing:</p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email) {
+                      setError("Please enter an email first");
+                      return;
+                    }
+                    try {
+                      const response = await fetch("/api/test-email", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ email }),
+                      });
+                      const data = await response.json();
+                      if (response.ok) {
+                        setMessage(`Test email sent! OTP: ${data.otp}`);
+                      } else {
+                        setError(`Test failed: ${data.error}`);
+                      }
+                    } catch (error) {
+                      setError("Test email failed");
+                    }
+                  }}
+                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                >
+                  Test Email Service
+                </button>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button

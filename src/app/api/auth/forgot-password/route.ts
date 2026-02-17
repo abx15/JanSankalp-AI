@@ -25,10 +25,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      // Don't reveal that user doesn't exist for security
+      // User doesn't exist, tell them to register first
       return NextResponse.json(
-        { message: 'If an account with this email exists, you will receive an OTP' },
-        { status: 200 }
+        { 
+          error: 'No account found with this email address',
+          suggestion: 'Please register an account first',
+          needsRegistration: true
+        },
+        { status: 404 }
       );
     }
 
@@ -60,18 +64,22 @@ export async function POST(request: NextRequest) {
 
     // For now, let's create a simple file-based storage or use session
     // In production, use Redis or database table
-    console.log('OTP for', email, ':', otp); // For development only
+    console.log('🔑 OTP Generated for', email, ':', otp); // For development only
+    console.log('⏰ OTP Expires at:', expiresAt);
 
     // Send OTP email
+    console.log('📧 Sending OTP email to:', email);
     const emailResult = await sendOTPEmail(email, user.name || 'User', otp);
 
     if (!emailResult.success) {
-      console.error("Email sending error:", emailResult.error);
+      console.error("❌ Email sending error:", emailResult.error);
       return NextResponse.json(
-        { error: 'Failed to send OTP email' },
+        { error: 'Failed to send OTP email. Please try again later.' },
         { status: 500 }
       );
     }
+
+    console.log('✅ OTP email sent successfully to:', email);
 
     // Store OTP in a temporary storage (in production, use Redis or database)
     // For now, we'll use a simple approach with a global variable (not recommended for production)
