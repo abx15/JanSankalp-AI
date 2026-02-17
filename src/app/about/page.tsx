@@ -428,7 +428,7 @@ export default function AboutPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://linkedin.com/in/arunkumar"
+                      href="https://www.linkedin.com/in/arun-kumar-a3b047353/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg"
@@ -442,7 +442,7 @@ export default function AboutPage() {
                       </svg>
                     </a>
                     <a
-                      href="mailto:arun@jansankalp.ai"
+                      href="mailto:developerarunwork@gmail.com"
                       className="w-12 h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg"
                     >
                       <svg
