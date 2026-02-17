@@ -8,12 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} src/lib/comprehensive-seed.ts",
-    "seed:dev": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} src/lib/seed-v2.ts"
+    "seed": "npx ts-node src/lib/comprehensive-seed.ts",
+    "seed:dev": "npx ts-node src/lib/seed-v2.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^5.13.0",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.0.2",
     "@tanstack/react-query": "^5.35.1",
     "@types/bcryptjs": "^2.4.6",
