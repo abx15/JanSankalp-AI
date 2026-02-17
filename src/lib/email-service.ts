@@ -2,6 +2,71 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Add function to send OTP email
+export async function sendOTPEmail(
+  email: string,
+  name: string,
+  otp: string
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'JanSankalp AI <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Password Reset OTP - JanSankalp AI',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #1e3a8a; text-transform: uppercase; letter-spacing: 2px; margin: 0;">JanSankalp AI</h1>
+            <p style="color: #64748b; margin: 5px 0;">Governance Portal</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Your Password Reset Code</p>
+            <div style="margin: 20px 0; font-size: 36px; font-weight: 900; letter-spacing: 8px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; display: inline-block;">
+              ${otp}
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.9;">This code expires in 10 minutes</p>
+          </div>
+          
+          <div style="padding: 20px; background-color: #f8fafc; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 16px; color: #475569;">Hello <strong>${name || 'User'}</strong>,</p>
+            <p style="margin: 10px 0; font-size: 14px; color: #475569;">You requested to reset your password. Use the OTP code above to proceed with creating a new password.</p>
+            
+            <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+              <p style="margin: 0; font-size: 13px; color: #991b1b; font-weight: 600;">
+                🔒 Security Notice:
+              </p>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 12px; color: #991b1b;">
+                <li>Never share this OTP with anyone</li>
+                <li>Our team will never ask for your OTP</li>
+                <li>If you didn't request this, please ignore this email</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 11px; color: #94a3b8; margin: 0;">
+              This is an automated message from JanSankalp AI Governance Portal.<br>
+              © 2024 JanSankalp AI. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error("Resend OTP Email Error:", error);
+      return { success: false, error };
+    }
+
+    console.log("OTP email sent successfully to:", email);
+    return { success: true, data };
+  } catch (error) {
+    console.error("OTP Email Service Error:", error);
+    return { success: false, error };
+  }
+}
+
 export async function sendComplaintConfirmationEmail(
   email: string,
   name: string,
