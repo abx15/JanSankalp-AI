@@ -25,7 +25,7 @@ function VerifyOTPForm() {
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email");
+  const email = searchParams?.get("email");
 
   useEffect(() => {
     if (!email) {
