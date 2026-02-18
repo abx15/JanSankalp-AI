@@ -364,6 +364,66 @@ async function main() {
             latitude: 12.9746,
             longitude: 77.5956,
             points: 185
+        },
+        {
+            email: "vikas.yadav@email.com",
+            name: "Vikas Yadav",
+            role: "CITIZEN" as const,
+            password: citizenPassword,
+            emailVerified: new Date(),
+            phone: "+91-9876543230",
+            address: "101 Jayanagar, Bangalore",
+            latitude: 12.9307,
+            longitude: 77.5838,
+            points: 300
+        },
+        {
+            email: "sunita.krishnan@email.com",
+            name: "Sunita Krishnan",
+            role: "CITIZEN" as const,
+            password: citizenPassword,
+            emailVerified: new Date(),
+            phone: "+91-9876543231",
+            address: "202 Koramangala, Bangalore",
+            latitude: 12.9352,
+            longitude: 77.6245,
+            points: 420
+        },
+        {
+            email: "rajesh.khanna@email.com",
+            name: "Rajesh Khanna",
+            role: "CITIZEN" as const,
+            password: citizenPassword,
+            emailVerified: new Date(),
+            phone: "+91-9876543232",
+            address: "303 Indiranagar, Bangalore",
+            latitude: 12.9784,
+            longitude: 77.6408,
+            points: 215
+        },
+        {
+            email: "neha.kapoor@email.com",
+            name: "Neha Kapoor",
+            role: "CITIZEN" as const,
+            password: citizenPassword,
+            emailVerified: new Date(),
+            phone: "+91-9876543233",
+            address: "404 Whitefield, Bangalore",
+            latitude: 12.9698,
+            longitude: 77.7499,
+            points: 155
+        },
+        {
+            email: "sanjay.dutt@email.com",
+            name: "Sanjay Dutt",
+            role: "CITIZEN" as const,
+            password: citizenPassword,
+            emailVerified: new Date(),
+            phone: "+91-9876543234",
+            address: "505 Malleshwaram, Bangalore",
+            latitude: 12.9988,
+            longitude: 77.5678,
+            points: 95
         }
     ];
 
@@ -376,14 +436,14 @@ async function main() {
     // Seed Complaints (30+ complaints with various statuses)
     console.log("📋 Creating complaints...");
     const complaintTypes = [
-        "Garbage", "Road damage", "Water leakage", "Street light", "Drainage", 
+        "Garbage", "Road damage", "Water leakage", "Street light", "Drainage",
         "Noise pollution", "Illegal construction", "Tree falling", "Public toilet",
         "Traffic jam", "Mosquito menace", "Stray animals", "Broken pipeline",
         "Encroachment", "Electricity issue"
     ];
 
     const statuses = ["PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"] as const;
-    
+
     const complaints = [];
     let ticketCounter = 10001;
 
@@ -397,13 +457,14 @@ async function main() {
             const status = statuses[Math.floor(Math.random() * statuses.length)];
             const severity = Math.floor(Math.random() * 5) + 1; // 1-5
             const department = createdDepts[Math.floor(Math.random() * createdDepts.length)];
-            
+
             // Random location near Bangalore
             const lat = 12.9716 + (Math.random() - 0.5) * 0.02;
             const lng = 77.5946 + (Math.random() - 0.5) * 0.02;
 
             const complaint = {
                 ticketId: `JSK-2026-${ticketCounter++}`,
+                receiptId: `JSK-RCPT-${Math.floor(1000 + Math.random() * 9000)}-${ticketCounter}`,
                 title: `${category} issue near ${(citizen.address || 'location').split(',')[0]}`,
                 description: `This is a sample complaint about ${category.toLowerCase()} in the area. The issue has been persisting for some time and needs immediate attention from the concerned authorities.`,
                 category,
@@ -454,22 +515,40 @@ async function main() {
     // Create audit logs
     console.log("📊 Creating audit logs...");
     const auditActions = [
-        "USER_REGISTERED", "COMPLAINT_CREATED", "COMPLAINT_ASSIGNED", 
+        "USER_REGISTERED", "COMPLAINT_CREATED", "COMPLAINT_ASSIGNED",
         "COMPLAINT_RESOLVED", "USER_LOGIN", "PASSWORD_RESET"
     ];
 
     for (let i = 0; i < 50; i++) {
         const user = [admin, ...createdOfficers, ...createdCitizens][Math.floor(Math.random() * (1 + createdOfficers.length + createdCitizens.length))];
         const action = auditActions[Math.floor(Math.random() * auditActions.length)];
-        
+
         await prisma.auditLog.create({
             data: {
                 action,
                 userId: user.id,
                 details: `Sample audit log entry for ${action} by ${user.name || 'Unknown'}`,
-                createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000) // Random date within last 30 days
+                createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
             }
         });
+    }
+
+    // Seed Notifications for Citizens
+    console.log("🔔 Creating notifications...");
+    for (const citizen of createdCitizens.slice(0, 5)) {
+        const citizenComplaints = createdComplaints.filter(c => c.authorId === citizen.id);
+        for (const complaint of citizenComplaints) {
+            await prisma.notification.create({
+                data: {
+                    userId: citizen.id,
+                    type: complaint.status === "RESOLVED" ? "RESOLVED" : "STATUS_UPDATE",
+                    title: complaint.status === "RESOLVED" ? "Issue Resolved" : "Status Updated",
+                    message: `Your complaint ${complaint.ticketId} regarding ${complaint.category} is now ${complaint.status.toLowerCase().replace('_', ' ')}.`,
+                    complaintId: complaint.id,
+                    read: Math.random() > 0.5
+                }
+            });
+        }
     }
 
     // Summary
@@ -480,19 +559,13 @@ async function main() {
     console.log(`👥 Citizens: ${createdCitizens.length}`);
     console.log(`📁 Departments: ${createdDepts.length}`);
     console.log(`📋 Complaints: ${createdComplaints.length}`);
+    console.log(`🔔 Notifications: Created sample notifications for active citizens`);
     console.log(`📊 Audit Logs: 50`);
-    
+
     console.log("\n🔑 Login Credentials:");
     console.log("Admin: admin@jansankalp.ai / admin123");
     console.log("Officers: [name].officer@jansankalp.ai / officer123");
     console.log("Citizens: [name].[lastname]@email.com / citizen123");
-    
-    console.log("\n🎯 Admin can:");
-    console.log("• View all users and their details");
-    console.log("• Monitor all complaints");
-    console.log("• Assign complaints to officers");
-    console.log("• Verify user registrations");
-    console.log("• View audit logs and system statistics");
 }
 
 main()

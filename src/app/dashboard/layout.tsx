@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 
 const adminItems = [
   { icon: LayoutDashboard, label: "Governance", href: "/dashboard" },
@@ -105,10 +106,7 @@ export default function DashboardLayout({
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <button className="p-2 rounded-full hover:bg-muted relative transition-all">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
-            </button>
+            <NotificationCenter userId={session?.user?.id} />
             <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold shadow-sm">
               {session?.user?.name?.[0] || "U"}
             </div>
