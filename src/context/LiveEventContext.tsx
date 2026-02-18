@@ -66,94 +66,91 @@ export const LiveEventProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [complaints, setComplaints] = useState<LiveComplaint[]>([]);
   const [stats, setStats] = useState({
-    totalToday: 1248,
-    resolvedToday: 892,
-    activeDepartments: 14,
+    totalToday: 0,
+    resolvedToday: 0,
+    activeDepartments: 0,
   });
   const [latestEvent, setLatestEvent] = useState<LiveComplaint | null>(null);
 
-  // Status progression logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setComplaints((prev) =>
-        prev.map((c) => {
-          const age = (new Date().getTime() - c.timestamp.getTime()) / 1000;
+  const fetchRealData = useCallback(async () => {
+    try {
+      const res = await fetch("/api/complaints");
+      const data = await res.json();
+      const raw = data.complaints || [];
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-          if (c.status === "Registered" && age > 8)
-            return { ...c, status: "Assigned" };
-          if (c.status === "Assigned" && age > 20)
-            return { ...c, status: "In Progress" }; // 8 + 12
-          if (c.status === "In Progress" && age > 40)
-            return { ...c, status: "Resolved" }; // 20 + 20
+      const formatted: LiveComplaint[] = raw
+        .filter((c: any) => {
+          if (c.status === "RESOLVED") {
+            return new Date(c.updatedAt) > twentyFourHoursAgo;
+          }
+          return true;
+        })
+        .map((c: any) => ({
+          id: c.ticketId || c.id,
+          category: c.category as any,
+          location: `${c.latitude.toFixed(2)}, ${c.longitude.toFixed(2)}`,
+          lat: c.latitude,
+          lng: c.longitude,
+          timestamp: new Date(c.createdAt),
+          status: (c.status === "PENDING"
+            ? "Registered"
+            : c.status === "IN_PROGRESS"
+              ? "In Progress"
+              : c.status === "RESOLVED"
+                ? "Resolved"
+                : "Assigned") as ComplaintStatus,
+        }));
 
-          return c;
-        }),
-      );
-    }, 2000);
+      setComplaints(formatted.slice(0, 15));
 
-    return () => clearInterval(interval);
-  }, []);
-
-  // Update stats logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats((prev) => ({
-        ...prev,
-        totalToday: prev.totalToday + 1,
-        resolvedToday: prev.resolvedToday + (Math.random() > 0.4 ? 1 : 0),
-      }));
-    }, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const addSimulatedComplaint = useCallback((data?: Partial<LiveComplaint>) => {
-    const loc = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
-    const newComplaint: LiveComplaint = {
-      id: data?.id || `JAN-${Math.floor(Math.random() * 1000000)}`,
-      category:
-        (data?.category as any) ||
-        CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)],
-      location: data?.location || loc.name,
-      lat: data?.lat || loc.lat + (Math.random() - 0.5) * 0.01,
-      lng: data?.lng || loc.lng + (Math.random() - 0.5) * 0.01,
-      timestamp: new Date(),
-      status: "Registered",
-    };
-
-    setComplaints((prev) => [newComplaint, ...prev].slice(0, 10));
-    setLatestEvent(newComplaint);
+      // Update basic stats from real data
+      const resolved = raw.filter((c: any) => c.status === "RESOLVED").length;
+      setStats({
+        totalToday: raw.length,
+        resolvedToday: resolved,
+        activeDepartments:
+          new Set(raw.map((c: any) => c.departmentId).filter(Boolean)).size ||
+          5,
+      });
+    } catch (error) {
+      console.error("Error fetching live events:", error);
+    }
   }, []);
 
   // Real-time Pusher Integration
   useEffect(() => {
+    fetchRealData();
+
     const channel = pusherClient.subscribe("governance-channel");
 
     channel.bind("new-complaint", (data: any) => {
-      addSimulatedComplaint({
-        id: data.id,
+      const newEvent: LiveComplaint = {
+        id: data.ticketId || data.id,
         category: data.category,
-        location: "Verified Location", // Simulating location lookup
-        lat: data.location?.lat,
-        lng: data.location?.lng,
-      });
+        location: data.location?.lat
+          ? `${data.location.lat.toFixed(2)}, ${data.location.lng.toFixed(2)}`
+          : "City Center",
+        lat: data.location?.lat || 20.5937,
+        lng: data.location?.lng || 78.9629,
+        timestamp: new Date(),
+        status: "Registered",
+      };
+
+      setComplaints((prev) => [newEvent, ...prev].slice(0, 15));
+      setLatestEvent(newEvent);
+      setStats((prev) => ({ ...prev, totalToday: prev.totalToday + 1 }));
+    });
+
+    channel.bind("complaint-updated", () => {
+      fetchRealData(); // Refetch all on update to keep status in sync
     });
 
     return () => {
       pusherClient.unsubscribe("governance-channel");
     };
-  }, [addSimulatedComplaint]);
-
-  // Event generation loop
-  useEffect(() => {
-    // Initial complaints only on client
-    addSimulatedComplaint();
-
-    const interval = setInterval(() => {
-      addSimulatedComplaint();
-    }, 10000); // New issue every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [addSimulatedComplaint]);
+  }, [fetchRealData]);
 
   return (
     <LiveEventContext.Provider value={{ complaints, stats, latestEvent }}>
