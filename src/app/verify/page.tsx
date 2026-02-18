@@ -25,7 +25,7 @@ function VerifyForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email");
+  const email = searchParams?.get("email");
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
