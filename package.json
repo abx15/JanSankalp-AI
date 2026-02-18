@@ -40,7 +40,7 @@
     "next": "^14.2.15",
     "next-auth": "^5.0.0-beta.30",
     "next-themes": "^0.3.0",
-    "nodemailer": "^8.0.1",
+    "nodemailer": "^6.9.16",
     "openai": "^4.44.0",
     "prisma": "^5.13.0",
     "pusher": "^5.3.2",
