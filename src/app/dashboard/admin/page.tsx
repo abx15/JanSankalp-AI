@@ -4,7 +4,15 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Settings, BarChart3, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import {
+  Users,
+  FileText,
+  Settings,
+  BarChart3,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+} from "lucide-react";
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 
 interface ComplaintUpdate {
@@ -25,12 +33,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/signin");
       return;
     }
-    
+
     if (session?.user?.role !== "ADMIN") {
       router.push("/dashboard");
       return;
@@ -42,7 +50,7 @@ export default function AdminDashboard() {
   //   if (status !== "authenticated") return;
 
   //   const eventSource = new EventSource("/api/notifications/stream");
-    
+
   //   eventSource.onmessage = (event) => {
   //     try {
   //       const data = JSON.parse(event.data);
@@ -79,7 +87,9 @@ export default function AdminDashboard() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage users, departments, and system settings</p>
+        <p className="text-muted-foreground">
+          Manage users, departments, and system settings
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -90,7 +100,9 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">33</div>
-            <p className="text-xs text-muted-foreground">2 Admins, 8 Officers, 21 Citizens</p>
+            <p className="text-xs text-muted-foreground">
+              2 Admins, 8 Officers, 21 Citizens
+            </p>
           </CardContent>
         </Card>
 
@@ -107,7 +119,9 @@ export default function AdminDashboard() {
 
         <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Complaints
+            </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -123,7 +137,9 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">Healthy</div>
-            <p className="text-xs text-muted-foreground">All systems operational</p>
+            <p className="text-xs text-muted-foreground">
+              All systems operational
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -163,18 +179,26 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 recentUpdates.map((update, index) => (
-                  <div key={`${update.complaintId}-${index}`} className="flex items-center gap-3 text-sm p-3 rounded-lg border">
-                    <div className={`w-2 h-2 rounded-full ${
-                      update.status === "RESOLVED" ? "bg-green-500" :
-                      update.status === "IN_PROGRESS" ? "bg-blue-500" :
-                      "bg-orange-500"
-                    }`}></div>
+                  <div
+                    key={`${update.complaintId}-${index}`}
+                    className="flex items-center gap-3 text-sm p-3 rounded-lg border"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        update.status === "RESOLVED"
+                          ? "bg-green-500"
+                          : update.status === "IN_PROGRESS"
+                            ? "bg-blue-500"
+                            : "bg-orange-500"
+                      }`}
+                    ></div>
                     <div className="flex-1">
                       <div className="font-medium">
                         Complaint {update.ticketId} updated to {update.status}
                       </div>
                       <div className="text-muted-foreground text-xs">
-                        by {update.updatedBy} ({update.userRole}) • {new Date(update.timestamp).toLocaleString()}
+                        by {update.updatedBy} ({update.userRole}) •{" "}
+                        {new Date(update.timestamp).toLocaleString()}
                       </div>
                       {update.officerNote && (
                         <div className="text-xs bg-muted p-2 rounded mt-1">
