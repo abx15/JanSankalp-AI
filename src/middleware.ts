@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET
-  });
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
+  const role = (req.auth?.user as any)?.role;
+  const pathname = nextUrl.pathname;
 
-  const pathname = req.nextUrl.pathname;
   const isAuthPage = pathname.startsWith("/auth");
 
   // If user is logged in and tries to access auth pages, redirect to dashboard
-  if (token && isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (isLoggedIn && isAuthPage) {
+    return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
   // Protected routes (require authentication)
@@ -21,46 +20,43 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/api/complaints") ||
     pathname.startsWith("/api/users");
 
-  if (isProtectedRoute && !token) {
-    const searchParams = new URLSearchParams(req.nextUrl.search);
+  if (isProtectedRoute && !isLoggedIn) {
+    const searchParams = new URLSearchParams(nextUrl.search);
     searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(new URL(`/auth/signin?${searchParams.toString()}`, req.url));
+    return NextResponse.redirect(new URL(`/auth/signin?${searchParams.toString()}`, nextUrl));
   }
 
   // Role-based access control
-  if (token) {
-    const role = (token as any)?.role;
-
+  if (isLoggedIn) {
     // Redirect from generic /dashboard to role-specific dashboard
     if (pathname === "/dashboard") {
       if (role === "ADMIN") {
-        return NextResponse.redirect(new URL("/dashboard/admin", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admin", nextUrl));
       }
       if (role === "OFFICER") {
-        return NextResponse.redirect(new URL("/dashboard/officer", req.url));
+        return NextResponse.redirect(new URL("/dashboard/officer", nextUrl));
       }
     }
 
     // Admin-only routes
     if (pathname.startsWith("/dashboard/admin") && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
 
     // Officer routes
     if (pathname.startsWith("/dashboard/officer") && role !== "OFFICER" && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/auth/:path*",
     "/api/complaints/:path*",
     "/api/users/:path*",
-    "/dashboard/admin/:path*",
-    "/dashboard/officer/:path*",
   ],
 };
