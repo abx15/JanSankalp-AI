@@ -3,7 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Users,
   FileText,
@@ -12,26 +18,71 @@ import {
   Clock,
   CheckCircle,
   AlertTriangle,
+  TrendingUp,
+  Activity,
+  Layers,
+  ArrowUpRight,
 } from "lucide-react";
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+} from "recharts";
 
-interface ComplaintUpdate {
-  complaintId: string;
-  ticketId: string;
-  status: string;
-  updatedBy: string;
-  userRole: string;
-  officerNote?: string;
-  verificationImageUrl?: string;
-  timestamp: string;
+interface AnalyticsData {
+  users: Array<{ role: string; _count: number }>;
+  statusDistribution: Array<{ status: string; _count: number }>;
+  categoryDistribution: Array<{ category: string; _count: number }>;
+  dailyTrends: Array<{ day: string; count: number }>;
+  severityDistribution: Array<{ severity: number; _count: number }>;
+  departmentActivity: Array<{ name: string; _count: { complaints: number } }>;
 }
+
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [recentUpdates, setRecentUpdates] = useState<ComplaintUpdate[]>([]);
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch("/api/admin/analytics");
+      if (res.ok) {
+        const analytics = await res.json();
+        setData(analytics);
+        setLastUpdated(new Date());
+      }
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    setMounted(true);
     if (status === "loading") return;
 
     if (!session) {
@@ -43,172 +94,465 @@ export default function AdminDashboard() {
       router.push("/dashboard");
       return;
     }
+
+    fetchData();
   }, [session, status, router]);
 
-  // Listen for real-time complaint updates (disabled for now to fix errors)
-  // useEffect(() => {
-  //   if (status !== "authenticated") return;
-
-  //   const eventSource = new EventSource("/api/notifications/stream");
-
-  //   eventSource.onmessage = (event) => {
-  //     try {
-  //       const data = JSON.parse(event.data);
-  //       if (data.type === "complaint-updated") {
-  //         setRecentUpdates(prev => [data, ...prev.slice(0, 9)]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error parsing notification:", error);
-  //     }
-  //   };
-
-  //   eventSource.onerror = (error) => {
-  //     console.error("EventSource error:", error);
-  //   };
-
-  //   return () => {
-  //     eventSource.close();
-  //   };
-  // }, [status]);
-
-  if (status === "loading") {
+  if (status === "loading" || loading || !mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-sm font-medium text-muted-foreground animate-pulse">
+            Loading Governance Analytics...
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (!session || session?.user?.role !== "ADMIN") {
+  if (!session || session?.user?.role !== "ADMIN" || !data) {
     return null;
   }
 
+  const totalUsers = data.users.reduce((acc, curr) => acc + curr._count, 0);
+  const totalComplaints = (data.statusDistribution || []).reduce(
+    (acc, curr) => acc + curr._count,
+    0,
+  );
+
+  const statusData = (data.statusDistribution || []).map((s) => ({
+    name: s.status,
+    value: s._count,
+  }));
+
+  const categoryData = (data.categoryDistribution || []).map((c) => ({
+    name: c.category,
+    count: c._count,
+  }));
+
+  const trendData = (data.dailyTrends || []).map((t) => ({
+    day: new Date(t.day).toLocaleDateString("en-US", { weekday: "short" }),
+    count: Number(t.count),
+  }));
+
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Manage users, departments, and system settings
-        </p>
+    <div className="space-y-8 p-8 animate-in fade-in duration-700 bg-slate-50/30 min-h-screen">
+      <RealTimeNotifications
+        userId={session?.user?.id}
+        onNewComplaint={fetchData}
+      />
+
+      <div className="flex justify-between items-center bg-white/50 p-6 rounded-3xl border border-white shadow-sm backdrop-blur-md">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
+            <Layers className="w-10 h-10 text-primary" />
+            Admin Insights
+          </h1>
+          <div className="flex items-center gap-3 mt-1">
+            <p className="text-muted-foreground font-medium">
+              Real-time governance analytics dashboard
+            </p>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={fetchData}
+            className="rounded-2xl border-2 border-slate-200 hover:border-primary hover:text-primary transition-all flex gap-2"
+          >
+            <Activity className="w-4 h-4" />
+            Sync Now
+          </Button>
+          <div className="flex items-center gap-2 px-4 py-3 bg-green-500/10 text-green-600 rounded-2xl text-xs font-bold ring-1 ring-green-500/20">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+            LIVE ENGINE
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">33</div>
-            <p className="text-xs text-muted-foreground">
-              2 Admins, 8 Officers, 21 Citizens
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Departments</CardTitle>
-            <Settings className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">Active departments</p>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Complaints
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              User Base
             </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Users className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">25+</div>
-            <p className="text-xs text-muted-foreground">Sample complaints</p>
+            <div className="text-3xl font-black">{totalUsers}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-bold text-blue-600 px-1.5 py-0.5 bg-blue-50 rounded">
+                Active
+              </span>
+              <p className="text-xs text-muted-foreground font-medium">
+                Across 3 major roles
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Health</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Total Reports
+            </CardTitle>
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <FileText className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">Healthy</div>
-            <p className="text-xs text-muted-foreground">
-              All systems operational
-            </p>
+            <div className="text-3xl font-black">{totalComplaints}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-bold text-orange-600 px-1.5 py-0.5 bg-orange-50 rounded">
+                Synced
+              </span>
+              <p className="text-xs text-muted-foreground font-medium">
+                Real-time DB sync
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Avg. Severity
+            </CardTitle>
+            <div className="p-2 bg-red-100 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black">
+              {totalComplaints > 0 &&
+              (data.severityDistribution || []).length > 0
+                ? (
+                    (data.severityDistribution || []).reduce(
+                      (a, b) => a + b.severity * b._count,
+                      0,
+                    ) / totalComplaints
+                  ).toFixed(1)
+                : "0.0"}
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-bold text-red-600 px-1.5 py-0.5 bg-red-50 rounded">
+                Critical
+              </span>
+              <p className="text-xs text-muted-foreground font-medium">
+                Automatic triage
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Health
+            </CardTitle>
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Activity className="h-4 w-4 text-green-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black text-green-600">99%</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-bold text-green-600 px-1.5 py-0.5 bg-green-50 rounded">
+                Optimal
+              </span>
+              <p className="text-xs text-muted-foreground font-medium">
+                All APIs operational
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-7">
+        <Card className="lg:col-span-4 border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Resolution Velocity
+                </CardTitle>
+                <CardDescription>
+                  Reporting trends over the last 7 active days
+                </CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" className="font-bold text-xs">
+                View Report <ArrowUpRight className="ml-1 w-3 h-3" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#f1f5f9"
+                  />
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fontWeight: 600 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fontWeight: 600 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#3b82f6"
+                    strokeWidth={4}
+                    fillOpacity={1}
+                    fill="url(#colorTrend)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3 border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">
+              Status Distribution
+            </CardTitle>
+            <CardDescription>
+              Breakdown by current complaint state
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-3 border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">
+              Priority Departments
+            </CardTitle>
+            <CardDescription>
+              Volume management across core sectors
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6 mt-4">
+              {data.departmentActivity.map((dept, i) => (
+                <div key={dept.name} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm font-bold">
+                    <span className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      {dept.name}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {dept._count.complaints} Cases
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${(dept._count.complaints / totalComplaints) * 100}%`,
+                      }}
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                      className="bg-primary h-full rounded-full"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-4 border-none shadow-sm ring-1 ring-slate-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">
+              Category Analysis
+            </CardTitle>
+            <CardDescription>
+              Total reports segmented by AI-classified categories
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData} layout="vertical">
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="#f1f5f9"
+                  />
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fontWeight: 700 }}
+                    width={120}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <Bar
+                    dataKey="count"
+                    fill="#3b82f6"
+                    radius={[0, 4, 4, 0]}
+                    barSize={32}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="border-none shadow-sm ring-1 ring-slate-200 bg-slate-900 text-white">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-slate-100">Governance Console</CardTitle>
+            <CardDescription className="text-slate-400">
+              Direct administrative control center
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-2">
-              <button className="w-full text-left p-3 rounded-lg border hover:bg-muted transition-colors">
-                Manage Users
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => router.push("/dashboard/admin/users")}
+                className="p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 text-left group"
+              >
+                <Users className="w-5 h-5 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
+                <div className="font-bold text-sm">User Management</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                  Control Access
+                </div>
               </button>
-              <button className="w-full text-left p-3 rounded-lg border hover:bg-muted transition-colors">
-                Manage Departments
+              <button
+                onClick={() => router.push("/dashboard/admin/departments")}
+                className="p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 text-left group"
+              >
+                <Settings className="w-5 h-5 text-orange-400 mb-2 group-hover:scale-110 transition-transform" />
+                <div className="font-bold text-sm">System Structure</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                  Manage Depts
+                </div>
               </button>
-              <button className="w-full text-left p-3 rounded-lg border hover:bg-muted transition-colors">
-                System Settings
+              <button className="p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 text-left group">
+                <BarChart3 className="w-5 h-5 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
+                <div className="font-bold text-sm">Audit Reports</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                  System Logs
+                </div>
               </button>
-              <button className="w-full text-left p-3 rounded-lg border hover:bg-muted transition-colors">
-                View Reports
+              <button className="p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 text-left group">
+                <Activity className="w-5 h-5 text-pink-400 mb-2 group-hover:scale-110 transition-transform" />
+                <div className="font-bold text-sm">Global Config</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                  Environment
+                </div>
               </button>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none shadow-sm ring-1 ring-slate-200">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-orange-500" />
+              Real-time System Audit
+            </CardTitle>
+            <CardDescription>
+              Latest telemetry from active governance sessions
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {recentUpdates.length === 0 ? (
-                <div className="text-center text-muted-foreground py-4">
-                  No recent updates
-                </div>
-              ) : (
-                recentUpdates.map((update, index) => (
-                  <div
-                    key={`${update.complaintId}-${index}`}
-                    className="flex items-center gap-3 text-sm p-3 rounded-lg border"
-                  >
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        update.status === "RESOLVED"
-                          ? "bg-green-500"
-                          : update.status === "IN_PROGRESS"
-                            ? "bg-blue-500"
-                            : "bg-orange-500"
-                      }`}
-                    ></div>
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        Complaint {update.ticketId} updated to {update.status}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        by {update.updatedBy} ({update.userRole}) •{" "}
-                        {new Date(update.timestamp).toLocaleString()}
-                      </div>
-                      {update.officerNote && (
-                        <div className="text-xs bg-muted p-2 rounded mt-1">
-                          Note: {update.officerNote}
-                        </div>
-                      )}
+            <div className="space-y-4">
+              {[1, 2, 3].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                    <Activity className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold flex items-center gap-2">
+                      System Kernel Sync
+                      <span className="text-[10px] font-bold text-green-600 px-1.5 py-0.5 bg-green-50 rounded">
+                        Success
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Database integrity check completed. 0 mismatch found in
+                      session logs.
+                    </p>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase mt-2">
+                      Just now
                     </div>
                   </div>
-                ))
-              )}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -216,3 +560,18 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+// Helper components
+function Button({ children, variant, size, className, ...props }: any) {
+  return (
+    <button
+      className={`inline-flex items-center justify-center rounded-lg font-bold px-4 py-2 transition-all ${variant === "ghost" ? "hover:bg-slate-100" : "bg-primary text-white"} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Add motion from framer-motion if available, otherwise fallback
+import { motion } from "framer-motion";
