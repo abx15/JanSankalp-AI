@@ -80,14 +80,20 @@ export default function DashboardPage() {
   const points = session?.user?.points || 0;
 
   useEffect(() => {
+    console.log("Dashboard - Session Status:", sessionStatus);
+    console.log("Dashboard - Session:", session);
+    
+    if (sessionStatus === "loading") return;
+    
     if (sessionStatus === "authenticated") {
+      console.log("User is authenticated, fetching complaints...");
       fetchComplaints();
     } else if (sessionStatus === "unauthenticated") {
       setLoading(false);
-      // Redirect to signin page
+      console.log("User not authenticated, redirecting to signin...");
       router.push("/auth/signin");
     }
-  }, [sessionStatus, router]);
+  }, [sessionStatus, router, session]);
 
   // Role-based redirect
   useEffect(() => {
