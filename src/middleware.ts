@@ -17,8 +17,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  // Officer-only routes (only officers, not admins)
-  if (pathname.startsWith("/dashboard/officer") && !isOfficer) {
+  // Officer routes (officers and admins can access)
+  if (pathname.startsWith("/dashboard/officer") && !isOfficer && !isAdmin) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
