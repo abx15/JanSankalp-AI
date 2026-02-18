@@ -1,194 +1,164 @@
 <div align="center">
+  <img src="public/logojansanklp.png" alt="JanSankalp AI Logo" width="180" />
 
-  <img src="public/logojansanklp.png" alt="JanSankalp AI Logo" width="200" />
+# 🇮🇳 JanSankalp AI: Smart Urban Governance
 
-# JanSankalp AI 🇮🇳
+### **Bridging the gap between Citizens and Authorities with AI-Driven Intelligence.**
 
-### **Har Awaaz, Har Shehar – Smart Governance for a Smarter India**
+[![Build & Build](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml)
+[![Dockerized](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](file:///c:/Users/arunk/Desktop/ReactProjects25-26/JanSankalp%20AI/docker/docker-compose.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Documentation](https://img.shields.io/badge/Docs-Comprehensive-green)](docs/architecture.md)
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT4-412991?style=for-the-badge&logo=openai)](https://openai.com/)
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-green?style=for-the-badge&logo=vercel)](https://jansanklpai.vercel.app/)
+---
 
-  <p align="center">
-    <a href="#-overview">Overview</a> •
-    <a href="#-key-features">Features</a> •
-    <a href="#-how-it-works">How It Works</a> •
-    <a href="#-tech-stack">Tech Stack</a> •
-    <a href="#-api-documentation">API Documentation</a> •
-    <a href="#-installation">Installation</a> •
-    <a href="#-license">License</a>
-  </p>
+[Overview](#-overview) • [Core Features](#-core-features) • [Tech Stack](#-tech-stack) • [System Flow](#-system-flow) • [Documentation](#-documentation) • [Getting Started](#-getting-started) • [Deployment](#-deployment)
+
 </div>
 
 ---
 
 ## 🏗️ Overview
 
-**JanSankalp AI** is a next-generation civic intelligence platform designed to bridge the gap between citizens and urban governance in India. By leveraging advanced Artificial Intelligence, we empower citizens to report issues in their native languages while providing authorities with real-time, actionable insights.
+**JanSankalp AI** is a state-of-the-art civic grievance redressal platform. Unlike traditional systems that are buried in bureaucracy and language barriers, JanSankalp AI uses **multilingual Voice AI** and **Geo-spatial clustering** to streamline the resolution of municipal issues.
 
-> **Problem**: Traditional grievance redressal systems are slow, manual, and often inaccessible to non-English speakers.
->
-> **Solution**: JanSankalp AI uses **Voice AI**, **Geo-Spatial Analytics**, and **Automated Routing** to solve civic problems 10x faster.
+### Why JanSankalp?
 
----
-
-## 🚀 Key Features
-
-### 🗣️ **Multilingual Voice AI**
-
-- **Speak in your language**: Support for **Hindi, English, Tamil, Telugu**, and 18+ other Indian languages.
-- **Auto-Transcription**: Powered by OpenAI Whisper for 95%+ accuracy.
-- **Real-time Translation**: Officers see complaints in English/Hindi regardless of source language.
-
-### 🧠 **Smart Classification & Routing**
-
-- **AI Triage**: Automatically categorizes complaints (Roads, Water, Electricity) using GPT-4.
-- **Severity Scoring**: Assigns priority (Low, Medium, High, Critical) based on analysis.
-- **Duplicate Detection**: Geo-spatial clustering identifies and groups similar complaints to prevent redundant work.
-
-### 📍 **Geo-Spatial Intelligence**
-
-- **Interactive Maps**: Heatmaps showing problem hotspots.
-- **Location Auto-Tagging**: GPS integration for precise issue localization.
-- **Officer Tracking**: Real-time field force management.
-
-### 📱 **Citizen-First Experience**
-
-- **WhatsApp Integration**: Easy reporting via familiar chat interfaces.
-- **Live Status Tracking**: SMS and Email notifications at every step.
-- **Digital Locker**: Secure storage for proofs and documents.
+- **Language Inclusivity**: Reporting issues in 18+ Indian languages via Voice AI.
+- **Automated Triage**: No manual sorting; AI routes complaints to the correct department.
+- **Transparency**: Every step is tracked in real-time on a community-driven map.
 
 ---
 
-## 🔄 How It Works
+## 🚀 Core Features
 
-We've simplified the complex process of governance into 4 automated steps:
+### 🎙️ Multilingual Voice-First Reporting
 
-1.  **Report**: Citizen speaks or types the issue (e.g., "Pothole on Main Road").
-2.  **Process**: AI translates, classifies, and checks for duplicates.
-3.  **Resolve**: The relevant department officer receives a prioritized alert.
-4.  **Verify**: Citizen gets photo proof of resolution and rates the service.
+Citizens can record their complaints in their mother tongue. Our pipeline transcribes (Whisper AI) and translates (GPT-4) the content instantly.
+
+- **Accuracy**: 95%+ for major Indian dialects.
+- **Automation**: Transcriptions are automatically summarized for the Quick-View dashboard.
+
+### 🧠 AI-Powered Intelligence
+
+Every complaint undergoes a deep analysis process:
+
+- **Severity Scoring**: Quantifies the urgency (1-5) based on text context.
+- **Category Detection**: Automatically tags issues (e.g., Road, Sanitation, Water).
+- **Duplicate Detection**: Uses geo-spatial proximity and semantic similarity to prevent redundant case files.
+
+### 📍 Geo-Spatial Governance
+
+Interactive maps provide high-fidelity visibility:
+
+- **Heatmaps**: Identifying systemic infrastructure failures.
+- **Radius-Based Tracking**: Officers see issues within their assigned territory.
+- **Status Markers**: Real-time color coding (Resolved: Green, Pending: Red, In-Progress: Amber).
+
+### 👮 Officer & Admin Portals
+
+- **Role-Based Workflows**: Dedicated dashboards for Field Officers and City Administrators.
+- **Performance Analytics**: Track resolution efficiency by department.
+- **PDF Reports**: One-click generation of official complaint receipts and closure reports.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Component     | Technology                                        |
-| :------------ | :------------------------------------------------ |
-| **Frontend**  | Next.js 14, React, Framer Motion, Tailwind CSS    |
-| **Backend**   | Next.js API Routes, Prisma ORM                    |
-| **Database**  | PostgreSQL (Supabase/Neon)                        |
-| **AI Engine** | OpenAI GPT-4, Whisper, TensorFlow (Custom Models) |
-| **Real-time** | Pusher / Socket.io                                |
-| **Maps**      | Leaflet / Mapbox                                  |
-| **Auth**      | NextAuth.js                                       |
+| Layer              | Technologies                             |
+| :----------------- | :--------------------------------------- |
+| **Framework**      | Next.js 14 (App Router), TypeScript      |
+| **Styling**        | Tailwind CSS, Framer Motion (Animations) |
+| **Database**       | PostgreSQL, Prisma ORM                   |
+| **Authentication** | NextAuth.js (v5 Beta)                    |
+| **Real-time**      | Pusher (WebSockets)                      |
+| **AI Services**    | OpenAI GPT-4o, OpenAI Whisper            |
+| **Storage**        | Cloudinary / ImageKit                    |
+| **Maps**           | Leaflet.js                               |
 
 ---
 
-## � API Documentation
+## 📂 System Architecture & Folder Structure
 
-Our comprehensive API documentation provides everything developers need to integrate with JanSankalp AI:
+We follow a modular, scalable architecture:
 
-### 🔗 **Quick Links**
-- **[📘 API Reference](docs/API_DOCUMENTATION.md)** - Complete REST API documentation with endpoints, authentication, and examples
-- **[🏗️ Architecture Guide](docs/ARCHITECTURE.md)** - System architecture, tech stack, and design patterns
-- **[🗄️ Database Schema](docs/DATABASE_SCHEMA.md)** - Complete database structure and relationships
-- **[🚀 Setup Guide](docs/SETUP_GUIDE.md)** - Step-by-step development environment setup
-- **[🔒 Security Guidelines](docs/SECURITY_GUIDELINES.md)** - Security best practices and guidelines
-- **[📦 Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Production deployment instructions
-
-### 🚀 **Getting Started with the API**
-
-1. **Authentication**: All API endpoints use JWT Bearer tokens
-2. **Base URL**: `http://localhost:3000/api` (development) or `https://jansanklpai.vercel.app/api` (production)
-3. **Content-Type**: `application/json` for all requests
-4. **Rate Limiting**: Implemented for production environments
-
-### 📖 **Key API Endpoints**
-- **Authentication**: `/api/auth/*` - User authentication and session management
-- **Complaints**: `/api/complaints/*` - CRUD operations for civic complaints
-- **AI Processing**: `/api/ai/*` - AI-powered classification and analysis
-- **Departments**: `/api/departments/*` - Municipal department management
-- **Users**: `/api/user/*` - User profile and management
-
-> **💡 Tip**: Check the complete [API Documentation](docs/API_DOCUMENTATION.md) for detailed request/response examples, error codes, and advanced features.
+```text
+├── .github/          # CI/CD pipelines & open-source templates
+├── config/           # Centralized project configuration
+├── docs/             # Technical Deep-dives (Architecture, API, Setup)
+├── docker/           # Production containerization (Multi-stage)
+├── prisma/           # Database schemas, migrations, and seed scripts
+├── public/           # Static assets (logos, images, fonts)
+├── scripts/          # Automation tools (setup, build, clean)
+└── src/
+    ├── app/          # Next.js App Router (UI & API Routes)
+    ├── components/   # Reusable Atomic UI units
+    ├── lib/          # Core logic (AI, Notifications, PDF, Database)
+    └── types/        # Global TypeScript interfaces
+```
 
 ---
 
-## �� Installation
+## 📘 Documentation Central
 
-Follow these steps to set up the project locally:
+For detailed technical information, refer to the following guides:
 
-### Prerequisites
-
-- Node.js 18+
-- PostgreSQL Database
-- OpenAI API Key
-
-### Steps
-
-1.  **Clone the repository**
-
-    ```bash
-    git clone https://github.com/abx15/JanSankalp-AI.git
-    cd JanSankalp-AI
-    ```
-
-2.  **Install dependencies**
-
-    ```bash
-    npm install
-    ```
-
-3.  **Configure Environment**
-    Create a `.env` file in the root directory:
-
-    ```env
-    DATABASE_URL="postgresql://user:password@localhost:5432/jansankalp"
-    OPENAI_API_KEY="sk-..."
-    NEXTAUTH_SECRET="your-secret"
-    NEXT_PUBLIC_PUSHER_KEY="..."
-    ```
-
-4.  **Initialize Database**
-
-    ```bash
-    npx prisma generate
-    npx prisma db push
-    ```
-
-5.  **Run Development Server**
-    ```bash
-    npm run dev
-    ```
-
-Visit `http://localhost:3000` to see the app in action! 🚀
+| Document            | Description                                | Link                                 |
+| :------------------ | :----------------------------------------- | :----------------------------------- |
+| **Architecture**    | System design and data flow patterns.      | [View Docs](docs/architecture.md)    |
+| **Environment**     | Required API keys and secrets.             | [View Docs](docs/environment.md)     |
+| **Local Setup**     | Step-by-step developer installation.       | [View Docs](docs/setup.md)           |
+| **Deployment**      | Vercel and Docker deployment instructions. | [View Docs](docs/deployment.md)      |
+| **API Reference**   | Detailed list of REST endpoints.           | [View Docs](docs/api.md)             |
+| **Troubleshooting** | Solutions for common setup issues.         | [View Docs](docs/troubleshooting.md) |
 
 ---
 
-## 🤝 Contributing
+## 🚀 Getting Started
 
-We welcome contributions! Please feel free to check out the [issues](https://github.com/abx15/JanSankalp-AI/issues) or submit a Pull Request.
+### 1. Zero-Install with Docker
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+The fastest way to get started is using our pre-configured Docker stack:
+
+```bash
+docker compose -f docker/docker-compose.yml up
+```
+
+### 2. Manual Installation
+
+For active development, use our automation scripts:
+
+```bash
+# Clone and enter the repo
+git clone https://github.com/abx15/JanSankalp-AI.git
+cd JanSankalp-AI
+
+# Run the automated setup (installs deps, generates prisma)
+./scripts/setup.sh
+
+# Start development server
+./scripts/dev.sh
+```
 
 ---
 
-## 📜 License
+## 🤝 Contributing & Community
 
-Distributed under the MIT License. See `LICENSE` for more information.
+We believe in open-source for public good.
+
+1. Review the [CONTRIBUTING.md](CONTRIBUTING.md).
+2. Follow our [Conventional Commits](https://www.conventionalcommits.org/).
+3. Be respectful in our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## ⚖️ License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ for India 🇮🇳</p>
-  <p>Built by <a href="https://github.com/abx15"><strong>Arun Kumar</strong></a></p>
+  <p>Built with ❤️ by <a href="https://github.com/abx15"><strong>Arun Kumar</strong></a></p>
+  <p>For a Smarter, Faster, and More Transparent India. 🇮🇳</p>
 </div>

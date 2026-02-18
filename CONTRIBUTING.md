@@ -1,31 +1,43 @@
-# Contributing to JanSankalp AI
+# Contributing to JanSankalp AI 🇮🇳
 
-First off, thank you for considering contributing to JanSankalp AI! It's people like you who make it a great tool for smart governance.
+First off, thank you for considering contributing to JanSankalp AI! It's people like you that make this platform a valuable tool for smarter governance in India.
+
+## Code of Conduct
+
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
-- Check the existing issues to see if the bug has already been reported.
-- If not, create a new issue. Provide as much detail as possible, including steps to reproduce the bug and your environment's details.
+- Search existing issues to see if the bug has already been reported.
+- If not, create a new issue using the **Bug Report** template.
+- Include as much detail as possible, including steps to reproduce.
 
-### Suggesting Enhancements
+### Requesting Features
 
-- Enhancement suggestions are tracked as [GitHub issues](https://github.com/abx15/JanSankalp-AI/issues).
-- Explain why the enhancement would be useful to most JanSankalp AI users.
+- Open a new issue using the **Feature Request** template.
+- Explain why this feature would be useful and how it should work.
 
 ### Pull Requests
 
-1. Fork the repo and create your branch from `main`.
-2. Install dependencies: `npm install --legacy-peer-deps`.
+1. Fork the repository.
+2. Create a new branch for your feature or fix (`git checkout -b feat/your-feature`).
 3. Make your changes.
-4. Ensure your code follows the project's style (run `npm run lint`).
-5. Open a Pull Request with a clear description of the changes.
+4. Run linting and build to ensure everything is correct:
+   ```bash
+   npm run lint
+   npm run build
+   ```
+5. Commit your changes using [Conventional Commits](https://www.conventionalcommits.org/).
+6. Push to your fork and submit a Pull Request.
 
-## Development Setup
+## Development Environment
 
-See the [README.md](README.md) for detailed setup instructions.
+Please refer to our [Setup Guide](docs/setup.md) for instructions on setting up your local environment.
 
----
+## Style Guide
 
-By contributing, you agree that your contributions will be licensed under its [MIT License](LICENSE).
+- Use TypeScript for all new code.
+- Follow the existing linting and formatting rules (`eslint`, `prettier`).
+- Document new components or logic in the `/docs` folder.
