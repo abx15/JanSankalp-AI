@@ -6,12 +6,7 @@ import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { 
-  ClipboardList, 
-  CheckCircle, 
-  Clock, 
-  AlertTriangle
-} from "lucide-react";
+import { ClipboardList, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 
 export default function OfficerDashboard() {
   const { data: session, status } = useSession();
@@ -19,14 +14,13 @@ export default function OfficerDashboard() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/signin");
       return;
     }
-    
-    // Only officers can access this dashboard, admins should use admin dashboard
-    if (session?.user?.role !== "OFFICER") {
+
+    if (session?.user?.role !== "OFFICER" && session?.user?.role !== "ADMIN") {
       router.push("/dashboard");
       return;
     }
@@ -49,13 +43,17 @@ export default function OfficerDashboard() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold">Officer Dashboard</h1>
-        <p className="text-muted-foreground">Manage assigned complaints and department tasks</p>
+        <p className="text-muted-foreground">
+          Manage assigned complaints and department tasks
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Assigned Cases</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Assigned Cases
+            </CardTitle>
             <ClipboardList className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -105,7 +103,10 @@ export default function OfficerDashboard() {
           </Button>
         </Link>
         <Link href="/dashboard/complaints">
-          <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+          <Button
+            variant="outline"
+            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+          >
             View All Complaints
           </Button>
         </Link>

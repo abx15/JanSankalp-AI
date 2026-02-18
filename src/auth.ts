@@ -44,10 +44,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 where: { id: user.id },
             });
 
+            if (!existingUser) return false;
+
             // Skip email verification check for admin users
-            if (existingUser?.role === "ADMIN") return true;
-            
-            if (!existingUser?.emailVerified) return false;
+            if (existingUser.role === "ADMIN") return true;
+
+            if (!existingUser.emailVerified) return false;
 
             return true;
         },
@@ -59,12 +61,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             return session
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
-                token.role = user.role
-                token.id = user.id
-                token.points = user.points
-            } else if (token.id) {
+                token.role = user.role;
+                token.id = user.id;
+                token.points = user.points;
+            }
+
+            // Sync with database if needed or if triggered by update
+            if (trigger === "update" && session?.points !== undefined) {
+                token.points = session.points;
+            }
+
+            // Refresh data from DB occasionally or if token.id exists but role is missing
+            if (token.id && !token.role) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     select: { role: true, points: true }

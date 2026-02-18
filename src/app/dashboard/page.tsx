@@ -80,34 +80,18 @@ export default function DashboardPage() {
   const points = session?.user?.points || 0;
 
   useEffect(() => {
-    console.log("Dashboard - Session Status:", sessionStatus);
-    console.log("Dashboard - Session:", session);
-    
-    if (sessionStatus === "loading") return;
-    
     if (sessionStatus === "authenticated") {
-      console.log("User is authenticated, fetching complaints...");
-      fetchComplaints();
-    } else if (sessionStatus === "unauthenticated") {
-      setLoading(false);
-      console.log("User not authenticated, redirecting to signin...");
-      router.push("/auth/signin");
-    }
-  }, [sessionStatus, router, session]);
-
-  // Role-based redirect
-  useEffect(() => {
-    if (sessionStatus === "authenticated" && session?.user) {
       if (role === "ADMIN") {
-        // Admin can stay on main dashboard or go to admin dashboard
+        router.push("/dashboard/admin");
       } else if (role === "OFFICER") {
-        // Officer can stay on main dashboard or go to officer dashboard
+        router.push("/dashboard/officer");
+      } else {
+        fetchComplaints();
       }
-      // Citizens stay on main dashboard
     }
-  }, [sessionStatus, session, role]);
+  }, [sessionStatus, role, router]);
 
-  if (loading) {
+  if (loading || (sessionStatus === "authenticated" && role !== "CITIZEN")) {
     return <DashboardSkeleton />;
   }
 
@@ -128,18 +112,24 @@ export default function DashboardPage() {
       <div className="space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold">Officer Dashboard</h1>
-          <p className="text-muted-foreground">Manage assigned complaints and department tasks</p>
+          <p className="text-muted-foreground">
+            Manage assigned complaints and department tasks
+          </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Assigned Cases</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Assigned Cases
+              </CardTitle>
               <ClipboardList className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">Active assignments</p>
+              <p className="text-xs text-muted-foreground">
+                Active assignments
+              </p>
             </CardContent>
           </Card>
 
@@ -167,12 +157,16 @@ export default function DashboardPage() {
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">High Priority</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                High Priority
+              </CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">2</div>
-              <p className="text-xs text-muted-foreground">Immediate attention</p>
+              <p className="text-xs text-muted-foreground">
+                Immediate attention
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -184,7 +178,10 @@ export default function DashboardPage() {
             </Button>
           </Link>
           <Link href="/dashboard/complaints">
-            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+            <Button
+              variant="outline"
+              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            >
               View All Complaints
             </Button>
           </Link>
@@ -281,14 +278,20 @@ function AdminDashboard({
           </Button>
           {role === "ADMIN" && (
             <Link href="/dashboard/admin">
-              <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+              <Button
+                variant="outline"
+                className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+              >
                 <Users className="w-4 h-4" /> Admin Panel
               </Button>
             </Link>
           )}
-          {(role === "OFFICER") && (
+          {role === "OFFICER" && (
             <Link href="/dashboard/officer">
-              <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+              <Button
+                variant="outline"
+                className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+              >
                 <ClipboardList className="w-4 h-4" /> Officer Panel
               </Button>
             </Link>
@@ -502,20 +505,29 @@ function CitizenDashboard({
       <div className="flex flex-wrap gap-3 justify-end">
         {role === "ADMIN" && (
           <Link href="/dashboard/admin">
-            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+            <Button
+              variant="outline"
+              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            >
               <Users className="w-4 h-4" /> Admin Panel
             </Button>
           </Link>
         )}
         {role === "OFFICER" && (
           <Link href="/dashboard/officer">
-            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+            <Button
+              variant="outline"
+              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            >
               <ClipboardList className="w-4 h-4" /> Officer Panel
             </Button>
           </Link>
         )}
         <Link href="/dashboard/complaints">
-          <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+          <Button
+            variant="outline"
+            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+          >
             <History className="w-4 h-4" /> My Complaints
           </Button>
         </Link>
