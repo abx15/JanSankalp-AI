@@ -6,7 +6,7 @@ import { pusherServer } from "@/lib/pusher";
 export async function POST(req: Request) {
     try {
         const session = await auth();
-        
+
         if (!session || !session.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
         const body = await req.json();
         const { complaintId, officerId } = body;
-        
+
         console.log("COMPLAINT_ASSIGNMENT_REQUEST", {
             complaintId,
             officerId,
@@ -71,7 +71,17 @@ export async function POST(req: Request) {
                 timestamp: new Date().toISOString()
             });
 
-            console.log("OFFICER_NOTIFICATION_SENT");
+            // Notify Admin Dashboard of the update
+            await pusherServer.trigger("governance-channel", "complaint-updated", {
+                complaintId: updatedComplaint.id,
+                ticketId: updatedComplaint.ticketId,
+                status: updatedComplaint.status,
+                updatedBy: session.user.name,
+                userRole: session.user.role,
+                timestamp: new Date().toISOString()
+            });
+
+            console.log("OFFICER_AND_ADMIN_NOTIFICATION_SENT");
         } catch (notifyError) {
             console.error("OFFICER_NOTIFICATION_ERROR:", notifyError);
         }
@@ -92,16 +102,16 @@ export async function POST(req: Request) {
             console.error("AUTHOR_NOTIFICATION_ERROR:", authorNotifyError);
         }
 
-        return NextResponse.json({ 
-            success: true, 
+        return NextResponse.json({
+            success: true,
             complaint: updatedComplaint,
             assignedOfficer: officer
         });
 
     } catch (error) {
         console.error("COMPLAINT_ASSIGNMENT_ERROR:", error);
-        return NextResponse.json({ 
-            error: "Internal server error" 
+        return NextResponse.json({
+            error: "Internal server error"
         }, { status: 500 });
     }
 }
