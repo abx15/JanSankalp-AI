@@ -30,6 +30,8 @@ export const LiveCityMap = () => {
   ]); // Central India
   const [mapZoom, setMapZoom] = useState(5);
   const [mounted, setMounted] = useState(false);
+  const [isAutoPanPaused, setIsAutoPanPaused] = useState(false);
+  const autoPanTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastEventId = useRef<string | null>(null);
   const LRef = useRef<any>(null);
 
@@ -53,7 +55,7 @@ export const LiveCityMap = () => {
     const map = useMap();
 
     useEffect(() => {
-      if (map) {
+      if (map && !isAutoPanPaused) {
         map.flyTo(center, zoom, {
           duration: 3,
           easeLinearity: 0.25,
@@ -62,6 +64,14 @@ export const LiveCityMap = () => {
     }, [center, zoom, map]);
 
     return null;
+  };
+
+  const pauseAutoPan = () => {
+    setIsAutoPanPaused(true);
+    if (autoPanTimeoutRef.current) clearTimeout(autoPanTimeoutRef.current);
+    autoPanTimeoutRef.current = setTimeout(() => {
+      setIsAutoPanPaused(false);
+    }, 30000); // Resume after 30 seconds of inactivity
   };
 
   useEffect(() => {
@@ -73,26 +83,28 @@ export const LiveCityMap = () => {
   useEffect(() => {
     if (latestEvent && latestEvent.id !== lastEventId.current) {
       lastEventId.current = latestEvent.id;
-      setMapCenter([latestEvent.lat, latestEvent.lng]);
-      setMapZoom(11);
+      if (!isAutoPanPaused) {
+        setMapCenter([latestEvent.lat, latestEvent.lng]);
+        setMapZoom(11);
+      }
     }
-  }, [latestEvent]);
+  }, [latestEvent, isAutoPanPaused]);
 
   // Fallback / Idle simulation: Pan to random cities if no new events
   useEffect(() => {
     const interval = setInterval(() => {
-      if (complaints.length > 0) {
+      if (complaints.length > 0 && !isAutoPanPaused) {
         const randomComplaint =
           complaints[Math.floor(Math.random() * complaints.length)];
         setMapCenter([randomComplaint.lat, randomComplaint.lng]);
         setMapZoom(10 + Math.random() * 2);
       }
-    }, 12000); // Slightly longer than new event interval to avoid conflicts
+    }, 12000);
 
     return () => clearInterval(interval);
-  }, [complaints]);
+  }, [complaints, isAutoPanPaused]);
 
-  // Standard Leaflet Icon fix (markers don't show by default in some Next.js setups)
+  // Standard Leaflet Icon fix
   const defaultIcon = useMemo(() => {
     if (typeof window === "undefined") return null;
     const L = require("leaflet");
@@ -120,20 +132,25 @@ export const LiveCityMap = () => {
           Dynamic Civic Activity
         </h2>
         <p className="text-slate-500 max-w-xl mx-auto font-medium">
-          Watching the &ldquo;Civic Operating System&rdquo; respond to citizens across India
-          in real-time.
+          Watching the &ldquo;Civic Operating System&rdquo; respond to citizens
+          across India in real-time.
         </p>
       </div>
 
-      <div className="relative h-[500px] md:h-[600px] bg-slate-100 rounded-[3rem] border-4 border-white shadow-2xl overflow-hidden group mb-6 z-10">
+      <div
+        className="relative h-[500px] md:h-[600px] bg-slate-100 rounded-[3rem] border-4 border-white shadow-2xl overflow-hidden group mb-6 z-10"
+        onMouseDown={pauseAutoPan}
+        onWheel={pauseAutoPan}
+        onTouchStart={pauseAutoPan}
+      >
         <MapContainer
           center={mapCenter}
           zoom={mapZoom}
           className="h-full w-full"
-          zoomControl={false}
-          scrollWheelZoom={false}
-          dragging={false}
-          doubleClickZoom={false}
+          zoomControl={true}
+          scrollWheelZoom={true}
+          dragging={true}
+          doubleClickZoom={true}
         >
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -211,6 +228,21 @@ export const LiveCityMap = () => {
               </span>
             </div>
           </div>
+          {isAutoPanPaused && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="px-4 py-2 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-2xl"
+            >
+              Manual Exploration Mode
+              <button
+                onClick={() => setIsAutoPanPaused(false)}
+                className="ml-2 text-primary hover:text-white transition-colors"
+              >
+                Resume Auto-Pan
+              </button>
+            </motion.div>
+          )}
         </div>
 
         <div className="absolute bottom-6 left-6 z-[1000] pointer-events-none">

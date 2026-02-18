@@ -6,14 +6,14 @@ import { pusherServer } from "@/lib/pusher";
 export async function PUT(req: Request) {
     try {
         const session = await auth();
-        
+
         if (!session || !session.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const body = await req.json();
         const { complaintId, status, officerNote, verificationImageUrl } = body;
-        
+
         console.log("COMPLAINT_UPDATE_REQUEST", {
             complaintId,
             status,
@@ -54,7 +54,7 @@ export async function PUT(req: Request) {
 
         // Send real-time notification to admin dashboard
         try {
-            await pusherServer.trigger("admin-channel", "complaint-updated", {
+            await pusherServer.trigger("governance-channel", "complaint-updated", {
                 complaintId: updatedComplaint.id,
                 ticketId: updatedComplaint.ticketId,
                 status: updatedComplaint.status,
@@ -85,15 +85,15 @@ export async function PUT(req: Request) {
             console.error("USER_NOTIFICATION_ERROR:", notificationError);
         }
 
-        return NextResponse.json({ 
-            success: true, 
-            complaint: updatedComplaint 
+        return NextResponse.json({
+            success: true,
+            complaint: updatedComplaint
         });
 
     } catch (error) {
         console.error("COMPLAINT_UPDATE_ERROR:", error);
-        return NextResponse.json({ 
-            error: "Internal server error" 
+        return NextResponse.json({
+            error: "Internal server error"
         }, { status: 500 });
     }
 }
