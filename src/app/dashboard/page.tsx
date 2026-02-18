@@ -81,6 +81,18 @@ export default function DashboardPage() {
     }
   }, [sessionStatus]);
 
+  // Role-based redirect
+  useEffect(() => {
+    if (sessionStatus === "authenticated" && session?.user) {
+      if (role === "ADMIN") {
+        // Admin can stay on main dashboard or go to admin dashboard
+      } else if (role === "OFFICER") {
+        // Officer can stay on main dashboard or go to officer dashboard
+      }
+      // Citizens stay on main dashboard
+    }
+  }, [sessionStatus, session, role]);
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -92,7 +104,78 @@ export default function DashboardPage() {
         loading={loading}
         refresh={fetchComplaints}
         session={session}
+        role={role}
       />
+    );
+  }
+
+  if (role === "OFFICER") {
+    return (
+      <div className="space-y-6 p-6">
+        <div>
+          <h1 className="text-3xl font-bold">Officer Dashboard</h1>
+          <p className="text-muted-foreground">Manage assigned complaints and department tasks</p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Assigned Cases</CardTitle>
+              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">12</div>
+              <p className="text-xs text-muted-foreground">Active assignments</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resolved</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">8</div>
+              <p className="text-xs text-muted-foreground">This month</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">4</div>
+              <p className="text-xs text-muted-foreground">Awaiting action</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">High Priority</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">2</div>
+              <p className="text-xs text-muted-foreground">Immediate attention</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Link href="/dashboard/officer/complaints">
+            <Button className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20">
+              <ClipboardList className="w-4 h-4" /> Manage Assigned Cases
+            </Button>
+          </Link>
+          <Link href="/dashboard/complaints">
+            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+              View All Complaints
+            </Button>
+          </Link>
+        </div>
+      </div>
     );
   }
 
@@ -102,6 +185,7 @@ export default function DashboardPage() {
       points={points}
       loading={loading}
       session={session}
+      role={role}
     />
   );
 }
@@ -111,11 +195,13 @@ function AdminDashboard({
   loading,
   refresh,
   session,
+  role,
 }: {
   complaints: any[];
   loading: boolean;
   refresh: () => void;
   session: any;
+  role: string;
 }) {
   const stats = [
     {
@@ -179,6 +265,20 @@ function AdminDashboard({
           >
             <History className="w-4 h-4" /> Refresh
           </Button>
+          {role === "ADMIN" && (
+            <Link href="/dashboard/admin">
+              <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+                <Users className="w-4 h-4" /> Admin Panel
+              </Button>
+            </Link>
+          )}
+          {(role === "OFFICER") && (
+            <Link href="/dashboard/officer">
+              <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+                <ClipboardList className="w-4 h-4" /> Officer Panel
+              </Button>
+            </Link>
+          )}
           <Link href="/dashboard/complaints">
             <Button className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20">
               <ClipboardList className="w-4 h-4" /> Manage All
@@ -370,11 +470,13 @@ function CitizenDashboard({
   points,
   loading,
   session,
+  role,
 }: {
   complaints: any[];
   points: number;
   loading: boolean;
   session: any;
+  role: string;
 }) {
   const resolvedCount = complaints.filter(
     (c) => c.status === "RESOLVED",
@@ -382,6 +484,29 @@ function CitizenDashboard({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Role-based Navigation Header */}
+      <div className="flex flex-wrap gap-3 justify-end">
+        {role === "ADMIN" && (
+          <Link href="/dashboard/admin">
+            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+              <Users className="w-4 h-4" /> Admin Panel
+            </Button>
+          </Link>
+        )}
+        {role === "OFFICER" && (
+          <Link href="/dashboard/officer">
+            <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+              <ClipboardList className="w-4 h-4" /> Officer Panel
+            </Button>
+          </Link>
+        )}
+        <Link href="/dashboard/complaints">
+          <Button variant="outline" className="rounded-xl font-bold gap-2 bg-background shadow-sm">
+            <History className="w-4 h-4" /> My Complaints
+          </Button>
+        </Link>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-primary">
