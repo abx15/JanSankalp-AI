@@ -44,6 +44,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 where: { id: user.id },
             });
 
+            // Skip email verification check for admin users
+            if (existingUser?.role === "ADMIN") return true;
+            
             if (!existingUser?.emailVerified) return false;
 
             return true;
