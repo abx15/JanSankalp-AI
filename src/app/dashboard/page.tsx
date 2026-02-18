@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -53,12 +54,17 @@ import { generateComplaintReceipt } from "@/lib/pdf-service";
 
 export default function DashboardPage() {
   const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchComplaints = async () => {
     try {
       const res = await fetch("/api/complaints");
+      if (res.status === 401) {
+        // User is not authenticated, don't try to fetch
+        return;
+      }
       const data = await res.json();
       setComplaints(data.complaints || []);
     } catch (err) {
@@ -78,8 +84,10 @@ export default function DashboardPage() {
       fetchComplaints();
     } else if (sessionStatus === "unauthenticated") {
       setLoading(false);
+      // Redirect to signin page
+      router.push("/auth/signin");
     }
-  }, [sessionStatus]);
+  }, [sessionStatus, router]);
 
   // Role-based redirect
   useEffect(() => {
