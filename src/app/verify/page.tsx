@@ -14,7 +14,6 @@ import {
 import { ShieldCheck, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
 import { Suspense } from "react";
 
 function VerifyForm() {
@@ -22,6 +21,10 @@ function VerifyForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // Resend state
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,6 +39,7 @@ function VerifyForm() {
 
     setLoading(true);
     setError("");
+    setResendMessage("");
 
     try {
       const res = await fetch("/api/auth/verify", {
@@ -58,6 +62,38 @@ function VerifyForm() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) return;
+
+    setResendLoading(true);
+    setError("");
+    setResendMessage("");
+
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to resend");
+      }
+
+      setResendMessage(data.message || "Code sent!");
+      if (data.debug?.token) {
+        console.log("Dev Token:", data.debug.token);
+        setResendMessage(`Code sent! (Dev: ${data.debug.token})`);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -93,6 +129,11 @@ function VerifyForm() {
                   {error}
                 </p>
               )}
+              {resendMessage && (
+                <p className="text-sm font-bold text-green-600 text-center">
+                  {resendMessage}
+                </p>
+              )}
             </div>
             <Button
               type="submit"
@@ -113,9 +154,11 @@ function VerifyForm() {
                 Didn&apos;t receive the code?{" "}
                 <button
                   type="button"
-                  className="text-primary font-bold hover:underline"
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  className="text-primary font-bold hover:underline disabled:opacity-50"
                 >
-                  Resend
+                  {resendLoading ? "Sending..." : "Resend"}
                 </button>
               </p>
             </div>

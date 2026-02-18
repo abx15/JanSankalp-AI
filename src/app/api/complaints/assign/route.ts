@@ -50,18 +50,8 @@ export async function POST(req: Request) {
 
         console.log("COMPLAINT_ASSIGNMENT_SUCCESS", updatedComplaint);
 
-        // Send notification to assigned officer
+        // 3. Integrated Notification (Officer Pusher + User Email & DB)
         try {
-            await prisma.notification.create({
-                data: {
-                    userId: officerId,
-                    type: "COMPLAINT_ASSIGNED",
-                    title: "New Complaint Assigned",
-                    message: `You have been assigned complaint ${updatedComplaint.ticketId}: ${updatedComplaint.title}`,
-                    complaintId: updatedComplaint.id
-                }
-            });
-
             // Real-time notification to officer
             await pusherServer.trigger("officer-channel", "complaint-assigned", {
                 complaintId: updatedComplaint.id,
@@ -71,7 +61,19 @@ export async function POST(req: Request) {
                 timestamp: new Date().toISOString()
             });
 
-            // Notify Admin Dashboard of the update
+            // Notify User via Email + DB + Pusher
+            const { notifyComplaintAssigned } = await import("@/lib/notification-service");
+            await notifyComplaintAssigned({
+                userId: updatedComplaint.authorId,
+                userEmail: updatedComplaint.author?.email || "",
+                userName: updatedComplaint.author?.name || "Citizen",
+                complaintId: updatedComplaint.id,
+                ticketId: updatedComplaint.ticketId,
+                officerName: officer.name || "Officer",
+                complaintTitle: updatedComplaint.title
+            });
+
+            // Status Update for Admins
             await pusherServer.trigger("governance-channel", "complaint-updated", {
                 complaintId: updatedComplaint.id,
                 ticketId: updatedComplaint.ticketId,
@@ -81,25 +83,9 @@ export async function POST(req: Request) {
                 timestamp: new Date().toISOString()
             });
 
-            console.log("OFFICER_AND_ADMIN_NOTIFICATION_SENT");
+            console.log("NOTIFICATIONS_SENT_SUCCESSFULLY");
         } catch (notifyError) {
-            console.error("OFFICER_NOTIFICATION_ERROR:", notifyError);
-        }
-
-        // Send notification to complaint author
-        try {
-            await prisma.notification.create({
-                data: {
-                    userId: updatedComplaint.authorId,
-                    type: "STATUS_UPDATE",
-                    title: "Complaint Assigned",
-                    message: `Your complaint ${updatedComplaint.ticketId} has been assigned to ${officer.name}`,
-                    complaintId: updatedComplaint.id
-                }
-            });
-            console.log("AUTHOR_NOTIFICATION_SENT");
-        } catch (authorNotifyError) {
-            console.error("AUTHOR_NOTIFICATION_ERROR:", authorNotifyError);
+            console.error("NOTIFICATION_TRIGGER_ERROR:", notifyError);
         }
 
         return NextResponse.json({

@@ -1,4 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+
+// Rate limiting storage (in production, use Redis)
+const rateLimitStorage = new Map();
+
+// Rate limiting: max 5 attempts per OTP per email
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const key = `verify-otp:${email}`;
+  const attempts = rateLimitStorage.get(key) || [];
+
+  // Remove old attempts (older than 10 minutes)
+  const validAttempts = attempts.filter((timestamp: number) => now - timestamp < 10 * 60 * 1000);
+
+  if (validAttempts.length >= 5) {
+    return false; // Rate limited
+  }
+
+  validAttempts.push(now);
+  rateLimitStorage.set(key, validAttempts);
+  return true;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,16 +33,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get OTP from temporary storage
-    (global as any).otpStorage = (global as any).otpStorage || new Map();
-    const storedOTPData = (global as any).otpStorage.get(email);
+    // Check rate limiting
+    if (!checkRateLimit(email)) {
+      return NextResponse.json(
+        {
+          error: 'Too many verification attempts. Please request a new OTP.',
+          retryAfter: '10 minutes'
+        },
+        { status: 429 }
+      );
+    }
 
-    console.log('🔍 Verifying OTP for email:', email);
-    console.log('🔍 Entered OTP:', otp);
-    console.log('🔍 Stored OTP Data:', storedOTPData ? 'Found' : 'Not found');
+    // Get OTP from database
+    const storedToken = await (prisma as any).passwordResetToken.findFirst({
+      where: {
+        email,
+        token: otp.toString(),
+      },
+    });
 
-    if (!storedOTPData) {
-      console.log('❌ No OTP data found for email:', email);
+    if (!storedToken) {
       return NextResponse.json(
         { error: 'Invalid or expired OTP. Please request a new OTP.' },
         { status: 400 }
@@ -28,38 +60,35 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if OTP has expired
-    if (new Date() > storedOTPData.expiresAt) {
-      console.log('❌ OTP expired for email:', email);
-      (global as any).otpStorage.delete(email);
+    if (new Date() > new Date(storedToken.expires)) {
+      await (prisma as any).passwordResetToken.delete({
+        where: { id: storedToken.id },
+      });
       return NextResponse.json(
         { error: 'OTP has expired. Please request a new one.' },
         { status: 400 }
       );
     }
 
-    // Verify OTP
-    if (storedOTPData.otp !== otp.toString()) {
-      console.log('❌ OTP mismatch. Expected:', storedOTPData.otp, 'Got:', otp);
-      return NextResponse.json(
-        { error: 'Invalid OTP. Please check and try again.' },
-        { status: 400 }
-      );
-    }
+    // OTP is valid — generate a reset token
+    const resetToken = Buffer.from(`${email}:${storedToken.id}:${Date.now()}`).toString('base64');
 
-    console.log('✅ OTP verified successfully for email:', email);
+    // Delete the used OTP token from DB (it's been verified)
+    await (prisma as any).passwordResetToken.delete({
+      where: { id: storedToken.id },
+    });
 
-    // OTP is valid, generate a reset token
-    const resetToken = Buffer.from(`${email}:${Date.now()}`).toString('base64');
-    
-    // Mark OTP as verified
-    storedOTPData.verified = true;
-    storedOTPData.resetToken = resetToken;
-    (global as any).otpStorage.set(email, storedOTPData);
+    // Store reset token temporarily in memory (short-lived, 15 min)
+    (global as any).resetTokenStorage = (global as any).resetTokenStorage || new Map();
+    (global as any).resetTokenStorage.set(email, {
+      resetToken,
+      userId: (await prisma.user.findUnique({ where: { email } }))?.id,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    });
 
     return NextResponse.json({
       message: 'OTP verified successfully',
       resetToken,
-      userId: storedOTPData.userId,
     });
 
   } catch (error) {

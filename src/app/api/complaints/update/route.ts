@@ -69,20 +69,19 @@ export async function PUT(req: Request) {
             console.error("ADMIN_NOTIFICATION_ERROR:", pusherError);
         }
 
-        // Send notification to the complaint author
-        try {
-            await prisma.notification.create({
-                data: {
-                    userId: updatedComplaint.authorId,
-                    type: "STATUS_UPDATE",
-                    title: `Status: ${status}`,
-                    message: `Your complaint ${updatedComplaint.ticketId} status has been updated to ${status}. ${officerNote ? `Officer note: ${officerNote}` : ''}`,
-                    complaintId: updatedComplaint.id
-                }
+        // 3. Notify Citizen (Real-time + Email + DB Record)
+        if (updatedComplaint.author) {
+            const { notifyStatusUpdate } = await import("@/lib/notification-service");
+            await notifyStatusUpdate({
+                userId: updatedComplaint.authorId,
+                userEmail: updatedComplaint.author.email || "",
+                userName: updatedComplaint.author.name || "Citizen",
+                complaintId: updatedComplaint.id,
+                ticketId: updatedComplaint.ticketId,
+                newStatus: status,
+                complaintTitle: updatedComplaint.title
             });
-            console.log("USER_NOTIFICATION_CREATED");
-        } catch (notificationError) {
-            console.error("USER_NOTIFICATION_ERROR:", notificationError);
+            console.log("NOTIFICATIONS_SENT_TO_USER");
         }
 
         return NextResponse.json({

@@ -21,23 +21,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get OTP data from temporary storage
-    (global as any).otpStorage = (global as any).otpStorage || new Map();
-    const storedOTPData = (global as any).otpStorage.get(email);
+    // Get reset token from temporary storage
+    (global as any).resetTokenStorage = (global as any).resetTokenStorage || new Map();
+    const storedResetData = (global as any).resetTokenStorage.get(email);
 
-    if (!storedOTPData || !storedOTPData.verified || storedOTPData.resetToken !== resetToken) {
+    if (!storedResetData || storedResetData.resetToken !== resetToken) {
       return NextResponse.json(
-        { error: 'Invalid or expired reset token' },
+        { error: 'Invalid or expired reset token. Please verify your OTP again.' },
         { status: 400 }
       );
     }
 
-    // Check if OTP has expired (extra security)
-    if (new Date() > storedOTPData.expiresAt) {
-      (global as any).otpStorage.delete(email);
+    // Check if reset token has expired (15 minutes)
+    if (new Date() > storedResetData.expiresAt) {
+      (global as any).resetTokenStorage.delete(email);
       return NextResponse.json(
-        { error: 'Reset token has expired. Please start over' },
+        { error: 'Reset session has expired. Please start over.' },
         { status: 400 }
+      );
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
       );
     }
 
@@ -46,12 +58,14 @@ export async function POST(request: NextRequest) {
 
     // Update user password
     const updatedUser = await prisma.user.update({
-      where: { id: storedOTPData.userId },
+      where: { id: user.id },
       data: { password: hashedPassword },
     });
 
-    // Clean up OTP data
-    (global as any).otpStorage.delete(email);
+    // Clean up reset token
+    (global as any).resetTokenStorage.delete(email);
+
+    console.log('✅ Password reset successfully for:', email);
 
     return NextResponse.json({
       message: 'Password reset successfully',
