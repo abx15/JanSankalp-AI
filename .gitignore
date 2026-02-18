@@ -32,6 +32,7 @@ yarn-error.log*
 /seed/
 seed.json
 /src/lib/seed-v2.ts
+/prisma/large_seed.js
 
 # Login Credentials
 LOGIN_DETAILS.md
