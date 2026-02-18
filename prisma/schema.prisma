@@ -42,6 +42,7 @@ model User {
   complaints    Complaint[]
   assignedTasks Complaint[] @relation("AssignedTo")
   managedDept   Department? @relation("DeptHead")
+  notifications Notification[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -77,9 +78,11 @@ model Complaint {
   department          Department?     @relation(fields: [departmentId], references: [id])
   departmentId        String?
   remarks             Remark[]
+  notifications       Notification[]
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
   duplicateOf         String?
+  receiptId           String?         @unique
 }
 
 model Department {
@@ -101,6 +104,19 @@ model Remark {
   complaint   Complaint @relation(fields: [complaintId], references: [id])
   complaintId String
   createdAt   DateTime  @default(now())
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // "COMPLAINT_REGISTERED", "STATUS_UPDATE", "RESOLVED"
+  title       String
+  message     String
+  complaintId String?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
 model AuditLog {

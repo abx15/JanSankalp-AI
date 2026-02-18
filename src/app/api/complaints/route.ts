@@ -83,6 +83,9 @@ export async function POST(req: Request) {
         console.log("SEVERITY_CALCULATED:", finalSeverity);
 
         console.log("SAVING_TO_PRISMA...");
+        // Generate Receipt ID
+        const receiptId = `JSK-RCPT-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString().slice(-4)}`;
+
         const complaint = await prisma.complaint.create({
             data: {
                 ticketId,
@@ -108,7 +111,7 @@ export async function POST(req: Request) {
 
         // 5. Real-time Notification for Officers/Admins
         try {
-            console.log("TRIGGERING_PUSHER...");
+            console.log("TRIGGERING_PUSHER_ADMIN...");
             await pusherServer.trigger("governance-channel", "new-complaint", {
                 id: complaint.id,
                 ticketId: complaint.ticketId,
@@ -117,26 +120,27 @@ export async function POST(req: Request) {
                 location: { lat: latitude, lng: longitude },
                 authorName: complaint.author?.name
             });
-            console.log("PUSHER_TRIGGER_SUCCESS");
+            console.log("PUSHER_ADMIN_SUCCESS");
         } catch (pusherError) {
-            console.error("PUSHER_ERROR_CONTINUING:", pusherError);
+            console.error("PUSHER_ADMIN_ERROR_CONTINUING:", pusherError);
         }
 
-        // 6. Async Email Trigger
-        if (complaint.author?.email) {
-            try {
-                console.log("SENDING_EMAIL...");
-                await sendComplaintConfirmationEmail(
-                    complaint.author.email,
-                    complaint.author.name || "Citizen",
-                    complaint.ticketId,
-                    complaint.category,
-                    `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
-                );
-                console.log("EMAIL_SEND_SUCCESS");
-            } catch (emailError) {
-                console.error("EMAIL_ERROR_CONTINUING:", emailError);
-            }
+        // 6. Integrated Notification Service (Database + Email + Citizen Real-time)
+        try {
+            console.log("TRIGGERING_NOTIFICATION_SERVICE...");
+            const { notifyComplaintRegistered } = await import("@/lib/notification-service");
+            await notifyComplaintRegistered({
+                userId: complaint.authorId,
+                userEmail: complaint.author?.email || "",
+                userName: complaint.author?.name || "Citizen",
+                complaintId: complaint.id,
+                ticketId: complaint.ticketId,
+                category: complaint.category,
+                location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+            });
+            console.log("NOTIFICATION_SERVICE_SUCCESS");
+        } catch (notifyError) {
+            console.error("NOTIFICATION_SERVICE_ERROR_CONTINUING:", notifyError);
         }
 
         return NextResponse.json({ complaint });

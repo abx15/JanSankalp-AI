@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
+import { pusherServer } from '@/lib/pusher';
 
 export async function GET(request: NextRequest) {
   try {
@@ -155,6 +156,8 @@ export async function POST(request: NextRequest) {
           where: { id: userId }
         });
 
+        await pusherServer.trigger("governance-channel", "user-deleted", { userId });
+
         return NextResponse.json({
           message: 'User deleted successfully'
         });
@@ -165,6 +168,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
     }
+
+    // Trigger real-time update for other admins
+    await pusherServer.trigger("governance-channel", "user-updated", { userId });
 
     return NextResponse.json({
       message: 'User updated successfully',

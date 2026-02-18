@@ -27,12 +27,10 @@ yarn-error.log*
 .env.*
 !.env.example
 
-# Seeded Data
+# Seeded Data (keep for development)
 /prisma/seed-data.js
 /seed/
 seed.json
-seed.ts
-seed.js
 /src/lib/seed-v2.ts
 
 # Login Credentials
@@ -75,3 +73,20 @@ next-env.d.ts
 
 # sensitive
 /src/lib/seed-admin.ts
+
+# Cache and temporary files
+.cache/
+.temp/
+*.tmp
+*.swp
+
+# Build artifacts
+.turbo/
+
+# Testing
+/coverage/
+.nyc_output/
+
+# Local environment
+.env.local
+.env.development.local
