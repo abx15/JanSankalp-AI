@@ -31,6 +31,10 @@ export function RealTimeNotifications({
       if (onNewComplaint) onNewComplaint();
     });
 
+    governanceChannel.bind("complaint-updated", (data: any) => {
+      if (onNewComplaint) onNewComplaint();
+    });
+
     // 2. Listen for personal events (for citizens)
     if (userId) {
       const userChannel = pusher.subscribe(`user-${userId}`);
