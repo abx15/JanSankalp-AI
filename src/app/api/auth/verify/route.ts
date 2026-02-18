@@ -12,6 +12,8 @@ export async function POST(req: Request) {
             );
         }
 
+        console.log("🔍 Verifying email:", email, "with token:", token);
+
         const verificationToken = await (prisma as any).verificationToken.findFirst({
             where: {
                 email,
@@ -20,11 +22,14 @@ export async function POST(req: Request) {
         });
 
         if (!verificationToken) {
+            console.warn("❌ Invalid verification attempt for:", email);
             return NextResponse.json(
                 { error: "Invalid verification code" },
                 { status: 400 }
             );
         }
+
+        console.log("✅ Found verification token, checking expiry...");
 
         const hasExpired = new Date(verificationToken.expires) < new Date();
 

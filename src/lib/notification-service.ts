@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
-import { sendStatusUpdateEmail, sendComplaintConfirmationEmail } from "@/lib/email-service";
+import { sendStatusUpdateEmail, sendComplaintConfirmationEmail, sendComplaintAssignedEmail } from "@/lib/email-service";
 
 export type NotificationType = "COMPLAINT_REGISTERED" | "STATUS_UPDATE" | "RESOLVED";
 
@@ -110,8 +110,42 @@ export async function notifyComplaintRegistered({
         complaintId
     });
 
-    // 2. Send Email Notification
     if (userEmail) {
         await sendComplaintConfirmationEmail(userEmail, userName, ticketId, category, location);
+    }
+}
+
+export async function notifyComplaintAssigned({
+    userId,
+    userEmail,
+    userName,
+    complaintId,
+    ticketId,
+    officerName,
+    complaintTitle
+}: {
+    userId: string;
+    userEmail: string;
+    userName: string;
+    complaintId: string;
+    ticketId: string;
+    officerName: string;
+    complaintTitle: string;
+}) {
+    const title = "Officer Assigned";
+    const message = `An officer (${officerName}) has been assigned to your complaint ${ticketId}.`;
+
+    // 1. Send Dashboard Notification
+    await createNotification({
+        userId,
+        type: "STATUS_UPDATE",
+        title,
+        message,
+        complaintId
+    });
+
+    // 2. Send Email Notification
+    if (userEmail) {
+        await sendComplaintAssignedEmail(userEmail, userName, ticketId, officerName, complaintTitle);
     }
 }

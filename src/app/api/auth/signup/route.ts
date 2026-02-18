@@ -49,7 +49,21 @@ export async function POST(req: Request) {
 
         // Generate OTP and send email
         const { token } = await generateVerificationToken(email);
-        await sendVerificationEmail(email, token);
+        const emailResult = await sendVerificationEmail(email, token);
+
+        if (!emailResult.success) {
+            console.error("❌ Failed to send verification email:", emailResult.error);
+            // We still return success: true because the user was created, 
+            // but we add a warning or handle it as a partial success
+            return NextResponse.json({
+                success: true,
+                message: "User created but failed to send verification email. Please request a new code.",
+                email: user.email,
+                warning: "Email delivery failed",
+                // In dev, send the token back so we can verify manually
+                debug: process.env.NODE_ENV === 'development' ? { token } : undefined
+            });
+        }
 
         return NextResponse.json({
             success: true,
