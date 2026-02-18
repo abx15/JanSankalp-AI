@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Pusher from "pusher-js";
+import { pusherClient } from "@/lib/pusher-client";
 import {
   Table,
   TableBody,
@@ -81,6 +81,24 @@ export function UserListTable() {
     }, 500);
     return () => clearTimeout(timer);
   }, [search, roleFilter]);
+
+  // Real-time updates via Pusher
+  useEffect(() => {
+    const channel = pusherClient.subscribe("governance-channel");
+
+    const handleUpdate = () => {
+      fetchUsers();
+    };
+
+    channel.bind("user-registered", handleUpdate);
+    channel.bind("user-updated", handleUpdate);
+    channel.bind("user-deleted", handleUpdate);
+
+    return () => {
+      channel.unbind_all();
+      pusherClient.unsubscribe("governance-channel");
+    };
+  }, []);
 
   const handleAction = async (userId: string, action: string) => {
     try {

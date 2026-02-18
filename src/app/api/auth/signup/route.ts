@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: Request) {
     try {
@@ -36,6 +37,15 @@ export async function POST(req: Request) {
                 role: "CITIZEN",
             },
         });
+
+        // Trigger real-time update for admins
+        await pusherServer.trigger("governance-channel", "user-registered", {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+        }).catch(err => console.error("Pusher trigger error:", err));
 
         // Generate OTP and send email
         const { token } = await generateVerificationToken(email);
