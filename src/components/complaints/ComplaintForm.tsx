@@ -109,7 +109,7 @@ export default function ComplaintForm() {
   // Smart Suggestion Logic (AI Powered)
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (debouncedDescription.length < 20) {
+      if (debouncedDescription.length < 10) {
         setSuggestion(null);
         return;
       }
