@@ -1,15 +1,5 @@
 import { auth } from "@/auth";
-import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
-
-// Initialize OpenAI lazily to avoid crashes if API key is missing during module load
-const getOpenAI = () => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-        throw new Error("OPENAI_API_KEY is not defined in environment variables");
-    }
-    return new OpenAI({ apiKey });
-};
 
 export async function POST(req: Request) {
     try {
@@ -31,57 +21,35 @@ export async function POST(req: Request) {
             return NextResponse.json({ suggestion: null });
         }
 
-        console.log("DEBUG: Processing suggestions for description length:", description.length);
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
         try {
-            let openai: OpenAI;
-            try {
-                openai = getOpenAI();
-            } catch (e: any) {
-                console.error("DEBUG: Suggestions API Init Failed:", e.message);
-                return new NextResponse(`AI Init Error: ${e.message}`, { status: 500 });
-            }
-
-            const response = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                messages: [
-                    {
-                        role: "system",
-                        content: `You are an AI assistant for JanSankalp AI. Analyze the user's civic complaint.
-          Suggest:
-          1. A concise, professional title.
-          2. Category from: Pothole, Garbage, Water Leakage, Streetlight, Road Damage, Drain Blockage, Corruption.
-          3. Responsible department (e.g., PWD, Municipal, Electricity Dept, Vigilance).
-          4. Priority (Low, Medium, High, Emergency).
-
-          Return ONLY valid JSON:
-          {
-            "title": "Title",
-            "category": "Category",
-            "department": "Department",
-            "priority": "Priority"
-          }`
-                    },
-                    { role: "user", content: description }
-                ],
-                response_format: { type: "json_object" }
+            const response = await fetch(`${AI_SERVICE_URL}/classify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: description }),
             });
 
-            const content = response.choices[0].message.content;
-            if (!content) {
-                console.error("DEBUG: OpenAI returned empty content");
-                return new NextResponse("AI returned empty content", { status: 500 });
+            if (!response.ok) {
+                throw new Error(`AI Engine error: ${response.statusText}`);
             }
 
-            const suggestion = JSON.parse(content);
+            const data = await response.json();
+
+            // Map the FastAPI response to the expected frontend format
+            const suggestion = {
+                title: `${data.category} Issue`, // AI Engine doesn't return title, we can synthesize or add chat call
+                category: data.category,
+                department: `${data.category} Dept`, // Simple mapping for now
+                priority: data.severity, // Low, Medium, High, Critical
+                confidence: data.confidence,
+                reasoning: data.reasoning
+            };
+
             return NextResponse.json({ suggestion });
-        } catch (openaiError: any) {
-            console.error("DEBUG: OpenAI Call Failed:", {
-                status: openaiError.status,
-                message: openaiError.message,
-                stack: openaiError.stack
-            });
-            return new NextResponse(`AI Error: ${openaiError.message || "Unknown"}`, { status: 500 });
+        } catch (aiError: any) {
+            console.error("DEBUG: AI Engine Call Failed:", aiError.message);
+            return new NextResponse(`AI Error: ${aiError.message || "Unknown"}`, { status: 500 });
         }
     } catch (error: any) {
         console.error("DEBUG: Suggestions API Top-Level Error:", error);
