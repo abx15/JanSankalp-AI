@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         const lastMessage = messages[messages.length - 1]?.content || "";
         const history = messages.slice(0, -1);
 
-        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
 
         try {
             const response = await fetch(`${AI_SERVICE_URL}/chat`, {
