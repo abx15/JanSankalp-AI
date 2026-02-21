@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jansankalp-config
+  namespace: jansankalp-frontend
+data:
+  AI_SERVICE_URL: "http://ai-engine-service.jansankalp-ai.svc.cluster.local:8000"
+  NEXT_PUBLIC_APP_URL: "https://jansankalp.example.com"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-engine-config
+  namespace: jansankalp-ai
+data:
+  WEAVIATE_URL: "http://weaviate-service.jansankalp-db.svc.cluster.local:8080"
+  PORT: "8000"
