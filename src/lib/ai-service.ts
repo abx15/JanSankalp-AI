@@ -195,3 +195,44 @@ export async function analyzeComplaint(text: string, imageUrl?: string) {
         };
     }
 }
+
+/**
+ * Federated Learning Operations
+ */
+export async function getFederatedMetrics() {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AI_ENGINE_URL || 'http://localhost:10000'}/analytics/federated`);
+        if (!response.ok) throw new Error("Failed to fetch federated metrics");
+        return await response.json();
+    } catch (error) {
+        console.error("Federated Metrics Error:", error);
+        return null;
+    }
+}
+
+export async function triggerTrainRound() {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AI_ENGINE_URL || 'http://localhost:10000'}/federated/train-round`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error("Failed to trigger training round");
+        return await response.json();
+    } catch (error) {
+        console.error("Train Round Error:", error);
+        return null;
+    }
+}
+
+/**
+ * Infrastructure & IoT Monitoring
+ */
+export async function getInfrastructureAnalytics() {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AI_ENGINE_URL || 'http://localhost:10000'}/analytics/infrastructure`);
+        if (!response.ok) throw new Error("Failed to fetch infra analytics");
+        return await response.json();
+    } catch (error) {
+        console.error("Infra Analytics Error:", error);
+        return null;
+    }
+}

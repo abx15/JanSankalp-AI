@@ -1,30 +1,38 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getTenantFilter } from "@/lib/rbac";
+import { Role, Prisma } from "@prisma/client";
 
 export async function GET() {
     const session = await auth();
+    const allowedRoles: Role[] = [Role.ADMIN, Role.STATE_ADMIN, Role.DISTRICT_ADMIN, Role.CITY_ADMIN];
 
-    if (!session || session.user?.role !== "ADMIN") {
+    if (!session || !allowedRoles.includes(session.user?.role as Role)) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
     try {
-        // 1. User Stats
+        const tenantFilter = getTenantFilter(session.user as any);
+
+        // 1. User Stats (Filtered by hierarchy)
         const userRoleCounts = await prisma.user.groupBy({
             by: ["role"],
+            where: tenantFilter,
             _count: true,
         });
 
         // 2. Complaint Stats by Status
         const statusCounts = await prisma.complaint.groupBy({
             by: ["status"],
+            where: tenantFilter,
             _count: true,
         });
 
         // 3. Complaint Stats by Category
         const categoryCounts = await prisma.complaint.groupBy({
             by: ["category"],
+            where: tenantFilter,
             _count: true,
             orderBy: {
                 _count: {
@@ -39,11 +47,18 @@ export async function GET() {
         sevenDaysAgo.setHours(0, 0, 0, 0);
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        // Get trends and convert BigInt to Number for JSON serialization
+        // Raw query needs dynamic filtering
+        const sqlFilter = [];
+        if (session.user.stateId) sqlFilter.push(Prisma.sql`"stateId" = ${session.user.stateId}`);
+        if (session.user.districtId) sqlFilter.push(Prisma.sql`"districtId" = ${session.user.districtId}`);
+        if (session.user.cityId) sqlFilter.push(Prisma.sql`"cityId" = ${session.user.cityId}`);
+
+        const tenantRawFilter = sqlFilter.length > 0 ? Prisma.sql`AND ${Prisma.join(sqlFilter, ' AND ')}` : Prisma.empty;
+
         const rawTrends: any[] = await prisma.$queryRaw`
             SELECT DATE_TRUNC('day', "createdAt") as day, COUNT(*)::integer as count
             FROM "Complaint"
-            WHERE "createdAt" >= ${sevenDaysAgo}
+            WHERE "createdAt" >= ${sevenDaysAgo} ${tenantRawFilter}
             GROUP BY day
             ORDER BY day ASC
         `;
@@ -69,16 +84,21 @@ export async function GET() {
 
         // 5. Severity Distribution
         const severityCounts = await prisma.complaint.groupBy({
+            where: tenantFilter,
             by: ["severity"],
             _count: true,
         });
 
-        // 6. Department Activity
+        // 6. Department Activity (Filtered implicitly via complaints)
         const deptActivity = await prisma.department.findMany({
             select: {
                 name: true,
                 _count: {
-                    select: { complaints: true }
+                    select: {
+                        complaints: {
+                            where: tenantFilter
+                        }
+                    }
                 }
             },
             orderBy: {
@@ -89,20 +109,23 @@ export async function GET() {
             take: 5
         });
 
-        // 7. AI Problem Insights
+        // 7. AI Problem Insights (Filtered)
         const complaintsForAI = await prisma.complaint.findMany({
-            where: { createdAt: { gte: sevenDaysAgo } },
+            where: {
+                ...tenantFilter,
+                createdAt: { gte: sevenDaysAgo }
+            },
             select: { category: true, description: true, status: true },
             take: 20
         });
 
         const aiInsights = {
             hotspots: categoryCounts.slice(0, 3).map(c => c.category),
-            summary: `Automated scan detected high volume in ${categoryCounts[0]?.category || 'Multiple'} sectors. Recommend immediate department allocation.`,
+            summary: `Automated scan detected patterns in ${categoryCounts[0]?.category || 'Multiple'} sectors for your region.`,
             suggestions: [
-                "Deploy quick-response teams to high-density garbage zones.",
-                "Review PWD routing for efficient pothole patching.",
-                "Verify water leakage reports against aging infrastructure maps."
+                "Deploy quick-response teams based on regional hotspot density.",
+                "Review departmental workload for your district.",
+                "Compare cross-district efficiency metrics."
             ]
         };
 
@@ -112,7 +135,7 @@ export async function GET() {
             categoryDistribution: categoryCounts,
             dailyTrends: formattedTrends,
             severityDistribution: severityCounts,
-            departmentActivity: deptActivity,
+            departmentActivity: deptActivity.map(d => ({ ...d, _count: { complaints: d._count.complaints } })), // Flatten for compat
             aiInsights: aiInsights
         });
     } catch (error: any) {

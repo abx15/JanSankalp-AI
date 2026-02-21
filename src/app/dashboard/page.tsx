@@ -24,6 +24,7 @@ import {
   Loader2,
   ClipboardList,
   FileDown,
+  Cpu,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -43,6 +44,26 @@ const TrendChart = dynamic(() => import("@/components/dashboard/TrendChart"), {
     <div className="h-[200px] w-full bg-muted/20 animate-pulse rounded-xl" />
   ),
 });
+
+const FLDashboard = dynamic(
+  () => import("@/components/dashboard/FLDashboard"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] w-full bg-muted/20 animate-pulse rounded-xl" />
+    ),
+  },
+);
+
+const InfraDashboard = dynamic(
+  () => import("@/components/dashboard/InfraDashboard"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] w-full bg-muted/20 animate-pulse rounded-xl" />
+    ),
+  },
+);
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 import NextImage from "next/image";
 import { cn } from "@/lib/utils";
@@ -356,6 +377,33 @@ function AdminDashboard({
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Federated Learning Monitor */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black tracking-tight text-primary flex items-center gap-2">
+            <Cpu className="w-6 h-6 text-blue-500" /> Decentralized AI Consensus
+          </h2>
+          <span className="text-[10px] font-black bg-blue-500/10 text-blue-500 px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">
+            Federated Mode Active
+          </span>
+        </div>
+        <FLDashboard />
+      </div>
+
+      {/* IoT & Infrastructure Monitoring */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black tracking-tight text-primary flex items-center gap-2">
+            <MapPin className="w-6 h-6 text-emerald-500" /> Predictive
+            Infrastructure Monitor
+          </h2>
+          <span className="text-[10px] font-black bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full border border-emerald-500/20 uppercase tracking-widest">
+            IoT + Satellite Active
+          </span>
+        </div>
+        <InfraDashboard />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-7">
