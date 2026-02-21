@@ -12,7 +12,7 @@ The AI microservice handles complex NLP and ML tasks. Vercel is not ideal for lo
 2. **Root Directory**: `ai-engine`
 3. **Environment**: `Python 3`
 4. **Build Command**: `pip install -r requirements.txt`
-5. **Start Command**: `python -m app.main` (or `uvicorn app.main:app --host 0.0.0.0 --port $PORT`)
+5. **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 6. **Environment Variables**: Add all keys from `ai-engine/.env.example`.
    - `OPENAI_API_KEY`
    - `GROK_API_KEY`
