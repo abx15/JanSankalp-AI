@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { usePathname } from "next/navigation";
 
+import { ChatBot } from "@/components/ai/ChatBot";
+
 export default function ClientEntry({
   children,
 }: {
@@ -41,6 +43,7 @@ export default function ClientEntry({
         }
       >
         {children}
+        <ChatBot />
       </div>
     </>
   );

@@ -106,68 +106,46 @@ export default function ComplaintForm() {
 
   const [debouncedDescription] = useDebounce(formData.description, 300);
 
-  // Smart Suggestion Logic
+  // Smart Suggestion Logic (AI Powered)
   useEffect(() => {
-    if (debouncedDescription.length < 5) {
-      setSuggestion(null);
-      return;
-    }
-
-    const text = debouncedDescription.toLowerCase();
-    let detected = null;
-
-    if (
-      text.includes("sadak") ||
-      text.includes("road") ||
-      text.includes("pothole") ||
-      text.includes("khadda")
-    ) {
-      detected = CATEGORIES.find(
-        (c) => c.id === "pothole" || c.id === "road_damage",
-      );
-    } else if (
-      text.includes("garbage") ||
-      text.includes("koora") ||
-      text.includes("kuncha") ||
-      text.includes("trash")
-    ) {
-      detected = CATEGORIES.find((c) => c.id === "garbage");
-    } else if (
-      text.includes("water") ||
-      text.includes("pani") ||
-      text.includes("leakage") ||
-      text.includes("nal")
-    ) {
-      detected = CATEGORIES.find((c) => c.id === "water_leakage");
-    } else if (
-      text.includes("light") ||
-      text.includes("bijli") ||
-      text.includes("electricity") ||
-      text.includes("power")
-    ) {
-      detected = CATEGORIES.find((c) => c.id === "streetlight");
-    } else if (
-      text.includes("bribe") ||
-      text.includes("risha") ||
-      text.includes("corruption") ||
-      text.includes("paisa")
-    ) {
-      detected = CATEGORIES.find((c) => c.id === "corruption");
-    }
-
-    if (detected) {
-      setSuggestion({
-        category: detected.label,
-        department: detected.department,
-        priority: detected.priority,
-      });
-      // Optionally auto-set category if user hasn't picked one
-      if (!formData.category) {
-        setFormData((prev) => ({ ...prev, category: detected!.id }));
+    const fetchSuggestions = async () => {
+      if (debouncedDescription.length < 20) {
+        setSuggestion(null);
+        return;
       }
-    } else {
-      setSuggestion(null);
-    }
+
+      try {
+        const response = await fetch("/api/ai/suggestions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description: debouncedDescription }),
+        });
+
+        if (response.ok) {
+          const { suggestion: aiSuggestion } = await response.json();
+          if (aiSuggestion) {
+            setSuggestion(aiSuggestion);
+            // Auto-set category if not already selected
+            if (!formData.category) {
+              const matchedCategory = CATEGORIES.find(
+                (c) =>
+                  c.label.toLowerCase() === aiSuggestion.category.toLowerCase(),
+              );
+              if (matchedCategory) {
+                setFormData((prev) => ({
+                  ...prev,
+                  category: matchedCategory.id,
+                }));
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch AI suggestions:", error);
+      }
+    };
+
+    fetchSuggestions();
   }, [debouncedDescription, formData.category]);
 
   const [submitted, setSubmitted] = useState(false);
@@ -285,7 +263,7 @@ export default function ComplaintForm() {
               </p>
             </div>
             <div className="pt-6 flex flex-wrap gap-3 justify-center">
-              <PDFDownloader 
+              <PDFDownloader
                 complaint={lastComplaint}
                 className="rounded-full"
               />

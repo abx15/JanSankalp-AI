@@ -30,12 +30,20 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
   const ikUploadRef = useRef<HTMLInputElement>(null);
 
   const onError = (err: any) => {
-    console.error("Upload Error:", err);
-    setError("Upload failed. Please try again.");
+    console.error("IMAGEKIT_UPLOAD_ERROR_DETAILED:", {
+      message: err.message,
+      help: err.help,
+      stack: err.stack,
+      raw: err,
+    });
+    setError(
+      `Upload failed: ${err.message || "Unknown error"}. Check console.`,
+    );
     setIsUploading(false);
   };
 
   const onSuccess = (res: any) => {
+    console.log("IMAGEKIT_UPLOAD_SUCCESS:", res);
     onUpload(res.url);
     setIsUploading(false);
     setError(null);
