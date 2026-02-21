@@ -217,58 +217,37 @@ RESEND_API_KEY             ──▶  OTP Email delivery
 
 ---
 
-## � Complete Documentation
-
-📖 **Explore our comprehensive documentation suite:**
-
-### 🚀 Quick Start
-- **[📋 Setup Guide](docs-new/guides/setup.md)** - Complete installation & configuration
-- **[🔧 Environment Setup](docs-new/guides/environment.md)** - Environment variables & configuration
-- **[🐳 Docker Setup](docs-new/guides/setup.md#-docker-setup-recommended)** - One-command deployment
-
-### 👥 User Guides
-- **[👤 Citizen Guide](docs-new/guides/citizen-guide.md)** - Complete citizen user manual
-- **[👮 Officer Guide](docs-new/guides/officer-guide.md)** - Officer training & operations
-- **[👨‍💼 Admin Guide](docs-new/guides/admin-guide.md)** - System administration guide
-
-### 🏗️ Technical Documentation
-- **[📊 System Architecture](docs-new/architecture/system-overview.md)** - Complete technical architecture
-- **[🌐 IoT Integration](docs-new/architecture/iot-architecture.md)** - Sensors & streaming setup
-- **[🔌 API Documentation](docs-new/api/README.md)** - Complete REST API reference
-
-### 📞 Support & Contact
-- **[📞 Contact Center](docs-new/contact.md)** - Complete support directory
-- **[🌐 Project Overview](docs-new/project-overview.md)** - Project vision & features
-- **[🔧 Troubleshooting](docs-new/troubleshooting/overview.md)** - Common issues & solutions
-
----
-
 ## 📂 Project Structure
 
 ```
 JanSankalp AI/
-├── 📚 docs/                    ← 📖 COMPLETE DOCUMENTATION
-│   ├── README.md               ← Documentation hub
-│   ├── INDEX.md                ← Complete documentation index
-│   ├── guides/                 ← User guides & setup
-│   │   ├── setup.md            ← Installation guide
-│   │   ├── citizen-guide.md    ← Citizen manual
-│   │   ├── officer-guide.md    ← Officer manual
-│   │   └── admin-guide.md      ← Admin manual
-│   ├── api/                    ← API documentation
-│   ├── architecture/          ← System architecture
-│   │   ├── system-overview.md  ← Technical architecture
-│   │   ├── database-schema.md  ← Database design
-│   │   └── security-guidelines.md ← Security architecture
-│   ├── deployment/             ← Deployment guides
-│   │   └── complete-guide.md   ← Production deployment
-│   ├── contact.md              ← Support directory
-│   └── archive/                ← Legacy docs
-├── 📱 src/                     ← Next.js Frontend
-├── 🤖 ai-engine/               ← FastAPI AI Backend
-├── 🗄️ prisma/                  ← Database Schema
-├── 🐳 docker/                  ← Docker Configuration
-└── 📊 public/                  ← Static Assets
+│
+├── .env.example             ← Frontend env template  ← START HERE
+├── ai-engine/.env.example   ← AI Engine env template ← COPY THIS TOO
+│
+├── ai-engine/               ← FastAPI Python AI Backend
+│   ├── app/main.py          ← All API endpoints
+│   ├── app/federated/       ← Federated Learning (coordinator, nodes, aggregator)
+│   ├── app/services/
+│   │   ├── iot_service.py       ← Water/Air/Electricity sensors
+│   │   ├── vision_service.py    ← Satellite + CCTV CV models
+│   │   ├── risk_service.py      ← Flood + Power outage predictor
+│   │   └── analytics_service.py ← Dashboard data generator
+│   └── app/events/
+│       ├── kafka_client.py      ← Kafka producer/consumer
+│       └── stream_processor.py  ← Real-time event handler
+│
+├── src/                     ← Next.js Frontend
+│   ├── app/dashboard/page.tsx       ← Admin dashboard (FL + Infra sections)
+│   ├── components/dashboard/
+│   │   ├── FLDashboard.tsx          ← Federated Learning UI
+│   │   └── InfraDashboard.tsx       ← Live IoT / Risk Map UI
+│   └── lib/ai-service.ts            ← All AI Engine API calls
+│
+├── prisma/schema.prisma     ← Database schema
+├── docs/IOT_ARCHITECTURE.md ← IoT sensor + Kafka connection guide
+├── docker-compose.yml       ← Run everything with one command
+└── render.yaml              ← One-click Render.com deployment
 ```
 
 ---
@@ -293,40 +272,13 @@ JanSankalp AI/
 
 ## 📚 Documentation
 
-📖 **Complete documentation suite available in [docs/](docs/)**
-
-### 🎯 Quick Navigation
-- **[📚 Documentation Index](docs/INDEX.md)** - 📖 Complete documentation hub (All links in one place)
-- **[🚀 Quick Start](docs/guides/setup.md)** - Step-by-step installation
-- **[👥 User Manuals](docs/INDEX.md#-user-guides-सभ-उपयगकरत-क-लए)** - Citizen, Officer & Admin guides
-- **[🔌 API Reference](docs/api/README.md)** - Complete REST API documentation
-
-### 🚀 Getting Started
-- **[📋 Setup Guide](docs/guides/setup.md)** - Step-by-step installation
-- **[🔧 Environment Setup](docs/guides/environment.md)** - Configuration guide
-- **[📞 Contact & Support](docs/contact.md)** - Help and support center
-
-### 👥 User Manuals
-- **[👤 Citizen Guide](docs/guides/citizen-guide.md)** - How to file and track complaints
-- **[👮 Officer Guide](docs/guides/officer-guide.md)** - Complaint management and resolution
-- **[👨‍💼 Admin Guide](docs/guides/admin-guide.md)** - System administration
-
-### 🏗️ Technical Documentation
-- **[📊 System Architecture](docs/architecture/system-overview.md)** - Complete technical overview
-- **[�️ Database Schema](docs/architecture/database-schema.md)** - Database design & relationships
-- **[�� API Reference](docs/api/README.md)** - REST API documentation
-- **[🌐 IoT Architecture](docs/architecture/iot-architecture.md)** - Sensor integration
-- **[🔐 Security Guidelines](docs/architecture/security-guidelines.md)** - Security architecture
-
-### 🚀 Deployment & Operations
-- **[🚀 Complete Deployment Guide](docs/deployment/complete-guide.md)** - Production deployment
-- **[🐳 Docker Setup](docs/guides/setup.md#-docker-setup-recommended)** - Docker deployment
-- **[🌐 Cloud Deployment](docs/deployment/complete-guide.md#-cloud-deployment)** - Cloud platforms
-
-### 📋 Additional Resources
-- **[🌐 Project Overview](docs/project-overview.md)** - Vision and features
-- **[🔧 Troubleshooting](docs/troubleshooting/overview.md)** - Common issues
-- **[� Contact Center](docs/contact.md)** - Complete support directory
+| File                                                 | Description                                         |
+| ---------------------------------------------------- | --------------------------------------------------- |
+| [docs/IOT_ARCHITECTURE.md](docs/IOT_ARCHITECTURE.md) | IoT sensor formats, Kafka topics, API curl examples |
+| [DEPLOYMENT.md](DEPLOYMENT.md)                       | Docker, Render.com, Vercel, Kubernetes guide        |
+| [LOGIN_DETAILS.md](LOGIN_DETAILS.md)                 | Test credentials (Admin, Officer, Citizen)          |
+| [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md) | Security analysis & compliance                      |
+| [CHANGELOG.md](CHANGELOG.md)                         | Feature history                                     |
 
 ---
 
