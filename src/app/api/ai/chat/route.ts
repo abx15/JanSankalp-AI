@@ -9,61 +9,44 @@ export async function POST(req: Request) {
         }
 
         const { messages } = await req.json();
-        const grokApiKey = process.env.GROK_API_KEY;
+        const lastMessage = messages[messages.length - 1]?.content || "";
+        const history = messages.slice(0, -1);
 
-        if (grokApiKey) {
-            try {
-                const response = await fetch("https://api.x.ai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${grokApiKey}`,
-                    },
-                    body: JSON.stringify({
-                        model: "grok-beta",
-                        messages: [
-                            {
-                                role: "system",
-                                content: "You are JanSankalp AI Assistant. Help citizens with civic complaints and governance in India. Professional, empathetic, and multi-lingual (Hindi/English).",
-                            },
-                            ...messages,
-                        ],
-                        stream: false,
-                    }),
-                });
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
-                if (response.ok) {
-                    const data = await response.json();
-                    return NextResponse.json(data);
-                }
-                console.warn("Grok API failed, falling back to OpenAI...");
-            } catch (grokError) {
-                console.error("Grok Fetch Error:", grokError);
+        try {
+            const response = await fetch(`${AI_SERVICE_URL}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: lastMessage,
+                    history: history.map((m: any) => ({
+                        role: m.role,
+                        content: m.content
+                    }))
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`AI Engine error: ${response.statusText}`);
             }
+
+            const data = await response.json();
+
+            // Format to match expected chat response
+            return NextResponse.json({
+                choices: [{
+                    message: {
+                        role: "assistant",
+                        content: data.response
+                    }
+                }]
+            });
+        } catch (aiError: any) {
+            console.error("AI Engine Chat Error:", aiError.message);
+            return new NextResponse(`AI Error: ${aiError.message}`, { status: 500 });
         }
-
-        // Fallback to OpenAI GPT-4o-mini
-        const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-            },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are JanSankalp AI Assistant. Help citizens with civic complaints and governance in India.",
-                    },
-                    ...messages,
-                ],
-            }),
-        });
-
-        const data = await openAIResponse.json();
-        return NextResponse.json(data);
-    } catch (error) {
+    } catch (error: any) {
         console.error("CHAT_API_ERROR", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
