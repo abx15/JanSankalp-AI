@@ -442,7 +442,7 @@ export default function AdminDashboard() {
                   AI Sector Summary
                 </div>
                 <p className="text-sm font-bold text-slate-700 leading-relaxed italic">
-                  "{data.aiInsights.summary}"
+                  &quot;{data.aiInsights.summary}&quot;
                 </p>
               </div>
               <div className="space-y-4">
