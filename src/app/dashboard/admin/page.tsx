@@ -42,6 +42,7 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { AIProcessingCenter } from "@/components/admin/AIProcessingCenter";
+import { RLOptimizationDashboard } from "@/components/admin/RLOptimizationDashboard";
 
 interface AnalyticsData {
   users: Array<{ role: string; _count: number }>;
@@ -73,7 +74,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState<"analytics" | "ai">("analytics");
+  const [activeTab, setActiveTab] = useState<
+    "analytics" | "ai" | "optimization"
+  >("analytics");
 
   const fetchData = async () => {
     try {
@@ -168,9 +171,15 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("ai")}
-                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "ai" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "ai" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
               >
-                AI Engine
+                AI Hub
+              </button>
+              <button
+                onClick={() => setActiveTab("optimization")}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "optimization" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-500 hover:text-slate-700"}`}
+              >
+                Optimization
               </button>
             </div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded">
@@ -195,6 +204,8 @@ export default function AdminDashboard() {
 
       {activeTab === "ai" ? (
         <AIProcessingCenter />
+      ) : activeTab === "optimization" ? (
+        <RLOptimizationDashboard />
       ) : (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

@@ -14,7 +14,10 @@ datasource db {
 enum Role {
   CITIZEN
   OFFICER
-  ADMIN
+  STATE_ADMIN
+  DISTRICT_ADMIN
+  CITY_ADMIN
+  ADMIN // System Global Admin
 }
 
 enum ComplaintStatus {
@@ -39,12 +42,66 @@ model User {
   latitude      Float?
   longitude     Float?
   avatarUrl     String?
+  
+  // Tenancy
+  state         State?      @relation(fields: [stateId], references: [id])
+  stateId       String?
+  district      District?   @relation(fields: [districtId], references: [id])
+  districtId    String?
+  city          City?       @relation(fields: [cityId], references: [id])
+  cityId        String?
+  ward          Ward?       @relation(fields: [wardId], references: [id])
+  wardId        String?
+
   complaints    Complaint[]
   assignedTasks Complaint[] @relation("AssignedTo")
   managedDept   Department? @relation("DeptHead")
   notifications Notification[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+model State {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  districts District[]
+  users     User[]
+  complaints Complaint[]
+}
+
+model District {
+  id        String     @id @default(cuid())
+  name      String
+  state     State      @relation(fields: [stateId], references: [id])
+  stateId   String
+  cities    City[]
+  users     User[]
+  complaints Complaint[]
+
+  @@unique([name, stateId])
+}
+
+model City {
+  id         String     @id @default(cuid())
+  name       String
+  district   District   @relation(fields: [districtId], references: [id])
+  districtId String
+  wards      Ward[]
+  users      User[]
+  complaints Complaint[]
+
+  @@unique([name, districtId])
+}
+
+model Ward {
+  id         String     @id @default(cuid())
+  name       String
+  city       City       @relation(fields: [cityId], references: [id])
+  cityId     String
+  users      User[]
+  complaints Complaint[]
+
+  @@unique([name, cityId])
 }
 
 model VerificationToken {
@@ -86,6 +143,17 @@ model Complaint {
   assignedToId        String?
   department          Department?     @relation(fields: [departmentId], references: [id])
   departmentId        String?
+  
+  // Tenancy (denormalized for sharding & performance)
+  state               State?          @relation(fields: [stateId], references: [id])
+  stateId             String?
+  district            District?       @relation(fields: [districtId], references: [id])
+  districtId          String?
+  city                City?           @relation(fields: [cityId], references: [id])
+  cityId              String?
+  ward                Ward?           @relation(fields: [wardId], references: [id])
+  wardId              String?
+
   remarks             Remark[]
   notifications       Notification[]
   createdAt           DateTime        @default(now())
