@@ -1,4 +1,7 @@
-from fastapi import FastAPI, HTTPException, Request
+import os
+import time
+import logging
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import (
     ChatRequest, ChatResponse, ClassifyRequest, ClassifyResponse,
@@ -14,32 +17,47 @@ from app.services.analytics_service import analytics_service
 from app.services.voice_service import voice_service
 from app.services.translation_service import translation_service
 from app.services.ml_model_service import ml_model_service
-import logging
-import time
 
-# Setup Logging
-logging.basicConfig(level=logging.INFO)
+# Production Logging Configuration
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 logger = logging.getLogger("ai-engine")
 
-app = FastAPI(title="JanSankalp AI Engine", version="1.0.0")
+app = FastAPI(
+    title="JanSankalp AI Engine",
+    description="Production-grade AI microservice for civic complaint management",
+    version="1.0.0"
+)
 
-# CORS Support
+# CORS Support - In production, limit origins to your Vercel URL
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Middleware for performance logging
+# Performance Middleware
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+async def log_request_time(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    logger.info(f"Path: {request.url.path} | Time: {process_time:.4f}s")
+    duration = time.time() - start_time
+    logger.info(f"Method: {request.method} | Path: {request.url.path} | Duration: {duration:.4f}s | Status: {response.status_code}")
     return response
+
+@app.get("/")
+@app.get("/health")
+def health_check():
+    return {
+        "status": "online",
+        "service": "JanSankalp AI Engine",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    }
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
@@ -73,10 +91,8 @@ async def translate_endpoint(text: str, target: str = "English"):
 async def predict_eta_endpoint(request: PredictETARequest):
     return await ml_model_service.predict_eta(request.category, request.severity, request.location_density)
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "timestamp": time.time()}
-
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Render provides PORT environment variable
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=False, workers=1)
