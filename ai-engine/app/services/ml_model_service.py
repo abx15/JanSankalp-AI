@@ -2,7 +2,9 @@ import joblib
 import numpy as np
 import os
 import logging
+import torch
 from app.schemas import PredictETAResponse
+from app.federated.coordinator import federated_coordinator
 
 logger = logging.getLogger("ai-engine")
 
@@ -50,5 +52,14 @@ class MLModelService:
         if self.classifier:
             return self.classifier.predict([text])[0]
         return None
+
+    async def classify_federated(self, input_tensor: torch.Tensor):
+        """Use the federated model for classification"""
+        self.federated_classifier = federated_coordinator.global_classifier
+        self.federated_classifier.eval()
+        with torch.no_grad():
+            outputs = self.federated_classifier(input_tensor)
+            _, predicted = torch.max(outputs.data, 1)
+            return predicted.item()
 
 ml_model_service = MLModelService()
