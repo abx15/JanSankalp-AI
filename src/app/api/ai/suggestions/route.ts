@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,51 +9,55 @@ export async function POST(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        let description;
-        try {
-            const body = await req.json();
-            description = body.description;
-        } catch (e) {
-            console.error("DEBUG: Failed to parse request JSON:", e);
-            return new NextResponse("Invalid JSON body", { status: 400 });
-        }
+        const body = await req.json();
+        const { description } = body;
 
-        if (!description) {
+        if (!description || description.length < 5) {
             return NextResponse.json({ suggestion: null });
         }
 
-        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
-
-        try {
-            const response = await fetch(`${AI_SERVICE_URL}/classify`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: description }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`AI Engine error: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-
-            // Map the FastAPI response to the expected frontend format
-            const suggestion = {
-                title: `${data.category} Issue`, // AI Engine doesn't return title, we can synthesize or add chat call
-                category: data.category,
-                department: `${data.category} Dept`, // Simple mapping for now
-                priority: data.severity, // Low, Medium, High, Critical
-                confidence: data.confidence,
-                reasoning: data.reasoning
-            };
-
-            return NextResponse.json({ suggestion });
-        } catch (aiError: any) {
-            console.error("DEBUG: AI Engine Call Failed:", aiError.message);
-            return new NextResponse(`AI Error: ${aiError.message || "Unknown"}`, { status: 500 });
+        if (!process.env.OPENAI_API_KEY) {
+            return NextResponse.json({ error: "OPENAI_API_KEY is missing in .env" }, { status: 500 });
         }
+
+        const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        });
+
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: `You are an AI assistant for JanSankalp AI. Analyze the user's civic complaint.
+          Suggest:
+          1. A concise, professional title.
+          2. Category from: Pothole, Garbage, Water Leakage, Streetlight, Road Damage, Drain Blockage, Corruption.
+          3. Responsible department (e.g., PWD, Municipal, Electricity Dept, Vigilance).
+          4. Priority (Low, Medium, High, Emergency).
+
+          Return ONLY valid JSON:
+          {
+            "title": "Title",
+            "category": "Category",
+            "department": "Department",
+            "priority": "Priority"
+          }`
+                },
+                { role: "user", content: description }
+            ],
+            response_format: { type: "json_object" }
+        });
+
+        const suggestion = JSON.parse(response.choices[0].message.content || "{}");
+        return NextResponse.json({ suggestion });
+
     } catch (error: any) {
-        console.error("DEBUG: Suggestions API Top-Level Error:", error);
-        return new NextResponse(`Internal Error: ${error.message || "Unknown"}`, { status: 500 });
+        console.error("SUGGESTIONS_API_ERROR_DETAIL:", error);
+        return NextResponse.json({
+            error: "Internal Error",
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }, { status: 500 });
     }
 }
