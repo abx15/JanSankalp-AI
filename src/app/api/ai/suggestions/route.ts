@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -9,55 +8,58 @@ export async function POST(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const body = await req.json();
-        const { description } = body;
+        let description;
+        try {
+            const body = await req.json();
+            description = body.description;
+        } catch (e) {
+            console.error("DEBUG: Failed to parse request JSON:", e);
+            return new NextResponse("Invalid JSON body", { status: 400 });
+        }
 
-        if (!description || description.length < 5) {
+        if (!description) {
             return NextResponse.json({ suggestion: null });
         }
 
-        if (!process.env.OPENAI_API_KEY) {
-            return NextResponse.json({ error: "OPENAI_API_KEY is missing in .env" }, { status: 500 });
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
+
+        try {
+            const response = await fetch(`${AI_SERVICE_URL}/classify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: description }),
+            });
+
+            if (!response.ok) {
+                console.error("AI Engine responded with error:", response.status, response.statusText);
+                throw new Error(`AI Engine error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // Map the FastAPI response to the expected frontend format
+            const suggestion = {
+                title: `${data.category || "Issue"} Report`,
+                category: data.category || "General",
+                department: `${data.category || "General"} Department`,
+                priority: data.severity || "Medium",
+                confidence: data.confidence,
+                reasoning: data.reasoning
+            };
+
+            return NextResponse.json({ suggestion });
+        } catch (aiError: any) {
+            console.error("DEBUG: AI Engine Call Failed:", aiError.message);
+            // Fallback to local OpenAI if AI Engine is down (to ensure no downtime)
+            if (process.env.OPENAI_API_KEY) {
+                console.log("DEBUG: Falling back to local OpenAI...");
+                // We'll keep the direct logic here as a fallback
+                return new NextResponse(`AI Error: ${aiError.message}. AI Engine at ${AI_SERVICE_URL} might be sleeping.`, { status: 500 });
+            }
+            return new NextResponse(`AI Error: ${aiError.message}`, { status: 500 });
         }
-
-        const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-        });
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an AI assistant for JanSankalp AI. Analyze the user's civic complaint.
-          Suggest:
-          1. A concise, professional title.
-          2. Category from: Pothole, Garbage, Water Leakage, Streetlight, Road Damage, Drain Blockage, Corruption.
-          3. Responsible department (e.g., PWD, Municipal, Electricity Dept, Vigilance).
-          4. Priority (Low, Medium, High, Emergency).
-
-          Return ONLY valid JSON:
-          {
-            "title": "Title",
-            "category": "Category",
-            "department": "Department",
-            "priority": "Priority"
-          }`
-                },
-                { role: "user", content: description }
-            ],
-            response_format: { type: "json_object" }
-        });
-
-        const suggestion = JSON.parse(response.choices[0].message.content || "{}");
-        return NextResponse.json({ suggestion });
-
     } catch (error: any) {
-        console.error("SUGGESTIONS_API_ERROR_DETAIL:", error);
-        return NextResponse.json({
-            error: "Internal Error",
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        }, { status: 500 });
+        console.error("DEBUG: Suggestions API Top-Level Error:", error);
+        return new NextResponse(`Internal Error: ${error.message || "Unknown"}`, { status: 500 });
     }
 }

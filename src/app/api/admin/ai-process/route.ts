@@ -16,7 +16,7 @@ export async function POST(req: Request) {
             take: 10,
         });
 
-        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
         const results = [];
 
         for (const complaint of pendingComplaints) {

@@ -33,7 +33,14 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("DEBUG: ImageKit Config:", { urlEndpoint, publicKey });
+  // Ensure keys are available, even if they arrive late or from different envs
+  const finalUrlEndpoint = urlEndpoint || "https://ik.imagekit.io/er7lmis3j";
+  const finalPublicKey = publicKey || "public_81Hn+17o1UB5aotmt+2cQrFX2nE=";
+
+  console.log("DEBUG: ImageKit Config Final:", {
+    finalUrlEndpoint,
+    finalPublicKey,
+  });
 
   const onError = (err: any) => {
     console.error("IMAGEKIT_UPLOAD_ERROR_DETAILED:", {
@@ -69,15 +76,17 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
 
   return (
     <ImageKitProvider
-      urlEndpoint={urlEndpoint}
-      publicKey={publicKey}
+      urlEndpoint={finalUrlEndpoint}
+      publicKey={finalPublicKey}
       authenticator={authenticator}
     >
       <div className="space-y-4 w-full">
-        {(!urlEndpoint || !publicKey) && (
+        {(!finalUrlEndpoint || !finalPublicKey) && (
           <div className="p-4 bg-orange-50 border border-orange-200 rounded-2xl text-orange-800 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0" />
-            <span>ImageKit Env Vars Missing! check Vercel Settings.</span>
+            <span>
+              ImageKit Configuration Missing! Please check .env or Vercel.
+            </span>
           </div>
         )}
         {value ? (
