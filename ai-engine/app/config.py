@@ -13,7 +13,7 @@ class Config:
     COHERE_API_KEY = os.getenv("COHERE_API_KEY")
     ASSEMBLY_AI_API_KEY = os.getenv("ASSEMBLY_AI_API_KEY")
     
-    AI_SERVICE_URL = os.getenv("AI_SERVICE_URL", "http://localhost:8000")
+    AI_SERVICE_URL = os.getenv("AI_SERVICE_URL", "https://jansankalp-ai.onrender.com")
     
     # Categories for classification
     CATEGORIES = ["Roads", "Water", "Electricity", "Sanitation", "Traffic", "Others"]
