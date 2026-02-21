@@ -60,30 +60,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.role = token.role as Role;
                 session.user.id = token.id as string;
                 session.user.points = token.points as number;
+                session.user.stateId = token.stateId as string | undefined;
+                session.user.districtId = token.districtId as string | undefined;
+                session.user.cityId = token.cityId as string | undefined;
+                session.user.wardId = token.wardId as string | undefined;
             }
             return session
         },
-        async jwt({ token, user, trigger, session }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
                 token.points = user.points;
-            }
-
-            // Sync with database if needed or if triggered by update
-            if (trigger === "update" && session?.points !== undefined) {
-                token.points = session.points;
+                token.stateId = (user as any).stateId;
+                token.districtId = (user as any).districtId;
+                token.cityId = (user as any).cityId;
+                token.wardId = (user as any).wardId;
             }
 
             // Refresh data from DB occasionally or if token.id exists but role is missing
-            if (token.id && !token.role) {
+            if (token.id && (!token.role || !token.stateId)) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    select: { role: true, points: true }
+                    select: {
+                        role: true,
+                        points: true,
+                        stateId: true,
+                        districtId: true,
+                        cityId: true,
+                        wardId: true
+                    }
                 });
                 if (dbUser) {
                     token.role = dbUser.role as Role;
                     token.points = dbUser.points as number;
+                    token.stateId = dbUser.stateId;
+                    token.districtId = dbUser.districtId;
+                    token.cityId = dbUser.cityId;
+                    token.wardId = dbUser.wardId;
                 }
             }
             return token
