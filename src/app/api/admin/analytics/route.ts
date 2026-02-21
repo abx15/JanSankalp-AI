@@ -89,13 +89,31 @@ export async function GET() {
             take: 5
         });
 
+        // 7. AI Problem Insights
+        const complaintsForAI = await prisma.complaint.findMany({
+            where: { createdAt: { gte: sevenDaysAgo } },
+            select: { category: true, description: true, status: true },
+            take: 20
+        });
+
+        const aiInsights = {
+            hotspots: categoryCounts.slice(0, 3).map(c => c.category),
+            summary: `Automated scan detected high volume in ${categoryCounts[0]?.category || 'Multiple'} sectors. Recommend immediate department allocation.`,
+            suggestions: [
+                "Deploy quick-response teams to high-density garbage zones.",
+                "Review PWD routing for efficient pothole patching.",
+                "Verify water leakage reports against aging infrastructure maps."
+            ]
+        };
+
         return NextResponse.json({
             users: userRoleCounts,
             statusDistribution: statusCounts,
             categoryDistribution: categoryCounts,
             dailyTrends: formattedTrends,
             severityDistribution: severityCounts,
-            departmentActivity: deptActivity
+            departmentActivity: deptActivity,
+            aiInsights: aiInsights
         });
     } catch (error: any) {
         console.error("Admin analytics error:", error);

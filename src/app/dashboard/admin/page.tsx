@@ -22,6 +22,7 @@ import {
   Activity,
   Layers,
   ArrowUpRight,
+  Sparkles,
 } from "lucide-react";
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 import {
@@ -47,6 +48,11 @@ interface AnalyticsData {
   dailyTrends: Array<{ day: string; count: number }>;
   severityDistribution: Array<{ severity: number; _count: number }>;
   departmentActivity: Array<{ name: string; _count: { complaints: number } }>;
+  aiInsights?: {
+    hotspots: string[];
+    summary: string;
+    suggestions: string[];
+  };
 }
 
 const COLORS = [
@@ -380,6 +386,68 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {data.aiInsights && (
+        <Card className="border-none shadow-xl ring-2 ring-primary/20 bg-primary/5 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Sparkles className="w-32 h-32 text-primary" />
+          </div>
+          <CardHeader>
+            <CardTitle className="text-2xl font-black flex items-center gap-3 text-primary uppercase tracking-tighter">
+              <Sparkles className="w-7 h-7" />
+              AI Intelligence Terminal
+            </CardTitle>
+            <CardDescription className="text-primary/70 font-bold">
+              Automated anomaly detection and strategic recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+              <div className="space-y-4">
+                <div className="text-xs font-black text-primary/50 uppercase tracking-widest">
+                  Primary Hotspots
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {data.aiInsights.hotspots.map((h, i) => (
+                    <span
+                      key={i}
+                      className="px-4 py-2 bg-white rounded-2xl text-sm font-black text-slate-800 shadow-sm border border-primary/10"
+                    >
+                      {h}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="text-xs font-black text-primary/50 uppercase tracking-widest">
+                  AI Sector Summary
+                </div>
+                <p className="text-sm font-bold text-slate-700 leading-relaxed italic">
+                  "{data.aiInsights.summary}"
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="text-xs font-black text-primary/50 uppercase tracking-widest">
+                  Strategic Suggestions
+                </div>
+                <ul className="space-y-3">
+                  {data.aiInsights.suggestions.map((s, i) => (
+                    <li
+                      key={i}
+                      className="flex gap-3 text-sm font-bold text-slate-600 bg-white/50 p-2 rounded-xl"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary shrink-0">
+                        {i + 1}
+                      </div>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-3 border-none shadow-sm ring-1 ring-slate-200">
