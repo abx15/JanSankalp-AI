@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { pusherClient } from "@/lib/pusher-client";
 import {
   Table,
@@ -56,7 +56,7 @@ export function UserListTable() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -73,14 +73,14 @@ export function UserListTable() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, roleFilter]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(timer);
-  }, [search, roleFilter]);
+  }, [fetchUsers]);
 
   // Real-time updates via Pusher
   useEffect(() => {
@@ -98,7 +98,7 @@ export function UserListTable() {
       channel.unbind_all();
       pusherClient.unsubscribe("governance-channel");
     };
-  }, []);
+  }, [fetchUsers]);
 
   const handleAction = async (userId: string, action: string) => {
     try {
