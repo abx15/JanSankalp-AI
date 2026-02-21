@@ -217,7 +217,10 @@ function DeleteModal({
         </h2>
         <p className="text-sm text-muted-foreground font-medium">
           Are you sure you want to delete{" "}
-          <span className="font-black text-slate-800">"{dept.name}"</span>?
+          <span className="font-black text-slate-800">
+            &ldquo;{dept.name}&rdquo;
+          </span>
+          ?
         </p>
         {dept._count.complaints > 0 && (
           <p className="text-xs font-bold text-orange-600 bg-orange-50 rounded-xl p-3">
@@ -295,7 +298,8 @@ export default function DepartmentsPage() {
     }
     fetchDepts();
     if (isAdmin) fetchOfficers();
-  }, [session, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, status, fetchDepts, fetchOfficers, isAdmin, router]);
 
   const handleSave = async (
     id: string | null,

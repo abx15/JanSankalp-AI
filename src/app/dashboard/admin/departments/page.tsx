@@ -228,7 +228,10 @@ function DeleteModal({
         </h2>
         <p className="text-sm text-muted-foreground font-medium">
           Are you sure you want to delete{" "}
-          <span className="font-black text-slate-800">"{dept.name}"</span>?
+          <span className="font-black text-slate-800">
+            &ldquo;{dept.name}&rdquo;
+          </span>
+          ?
           {dept._count.complaints > 0 && (
             <span className="block mt-2 text-orange-600 font-bold">
               ⚠ This department has {dept._count.complaints} complaints
