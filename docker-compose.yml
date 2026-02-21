@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/jansankalp
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=http://localhost:3000
+      - AI_SERVICE_URL=http://ai-engine:8000
+    depends_on:
+      - postgres
+      - redis
+      - ai-engine
+    networks:
+      - jansankalp-net
+
+  ai-engine:
+    build:
+      context: ./ai-engine
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - ./ai-engine/.env
+    environment:
+      - PORT=8000
+      - WEAVIATE_URL=http://vector-db:8080
+    depends_on:
+      - vector-db
+    volumes:
+      - ai-models:/app/models
+    networks:
+      - jansankalp-net
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=jansankalp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - jansankalp-net
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - jansankalp-net
+
+  vector-db:
+    image: semitechnologies/weaviate:1.24.1
+    restart: always
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=text2vec-openai
+      - ENABLE_MODULES=text2vec-openai
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    networks:
+      - jansankalp-net
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - ai-engine
+    networks:
+      - jansankalp-net
+
+networks:
+  jansankalp-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  weaviate-data:
+  ai-models:

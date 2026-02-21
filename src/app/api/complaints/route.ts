@@ -44,90 +44,86 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        console.log("RECEIVED_COMPLAINT_BODY:", body);
         const { title, description, imageUrl, latitude, longitude, authorId } = body;
 
         if (!authorId) {
-            console.error("MISSING_AUTHOR_ID");
             return new NextResponse("Missing authorId", { status: 400 });
         }
 
-        // 0. Generate Unique Ticket ID: JSK-YYYY-XXXXX
         const ticketId = `JSK-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
-        console.log("GENERATED_TICKET_ID:", ticketId);
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
 
-        // 1. Language Detection & Translation
-        console.log("STARTING_AI_TRANSLATION...");
-        const { originalLanguage, translatedText } = await detectAndTranslate(description);
-        console.log("AI_TRANSLATION_DONE:", { originalLanguage, translatedText });
+        // --- Autonomous AI Workflow ---
+        console.log(`[AI-WORKFLOW] Starting for Ticket: ${ticketId}`);
 
-        // 2. AI Image/Text Classification
-        console.log("STARTING_AI_ANALYSIS...");
-        const aiAnalysis = await analyzeComplaint(translatedText, imageUrl);
-        console.log("AI_ANALYSIS_DONE:", aiAnalysis);
+        let aiResult: any = null;
+        try {
+            const aiResponse = await fetch(`${AI_SERVICE_URL}/process-workflow`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    complaint_id: ticketId,
+                    text: description,
+                    latitude,
+                    longitude
+                }),
+            });
 
-        // 3. Duplicate Detection
-        console.log("CHECKING_DUPLICATES...");
-        const duplicates = await findNearbyDuplicates(latitude, longitude, aiAnalysis.category);
-        const duplicateOf = duplicates.length > 0 ? duplicates[0].id : null;
-        console.log("DUPLICATES_CHECK_DONE:", { count: duplicates.length, duplicateOf });
+            if (aiResponse.ok) {
+                aiResult = await aiResponse.json();
+                console.log("[AI-WORKFLOW] Result:", aiResult);
+            }
+        } catch (aiError: any) {
+            console.error("[AI-WORKFLOW] Service unreachable, falling back to basic processing:", aiError.message);
+        }
 
-        // 4. Refined Severity Scoring
-        const kwWeight = getKeywordWeight(translatedText);
-        const finalSeverity = calculateSeverity(
-            aiAnalysis.severity,
-            aiAnalysis.sentiment,
-            kwWeight,
-            duplicates.length
-        );
-        console.log("SEVERITY_CALCULATED:", finalSeverity);
+        const status = aiResult?.status === "REJECTED_SPAM" ? "REJECTED" :
+            (aiResult?.assigned_officer ? "IN_PROGRESS" : "PENDING");
 
-        console.log("SAVING_TO_PRISMA...");
-        // Generate Receipt ID
-        const receiptId = `JSK-RCPT-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString().slice(-4)}`;
-
+        // Save to Database
         const complaint = await prisma.complaint.create({
             data: {
                 ticketId,
-                title: aiAnalysis.category + " reported",
+                title: aiResult?.analysis?.category ? `${aiResult.analysis.category} Issue` : (title || "Civic Issue"),
                 description,
                 originalText: description,
-                originalLanguage,
-                translatedText,
-                category: aiAnalysis.category,
-                severity: finalSeverity,
-                confidenceScore: aiAnalysis.confidence,
+                status,
+                category: aiResult?.analysis?.category || "General",
+                severity: aiResult?.analysis?.severity ?
+                    (aiResult.analysis.severity === "Critical" ? 5 :
+                        aiResult.analysis.severity === "High" ? 4 :
+                            aiResult.analysis.severity === "Medium" ? 3 : 2) : 1,
+                confidenceScore: aiResult?.analysis?.confidence || 0.5,
                 imageUrl,
                 latitude,
                 longitude,
                 authorId,
-                duplicateOf: duplicateOf,
+                assignedToId: aiResult?.assigned_officer || null,
+                duplicateOf: aiResult?.is_duplicate ? "DUPLICATE_FOUND" : null, // Simplification for now
+                aiAnalysis: aiResult ? {
+                    category: aiResult.analysis.category,
+                    reasoning: aiResult.analysis.reasoning,
+                    confidence: aiResult.analysis.confidence,
+                    eta_days: aiResult.eta_days
+                } : null,
+                spamScore: aiResult?.is_spam ? 1.0 : 0.0,
+                isDuplicate: aiResult?.is_duplicate || false,
             } as any,
             include: {
                 author: { select: { name: true, email: true } },
             }
         });
-        console.log("PRISMA_SAVE_SUCCESS:", complaint.id);
 
-        // 5. Real-time Notification for Officers/Admins
+        // Notifications
         try {
-            console.log("TRIGGERING_PUSHER_ADMIN...");
             await pusherServer.trigger("governance-channel", "new-complaint", {
                 id: complaint.id,
                 ticketId: complaint.ticketId,
                 category: complaint.category,
-                severity: complaint.severity,
-                location: { lat: latitude, lng: longitude },
-                authorName: complaint.author?.name
+                status: complaint.status,
+                location: { lat: latitude, lng: longitude }
             });
-            console.log("PUSHER_ADMIN_SUCCESS");
-        } catch (pusherError) {
-            console.error("PUSHER_ADMIN_ERROR_CONTINUING:", pusherError);
-        }
 
-        // 6. Integrated Notification Service (Database + Email + Citizen Real-time)
-        try {
-            console.log("TRIGGERING_NOTIFICATION_SERVICE...");
             const { notifyComplaintRegistered } = await import("@/lib/notification-service");
             await notifyComplaintRegistered({
                 userId: complaint.authorId,
@@ -138,14 +134,22 @@ export async function POST(req: Request) {
                 category: complaint.category,
                 location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
             });
-            console.log("NOTIFICATION_SERVICE_SUCCESS");
-        } catch (notifyError) {
-            console.error("NOTIFICATION_SERVICE_ERROR_CONTINUING:", notifyError);
+        } catch (err) {
+            console.error("[NOTIFY] Error:", err);
         }
 
-        return NextResponse.json({ complaint });
-    } catch (error) {
-        console.error("COMPLAINT_SUBMIT_ERROR_DETAIL:", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return NextResponse.json({
+            complaint,
+            aiSummary: aiResult ? {
+                status: aiResult.status,
+                isSpam: aiResult.is_spam,
+                isDuplicate: aiResult.is_duplicate,
+                eta: aiResult.eta_days
+            } : null
+        });
+
+    } catch (error: any) {
+        console.error("COMPLAINT_POST_ERROR", error);
+        return new NextResponse(`Internal Error: ${error.message}`, { status: 500 });
     }
 }

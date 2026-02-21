@@ -1,57 +1,58 @@
-# JanSankalp AI Deployment Guide
+# Production Deployment & Scaling Guide
 
-This project consists of two main components that need to be deployed separately for production.
+This guide provides instructions for deploying the JanSankalp AI platform in a production environment using Docker and Nginx.
 
-## 1. AI Engine (Python FastAPI) - Recommended: Render / Railway
+## 🐳 Deployment Steps (VPS / Cloud)
 
-The AI microservice handles complex NLP and ML tasks. Vercel is not ideal for long-running Python services with large dependencies.
+### 1. Prerequisites
 
-### Deployment Steps (Render.com)
+- Docker & Docker Compose installed.
+- Domain name pointed to your server IP.
+- SSL Certificates (Certbot recommended).
 
-1. **Create a New Web Service**: Link your GitHub repository.
-2. **Root Directory**: `ai-engine`
-3. **Environment**: `Python 3`
-4. **Build Command**: `pip install -r requirements.txt`
-5. **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-6. **Environment Variables**: Add all keys from `ai-engine/.env.example`.
-   - `OPENAI_API_KEY`
-   - `GROK_API_KEY`
-   - `HUGGINGFACE_API_KEY`
-   - `COHERE_API_KEY`
-   - `ASSEMBLY_AI_API_KEY`
+### 2. Environment Setup
 
----
+Create a `.env` file in the root directory and ensure all keys from `ai-engine/.env` are present.
 
-## 2. Frontend (Next.js) - Recommended: Vercel
+```bash
+cp ai-engine/.env.example .env
+nano .env
+```
 
-Deployment to Vercel is standard for Next.js.
+### 3. Build & Run
 
-### Deployment Steps (Vercel)
+```bash
+docker compose up --build -d
+```
 
-1. **Import Project**: Choose the root of the repo.
-2. **Framework Preset**: Next.js
-3. **Environment Variables**:
-   - Copy all keys from your root `.env`.
-   - **CRITICAL**: Set `AI_SERVICE_URL` to the URL provided by Render (e.g., `https://your-ai-engine.onrender.com`).
-4. **Deploy**: Click Deploy.
+### 4. Initialize ML Models
 
----
+Run the training script inside the container to generate initial models:
 
-## 3. Production Connectivity Check
+```bash
+docker compose exec ai-engine python -m ml_training.train
+```
 
-Once both are deployed:
+## 📈 Scaling Strategy
 
-1. Ensure the Vercel app can reach the Render URL.
-2. If using restricted origins, add your Vercel URL to the `allow_origins` list in `ai-engine/app/main.py`.
-3. Verify that `POST /api/ai/suggestions` on Vercel returns data from your AI Engine on Render.
+### Vertical Scaling
 
-## Global Environment Checklist
+- Increase CPU/Memory limits for `ai-engine` and `vector-db`.
+- Adjust Uvicorn workers: `CMD ["uvicorn", "app.main:app", "--workers", "8"]`
 
-| Key                   | Used By   | Description                     |
-| --------------------- | --------- | ------------------------------- |
-| `AI_SERVICE_URL`      | Next.js   | Points to the FastAPI service   |
-| `DATABASE_URL`        | Next.js   | Neon Postgres connection string |
-| `NEXTAUTH_SECRET`     | Next.js   | Auth.js security key            |
-| `IMAGEKIT_*`          | Next.js   | Image upload credentials        |
-| `OPENAI_API_KEY`      | Both      | AI processing and embeddings    |
-| `ASSEMBLY_AI_API_KEY` | AI Engine | Voice-to-text processing        |
+### Horizontal Scaling
+
+- Replicate `ai-engine` service: `docker compose up --scale ai-engine=3 -d`
+- Use Nginx as a Load Balancer (already configured in `nginx.conf`).
+
+### Database Optimization
+
+- **Redis**: Enable cluster mode if caching load increases.
+- **PostgreSQL**: Set up Read Replicas for analytics heavy tasks.
+- **Weaviate**: Use Sharding for massive vector datasets.
+
+## 🩺 Monitoring & Health
+
+- **Next.js**: `http://your-domain.com/health` (via Nginx)
+- **AI Engine**: `http://your-domain.com/ai/health`
+- **Logs**: `docker compose logs -f ai-engine`

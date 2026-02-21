@@ -63,3 +63,39 @@ class AnalyticsResponse(BaseModel):
     severity_distribution: Dict[str, int]
     department_breakdown: Dict[str, int]
     officer_performance: List[Dict[str, Any]]
+
+# --- Autonomous Governance Schemas ---
+
+class SpamCheckRequest(BaseModel):
+    text: str
+
+class SpamCheckResponse(BaseModel):
+    is_spam: bool
+    spam_score: float # 0 to 1
+    reasoning: str
+
+class ResolutionVerifyRequest(BaseModel):
+    complaint_text: str
+    resolution_text: str
+    evidence_image_url: Optional[str] = None
+
+class ResolutionVerifyResponse(BaseModel):
+    is_verified: bool
+    confidence: float
+    feedback: str
+    requires_admin: bool
+
+class AIProcessWorkflowRequest(BaseModel):
+    complaint_id: str
+    text: str
+    latitude: float
+    longitude: float
+
+class AIProcessWorkflowResponse(BaseModel):
+    status: str
+    analysis: ClassifyResponse
+    is_duplicate: bool
+    is_spam: bool
+    assigned_department: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    eta_days: float

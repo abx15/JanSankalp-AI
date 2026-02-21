@@ -28,21 +28,56 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
+        // Fetch original complaint for AI context
+        const originalComplaint = await prisma.complaint.findUnique({
+            where: { id: complaintId }
+        });
+
+        const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
+        let aiVerification = null;
+
+        if (status === "RESOLVED" && originalComplaint) {
+            try {
+                const verifyResp = await fetch(`${AI_SERVICE_URL}/verify-resolution`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        complaint_text: originalComplaint.description,
+                        resolution_text: officerNote,
+                        evidence_image_url: verificationImageUrl
+                    }),
+                });
+
+                if (verifyResp.ok) {
+                    aiVerification = await verifyResp.json();
+                    console.log("[AI-VERIFICATION] Result:", aiVerification);
+                }
+            } catch (err) {
+                console.error("[AI-VERIFICATION] Failed:", err);
+            }
+        }
+
         // Update the complaint
         const updatedComplaint = await prisma.complaint.update({
             where: { id: complaintId },
             data: {
-                status,
-                assignedToId: session.user.id, // Assign to the officer updating it
+                status: (aiVerification && !aiVerification.verified) ? "IN_PROGRESS" : status,
+                assignedToId: session.user.id,
                 remarks: officerNote ? {
                     create: {
-                        text: officerNote,
+                        text: aiVerification?.ai_summary || officerNote,
                         authorName: session.user.name || "",
                         authorRole: session.user.role as "OFFICER" | "ADMIN",
                         imageUrl: verificationImageUrl || ""
                     }
+                } : undefined,
+                aiVerification: aiVerification ? {
+                    verified: aiVerification.verified,
+                    score: aiVerification.confidence_score,
+                    reasoning: aiVerification.reasoning,
+                    summary: aiVerification.ai_summary
                 } : undefined
-            },
+            } as any,
             include: {
                 author: { select: { name: true, email: true } },
                 assignedTo: { select: { name: true } },

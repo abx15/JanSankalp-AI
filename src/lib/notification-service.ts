@@ -160,7 +160,8 @@ export async function notifyResolutionWithAI({
     complaintId,
     ticketId,
     resolutionDetails,
-    complaintTitle
+    complaintTitle,
+    aiAnalysis
 }: {
     userId: string;
     userEmail: string;
@@ -169,10 +170,14 @@ export async function notifyResolutionWithAI({
     ticketId: string;
     resolutionDetails: string;
     complaintTitle: string;
+    aiAnalysis?: any;
 }) {
-    // We can use AI to summarize the resolution for the notification message
-    const title = "Issue Resolved! 🏆";
-    const message = `Excellent news! Your complaint ${ticketId} has been professionally resolved. Summary: ${resolutionDetails.slice(0, 100)}...`;
+    const title = "Issue Resolved by AI Governance 🏆";
+
+    // AI-generated personalized message
+    const message = aiAnalysis?.summary
+        ? `Great news! ${aiAnalysis.summary} (Ref: ${ticketId})`
+        : `Your complaint ${ticketId} has been professionally resolved. Resolution: ${resolutionDetails}`;
 
     // 1. Send Dashboard Notification
     await createNotification({
@@ -185,6 +190,7 @@ export async function notifyResolutionWithAI({
 
     // 2. Send Email Notification
     if (userEmail) {
+        // Here we could pass the full AI summary to the email service
         await sendStatusUpdateEmail(userEmail, userName, ticketId, "RESOLVED", complaintTitle);
     }
 }
