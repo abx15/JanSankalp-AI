@@ -35,7 +35,11 @@ export async function transcribeVoice(audioFile: File) {
                 "authorization": apiKey,
                 "content-type": "application/json",
             },
-            body: JSON.stringify({ audio_url: uploadUrl, language_code: "hi" }), // Default to Hindi/Multi for JanSankalp
+            body: JSON.stringify({
+                audio_url: uploadUrl,
+                language_code: "hi",
+                boost_param: "high"
+            }),
         });
         const transcriptData = await transcriptResponse.json();
         const transcriptId = transcriptData.id;
@@ -57,6 +61,26 @@ export async function transcribeVoice(audioFile: File) {
     } catch (error) {
         console.error("AssemblyAI/Whisper Error:", error);
         return "Transcription failed. Please use text input.";
+    }
+}
+
+/**
+ * Text-to-Speech (Voice Generation)
+ */
+export async function generateSpeech(text: string) {
+    try {
+        // Since AssemblyAI is primarily STT, we use OpenAI for high-quality TTS
+        const mp3 = await openai.audio.speech.create({
+            model: "tts-1",
+            voice: "alloy",
+            input: text,
+        });
+
+        const buffer = Buffer.from(await mp3.arrayBuffer());
+        return buffer;
+    } catch (error) {
+        console.error("TTS Error:", error);
+        return null;
     }
 }
 
@@ -95,15 +119,14 @@ export async function detectAndTranslate(text: string) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                message: `Detect the language and translate this text to English. Text: ${text}. Return JSON: { "originalLanguage": "...", "translatedText": "..." }`,
-                preamble: "You are a multi-lingual expert. Response must be valid JSON.",
+                message: `Detect language and translate to English: ${text}. Return JSON: { "originalLanguage": "...", "translatedText": "..." }`,
             }),
         });
 
         const data = await response.json();
         const result = JSON.parse(data.text);
         return {
-            originalLanguage: result.originalLanguage || "Detected via Cohere",
+            originalLanguage: result.originalLanguage || "Detected",
             translatedText: result.translatedText || text,
         };
 
@@ -114,12 +137,12 @@ export async function detectAndTranslate(text: string) {
 }
 
 /**
- * Hugging Face Vision & NLP Analysis
+ * Hugging Face Vision & LLM Analysis Hub
  */
 export async function analyzeComplaint(text: string, imageUrl?: string) {
     try {
         const hfKey = process.env.HUGGINGFACE_API_KEY;
-        let visionData = "";
+        let visionSummary = "";
 
         // If Image + HF Key exists, use HF Vision Model
         if (imageUrl && hfKey) {
@@ -134,38 +157,23 @@ export async function analyzeComplaint(text: string, imageUrl?: string) {
                     }
                 );
                 const result = await response.json();
-                visionData = result[0]?.generated_text || "";
+                visionSummary = result[0]?.generated_text || "";
             } catch (vError) {
-                console.error("HF Vision Error:", vError);
+                console.error("HuggingFace Vision failed:", vError);
             }
         }
 
         // Combined analysis using OpenAI with HF Vision data if available
-        const messages: any[] = [
-            {
-                role: "system",
-                content: `Analyze the following civic complaint. 
-        1. Classify it into one of: Pothole, Garbage, Water leakage, Streetlight issue, Road damage, Drain blockage.
-        2. Assign a severity score from 1-5 (1: Minor, 5: Emergency).
-        3. Analyze sentiment (0-1, where 1 is highly urgent/angry).
-        Return JSON: { "category": "...", "severity": number, "sentiment": number, "confidence": number }`,
-            },
-            { role: "user", content: `Text: ${text}${visionData ? `\nVision Analysis Result: ${visionData}` : ""}` },
-        ];
-
-        if (imageUrl) {
-            messages.push({
-                role: "user",
-                content: [
-                    { type: "text", text: "Analyze the attached image as well." },
-                    { type: "image_url", image_url: { url: imageUrl } },
-                ],
-            });
-        }
-
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
-            messages,
+            messages: [
+                {
+                    role: "system",
+                    content: `Analyze this civic complaint. Use the vision analysis if provided.
+                    Return JSON: { "category": "...", "severity": number (1-5), "sentiment": number (0-1), "confidence": number }`,
+                },
+                { role: "user", content: `Text: ${text}${visionSummary ? `\nVision: ${visionSummary}` : ""}` },
+            ],
             response_format: { type: "json_object" },
         });
 
