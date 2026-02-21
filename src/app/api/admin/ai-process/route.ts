@@ -4,9 +4,12 @@ import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 import { notifyResolutionWithAI } from "@/lib/notification-service";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy init
+const getOpenAI = () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OPENAI_API_KEY is missing");
+    return new OpenAI({ apiKey });
+};
 
 export async function POST(req: Request) {
     try {
@@ -27,6 +30,7 @@ export async function POST(req: Request) {
 
         for (const complaint of pendingComplaints) {
             // 2. AI Analysis for Resolution
+            const openai = getOpenAI();
             const response = await openai.chat.completions.create({
                 model: "gpt-4o",
                 messages: [
