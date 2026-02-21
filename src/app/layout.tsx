@@ -84,6 +84,7 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Toaster } from "sonner";
 import { NotificationListener } from "@/components/providers/NotificationListener";
+import SessionDebugger from "@/components/debug/SessionDebugger";
 
 import ClientEntry from "@/components/layout/ClientEntry";
 
@@ -107,6 +108,7 @@ export default function RootLayout({
               <NotificationListener />
               <Navbar />
               {children}
+              {process.env.NODE_ENV === 'development' && <SessionDebugger />}
             </ClientEntry>
           </ThemeProvider>
         </AuthProvider>

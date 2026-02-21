@@ -67,6 +67,10 @@ model State {
   districts District[]
   users     User[]
   complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
 }
 
 model District {
@@ -77,6 +81,10 @@ model District {
   cities    City[]
   users     User[]
   complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
 
   @@unique([name, stateId])
 }
@@ -175,6 +183,10 @@ model Department {
   head       User?       @relation("DeptHead", fields: [headId], references: [id])
   headId     String?     @unique
   complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
@@ -209,4 +221,147 @@ model AuditLog {
   userId    String
   details   String?
   createdAt DateTime @default(now())
+}
+
+// Budget Forecasting Models
+model BudgetForecast {
+  id              String   @id @default(cuid())
+  period          String   // "2024-01", "2024-Q1", "2024-Annual"
+  periodType      String   // "MONTHLY", "QUARTERLY", "ANNUAL"
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Forecast values
+  predictedAmount  Float
+  actualAmount     Float?
+  confidence       Float   // 0-1 confidence score
+  modelVersion     String  // Version of forecasting model
+  
+  // Breakdown
+  personnelCost    Float?
+  infrastructureCost Float?
+  operationalCost  Float?
+  emergencyFund    Float?
+  
+  // Metadata
+  forecastDate     DateTime @default(now())
+  lastUpdated      DateTime @updatedAt
+  createdBy        String
+  status           String   @default("ACTIVE") // ACTIVE, ARCHIVED, SUPERSEDED
+  
+  // AI Insights
+  insights         Json?    // AI-generated insights
+  riskFactors      Json?    // Risk assessment
+  recommendations  Json?    // Cost optimization recommendations
+  
+  @@unique([period, periodType, departmentId, stateId, districtId])
+}
+
+model BudgetActual {
+  id              String   @id @default(cuid())
+  period          String   // "2024-01", "2024-Q1", "2024-Annual"
+  periodType      String   // "MONTHLY", "QUARTERLY", "ANNUAL"
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Actual spending
+  totalAmount     Float
+  personnelCost    Float?
+  infrastructureCost Float?
+  operationalCost  Float?
+  emergencySpent  Float?
+  
+  // Context
+  complaintCount   Int?
+  resolvedCount    Int?
+  emergencyEvents  Int?
+  
+  recordedAt       DateTime @default(now())
+  verifiedBy       String?
+  notes            String?
+}
+
+model CostOptimization {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  category        String   // "PERSONNEL", "INFRASTRUCTURE", "OPERATIONAL", "PROCUREMENT"
+  priority        String   // "HIGH", "MEDIUM", "LOW"
+  
+  // Impact metrics
+  potentialSavings Float
+  implementationCost Float
+  roi             Float    // Return on Investment
+  timeframe       String   // "SHORT_TERM", "MEDIUM_TERM", "LONG_TERM"
+  
+  // Target scope
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Status
+  status          String   @default("PROPOSED") // PROPOSED, APPROVED, IMPLEMENTED, REJECTED
+  approvedBy      String?
+  approvedAt      DateTime?
+  implementedBy   String?
+  implementedAt   DateTime?
+  
+  // AI analysis
+  aiConfidence    Float?
+  aiReasoning     Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model DemandSurge {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  severity        String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  
+  // Prediction details
+  predictedStart  DateTime
+  predictedEnd    DateTime
+  confidence      Float   // 0-1 confidence score
+  
+  // Scope
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Impact assessment
+  estimatedComplaints Int?
+  estimatedCost       Float?
+  affectedAreas       Json?   // Geographic or service areas affected
+  
+  // Contributing factors
+  factors         Json?   // Weather, events, seasonal trends, etc.
+  
+  // Status
+  status          String   @default("PREDICTED") // PREDICTED, ACTIVE, RESOLVED, FALSE_ALARM
+  actualStart     DateTime?
+  actualEnd       DateTime?
+  actualImpact    Json?
+  
+  // AI analysis
+  modelVersion    String
+  aiInsights      Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

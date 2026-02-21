@@ -1,12 +1,11 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import prisma from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { Role } from "@prisma/client"
+import type { NextAuthConfig } from "next-auth"
+import prisma from "@/lib/prisma"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-    adapter: PrismaAdapter(prisma),
+const config: NextAuthConfig = {
     providers: [
         Credentials({
             name: "Credentials",
@@ -15,46 +14,45 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null
+                if (!credentials?.email || !credentials?.password) return null;
 
                 const user = await prisma.user.findUnique({
                     where: { email: credentials.email as string },
-                })
+                });
 
-                // @ts-ignore
-                if (!user || !user.password) return null
+                if (!user || !user.password) return null;
 
                 const isPasswordValid = await bcrypt.compare(
                     credentials.password as string,
-                    // @ts-ignore
                     user.password
-                )
+                );
 
-                if (!isPasswordValid) return null
+                if (!isPasswordValid) return null;
 
-                return user
+                // Block login for unverified non-admin users
+                if (user.role !== "ADMIN" && !user.emailVerified) {
+                    throw new Error(`EMAIL_NOT_VERIFIED:${user.email}`);
+                }
+
+                return {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    points: user.points,
+                    stateId: user.stateId,
+                    districtId: user.districtId,
+                    cityId: user.cityId,
+                    wardId: user.wardId,
+                };
             },
         }),
     ],
+    session: {
+        strategy: "jwt",
+        maxAge: 24 * 60 * 60,
+    },
     callbacks: {
-        async signIn({ user, account }) {
-            if (account?.provider !== "credentials") return true;
-
-            const existingUser = await prisma.user.findUnique({
-                where: { id: user.id },
-            });
-
-            if (!existingUser) return false;
-
-            // Skip email verification check for admin users
-            if (existingUser.role === "ADMIN") return true;
-
-            if (!existingUser.emailVerified) {
-                return `/verify?email=${encodeURIComponent(existingUser.email)}`;
-            }
-
-            return true;
-        },
         async session({ session, token }) {
             if (session.user) {
                 session.user.role = token.role as Role;
@@ -65,31 +63,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.cityId = token.cityId as string | undefined;
                 session.user.wardId = token.wardId as string | undefined;
             }
-            return session
+            return session;
         },
         async jwt({ token, user }) {
             if (user) {
-                token.role = user.role;
+                token.role = (user as any).role;
                 token.id = user.id;
-                token.points = user.points;
+                token.points = (user as any).points;
                 token.stateId = (user as any).stateId;
                 token.districtId = (user as any).districtId;
                 token.cityId = (user as any).cityId;
                 token.wardId = (user as any).wardId;
             }
 
-            // Refresh data from DB occasionally or if token.id exists but role is missing
-            if (token.id && (!token.role || !token.stateId)) {
+            // Refresh role from DB if missing
+            if (token.id && !token.role) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    select: {
-                        role: true,
-                        points: true,
-                        stateId: true,
-                        districtId: true,
-                        cityId: true,
-                        wardId: true
-                    }
+                    select: { role: true, points: true, stateId: true, districtId: true, cityId: true, wardId: true },
                 });
                 if (dbUser) {
                     token.role = dbUser.role as Role;
@@ -100,15 +91,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     token.wardId = dbUser.wardId;
                 }
             }
-            return token
+
+            return token;
         },
-    },
-    session: {
-        strategy: "jwt",
     },
     pages: {
         signIn: "/auth/signin",
+        error: "/auth/error",
     },
     secret: process.env.AUTH_SECRET,
     trustHost: true,
-})
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);

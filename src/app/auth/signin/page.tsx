@@ -35,14 +35,29 @@ function SignInForm() {
     const result = await signIn("credentials", {
       email,
       password,
-      redirect: true,
-      callbackUrl,
+      redirect: false,
     });
 
-    if ((result as any)?.error) {
-      setError("Invalid email or password");
-    }
     setLoading(false);
+
+    if (!result) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    if (result.error) {
+      // Handle email not verified
+      if (result.error.includes("EMAIL_NOT_VERIFIED")) {
+        const emailAddr = result.error.split(":")[1] || email;
+        window.location.href = `/auth/verify-otp?email=${encodeURIComponent(emailAddr)}`;
+        return;
+      }
+      setError("Invalid email or password");
+      return;
+    }
+
+    // Success — redirect to intended page
+    window.location.href = callbackUrl || "/dashboard";
   };
 
   return (
