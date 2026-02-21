@@ -19,3 +19,12 @@ cors
 python-docx
 PyPDF2
 weaviate-client
+aiokafka
+torch
+torchvision
+cryptography
+
+# IoT & Computer Vision
+opencv-python-headless
+Pillow>=9.0
+scikit-image
