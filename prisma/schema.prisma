@@ -92,6 +92,13 @@ model Complaint {
   updatedAt           DateTime        @updatedAt
   duplicateOf         String?
   receiptId           String?         @unique
+  
+  // AI Governance Fields
+  aiAnalysis          Json?           // Stores classification, confidence, category, reasoning
+  spamScore           Float?          @default(0)
+  isDuplicate         Boolean         @default(false)
+  resolutionVerified  Boolean?
+  verificationLog     String?
 }
 
 model Department {

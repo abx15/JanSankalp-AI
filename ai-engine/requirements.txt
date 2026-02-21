@@ -18,3 +18,4 @@ passlib[bcrypt]
 cors
 python-docx
 PyPDF2
+weaviate-client

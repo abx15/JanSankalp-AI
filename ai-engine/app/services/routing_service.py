@@ -24,12 +24,28 @@ officer_workload = {
     "OFF_GEN_001": 3
 }
 
+# Mock expertise mapping
+OFFICER_EXPERTISE = {
+    "OFF_ROAD_001": ["Potholes", "Major Roads"],
+    "OFF_ROAD_002": ["Pavements", "Road Signs"],
+    "OFF_WATER_001": ["Pipelines", "Contamination"],
+    "OFF_WATER_002": ["Pump Stations"],
+}
+
 class RoutingService:
-    async def route_complaint(self, category: str, severity: str) -> RouteResponse:
+    async def route_complaint(self, category: str, severity: str, sub_category: Optional[str] = None) -> RouteResponse:
         officers = DEPARTMENTS.get(category, DEPARTMENTS["Others"])
         
-        # Select officer with least workload (Load Balancing)
-        selected_officer = min(officers, key=lambda x: officer_workload.get(x, 0))
+        # 1. Filter by expertise if sub_category is provided
+        skilled_officers = officers
+        if sub_category:
+            skilled_officers = [
+                off for off in officers 
+                if sub_category in OFFICER_EXPERTISE.get(off, [])
+            ] or officers
+        
+        # 2. Select officer with least workload (Load Balancing)
+        selected_officer = min(skilled_officers, key=lambda x: officer_workload.get(x, 0))
         
         # Priority mapping
         priority_map = {

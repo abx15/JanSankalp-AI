@@ -10,61 +10,59 @@ export async function POST(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const pendingComplaints = await prisma.complaint.findMany({
-            where: { status: "PENDING" },
-            include: { author: { select: { name: true, email: true } } },
-            take: 10,
+        // Fetch complaints that haven't been processed by the new AI Engine
+        const unprocessedComplaints = await (prisma.complaint as any).findMany({
+            where: { aiAnalysis: null },
+            take: 20, // Process in batches
         });
 
         const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "https://jansankalp-ai.onrender.com";
         const results = [];
 
-        for (const complaint of pendingComplaints) {
+        for (const complaint of unprocessedComplaints) {
             try {
-                // Use AI Engine for Classification and Severity
-                const classifyResp = await fetch(`${AI_SERVICE_URL}/classify`, {
+                const aiResponse = await fetch(`${AI_SERVICE_URL}/process-workflow`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: complaint.description }),
+                    body: JSON.stringify({
+                        complaint_id: (complaint as any).ticketId,
+                        text: (complaint as any).description,
+                        latitude: (complaint as any).latitude,
+                        longitude: (complaint as any).longitude
+                    }),
                 });
 
-                if (!classifyResp.ok) throw new Error("AI Engine Classify Failed");
-                const analysis = await classifyResp.json();
+                if (aiResponse.ok) {
+                    const aiResult = await aiResponse.json();
 
-                // If severity is critical or confidence is high, try to auto-resolve or mark priority
-                if (analysis.confidence > 0.9 && analysis.severity === "Critical") {
-                    await prisma.complaint.update({
-                        where: { id: complaint.id },
+                    await (prisma.complaint as any).update({
+                        where: { id: (complaint as any).id },
                         data: {
-                            status: "RESOLVED",
-                            translatedText: analysis.reasoning,
-                            confidenceScore: analysis.confidence
+                            aiAnalysis: {
+                                category: aiResult.analysis.category,
+                                reasoning: aiResult.analysis.reasoning,
+                                confidence: aiResult.analysis.confidence,
+                                eta_days: aiResult.eta_days
+                            } as any,
+                            category: aiResult.analysis.category,
+                            status: aiResult.status === "REJECTED_SPAM" ? "REJECTED" :
+                                (aiResult.assigned_officer ? "IN_PROGRESS" : (complaint as any).status),
+                            assignedToId: aiResult.assigned_officer || (complaint as any).assignedToId,
+                            spamScore: aiResult.is_spam ? 1.0 : 0.0,
+                            isDuplicate: aiResult.is_duplicate || false,
                         }
                     });
 
-                    if (complaint.author.email) {
-                        await notifyResolutionWithAI({
-                            userId: complaint.authorId,
-                            userEmail: complaint.author.email,
-                            userName: complaint.author.name || "Citizen",
-                            complaintId: complaint.id,
-                            ticketId: complaint.ticketId,
-                            resolutionDetails: analysis.reasoning,
-                            complaintTitle: complaint.title
-                        });
-                    }
-                    results.push({ id: complaint.id, status: "RESOLVED", reason: analysis.reasoning });
-                } else {
-                    results.push({ id: complaint.id, status: "MANUAL_PENDING", reason: "Needs human review" });
+                    results.push({ id: complaint.id, status: "SUCCESS" });
                 }
             } catch (err: any) {
-                console.error(`Error processing complaint ${complaint.id}:`, err.message);
-                results.push({ id: complaint.id, status: "ERROR", reason: err.message });
+                console.error(`Error processing ${complaint.id}:`, err.message);
+                results.push({ id: complaint.id, status: "ERROR", error: err.message });
             }
         }
 
         return NextResponse.json({
-            message: `Processed ${pendingComplaints.length} complaints via AI Engine.`,
+            message: `Processed ${unprocessedComplaints.length} complaints.`,
             results
         });
 
