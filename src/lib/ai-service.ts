@@ -1,8 +1,11 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI lazily
+const getOpenAI = () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OPENAI_API_KEY is missing");
+    return new OpenAI({ apiKey });
+};
 
 /**
  * AssemblyAI Speech-to-Text Integration
@@ -12,6 +15,7 @@ export async function transcribeVoice(audioFile: File) {
         const apiKey = process.env.ASSEMBLY_AI_API_KEY;
         if (!apiKey) {
             console.warn("AssemblyAI API Key missing, falling back to Whisper...");
+            const openai = getOpenAI();
             const transcription = await openai.audio.transcriptions.create({
                 file: audioFile,
                 model: "whisper-1",
@@ -69,6 +73,7 @@ export async function transcribeVoice(audioFile: File) {
  */
 export async function generateSpeech(text: string) {
     try {
+        const openai = getOpenAI();
         // Since AssemblyAI is primarily STT, we use OpenAI for high-quality TTS
         const mp3 = await openai.audio.speech.create({
             model: "tts-1",
@@ -92,6 +97,7 @@ export async function detectAndTranslate(text: string) {
         const cohereKey = process.env.COHERE_API_KEY;
         if (!cohereKey) {
             // Fallback to OpenAI
+            const openai = getOpenAI();
             const response = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
                 messages: [
@@ -164,6 +170,7 @@ export async function analyzeComplaint(text: string, imageUrl?: string) {
         }
 
         // Combined analysis using OpenAI with HF Vision data if available
+        const openai = getOpenAI();
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [

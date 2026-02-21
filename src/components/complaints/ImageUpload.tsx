@@ -17,17 +17,23 @@ const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
 const authenticator = async () => {
   try {
     const response = await fetch("/api/imagekit/auth");
-    if (!response.ok) throw new Error("Authentication failed");
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("DEBUG: ImageKit Auth API failed:", errorText);
+      throw new Error(`Auth API failed: ${errorText}`);
+    }
     return await response.json();
-  } catch (error) {
-    throw new Error("ImageKit Auth failed");
+  } catch (error: any) {
+    console.error("DEBUG: Authenticator catch:", error);
+    throw new Error(`ImageKit Auth failed: ${error.message}`);
   }
 };
 
 export function ImageUpload({ onUpload, value }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ikUploadRef = useRef<HTMLInputElement>(null);
+
+  console.log("DEBUG: ImageKit Config:", { urlEndpoint, publicKey });
 
   const onError = (err: any) => {
     console.error("IMAGEKIT_UPLOAD_ERROR_DETAILED:", {
@@ -68,6 +74,12 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
       authenticator={authenticator}
     >
       <div className="space-y-4 w-full">
+        {(!urlEndpoint || !publicKey) && (
+          <div className="p-4 bg-orange-50 border border-orange-200 rounded-2xl text-orange-800 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>ImageKit Env Vars Missing! check Vercel Settings.</span>
+          </div>
+        )}
         {value ? (
           <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden border-4 border-white shadow-xl">
             <Image
