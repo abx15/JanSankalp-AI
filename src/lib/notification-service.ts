@@ -149,3 +149,42 @@ export async function notifyComplaintAssigned({
         await sendComplaintAssignedEmail(userEmail, userName, ticketId, officerName, complaintTitle);
     }
 }
+
+/**
+ * AI-Driven Resolution Notification
+ */
+export async function notifyResolutionWithAI({
+    userId,
+    userEmail,
+    userName,
+    complaintId,
+    ticketId,
+    resolutionDetails,
+    complaintTitle
+}: {
+    userId: string;
+    userEmail: string;
+    userName: string;
+    complaintId: string;
+    ticketId: string;
+    resolutionDetails: string;
+    complaintTitle: string;
+}) {
+    // We can use AI to summarize the resolution for the notification message
+    const title = "Issue Resolved! 🏆";
+    const message = `Excellent news! Your complaint ${ticketId} has been professionally resolved. Summary: ${resolutionDetails.slice(0, 100)}...`;
+
+    // 1. Send Dashboard Notification
+    await createNotification({
+        userId,
+        type: "RESOLVED",
+        title,
+        message,
+        complaintId
+    });
+
+    // 2. Send Email Notification
+    if (userEmail) {
+        await sendStatusUpdateEmail(userEmail, userName, ticketId, "RESOLVED", complaintTitle);
+    }
+}
