@@ -11,41 +11,57 @@ export async function POST(req: Request) {
         const { messages } = await req.json();
         const grokApiKey = process.env.GROK_API_KEY;
 
-        if (!grokApiKey) {
-            console.error("GROK_API_KEY_MISSING");
-            // Fallback to OpenAI if Grok key is missing, or return error
-            return NextResponse.json(
-                { error: "Grok AI is not configured. Please add GROK_API_KEY to .env" },
-                { status: 500 }
-            );
+        if (grokApiKey) {
+            try {
+                const response = await fetch("https://api.x.ai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${grokApiKey}`,
+                    },
+                    body: JSON.stringify({
+                        model: "grok-beta",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are JanSankalp AI Assistant. Help citizens with civic complaints and governance in India. Professional, empathetic, and multi-lingual (Hindi/English).",
+                            },
+                            ...messages,
+                        ],
+                        stream: false,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return NextResponse.json(data);
+                }
+                console.warn("Grok API failed, falling back to OpenAI...");
+            } catch (grokError) {
+                console.error("Grok Fetch Error:", grokError);
+            }
         }
 
-        const response = await fetch("https://api.x.ai/v1/chat/completions", {
+        // Fallback to OpenAI GPT-4o-mini
+        const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${grokApiKey}`,
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
             },
             body: JSON.stringify({
-                model: "grok-beta", // Or the appropriate grok model
+                model: "gpt-4o-mini",
                 messages: [
                     {
                         role: "system",
-                        content: "You are JanSankalp AI Assistant. You help citizens with civic complaints, governance procedures, and system information in India. Be professional, empathetic, and multi-lingual (Hindi/English). Use reasoning to solve complex citizen problems.",
+                        content: "You are JanSankalp AI Assistant. Help citizens with civic complaints and governance in India.",
                     },
                     ...messages,
                 ],
-                stream: false,
             }),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("GROK_API_ERROR", errorData);
-            return NextResponse.json({ error: "Grok API error" }, { status: 500 });
-        }
-
-        const data = await response.json();
+        const data = await openAIResponse.json();
         return NextResponse.json(data);
     } catch (error) {
         console.error("CHAT_API_ERROR", error);

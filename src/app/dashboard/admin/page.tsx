@@ -402,6 +402,25 @@ export default function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="flex justify-end mb-6">
+              <Button
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/admin/ai-process", {
+                      method: "POST",
+                    });
+                    const data = await res.json();
+                    alert(`AI Hub: ${data.message}`);
+                  } catch (e) {
+                    alert("AI Hub reported an error.");
+                  }
+                }}
+                className="bg-primary text-white font-black uppercase tracking-widest gap-2 rounded-2xl px-6"
+              >
+                <Sparkles className="w-4 h-4" />
+                Run AI Auto-Processor
+              </Button>
+            </div>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 relative z-10">
               <div className="space-y-4">
                 <div className="text-xs font-black text-primary/50 uppercase tracking-widest">

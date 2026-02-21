@@ -19,65 +19,25 @@ export async function POST(req: Request) {
             return NextResponse.json({ suggestion: null });
         }
 
-        const anthropicKey = process.env.ANTHROPIC_API_KEY;
-
-        if (anthropicKey) {
-            console.log("Using Anthropic Claude for Suggestions...");
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "x-api-key": anthropicKey,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json",
-                },
-                body: JSON.stringify({
-                    model: "claude-3-5-haiku-20241022",
-                    max_tokens: 1024,
-                    messages: [
-                        {
-                            role: "user",
-                            content: `Analyze the user's civic complaint description and suggest a title, category, department, and priority.
-              Description: ${description}
-              
-              Return ONLY a JSON object:
-              {
-                "title": "Concise Title",
-                "category": "Detected Category",
-                "department": "Detected Department",
-                "priority": "Detected Priority (Low, Medium, High, Emergency)"
-              }`
-                        }
-                    ]
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                const content = data.content[0].text;
-                const suggestion = JSON.parse(content);
-                return NextResponse.json({ suggestion });
-            }
-            console.warn("Anthropic API failed, falling back to OpenAI...");
-        }
-
+        // Using GPT-4o-mini for ultra-fast and cost-effective suggestions
         const response = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
-                    content: `You are an AI assistant for a civic complaint platform called JanSankalp AI. 
-          Analyze the user's complaint description and suggest:
+                    content: `You are an AI assistant for JanSankalp AI. Analyze the user's civic complaint.
+          Suggest:
           1. A concise, professional title.
-          2. The most appropriate category from this list: Pothole, Garbage, Water Leakage, Streetlight, Road Damage, Drain Blockage, Corruption.
-          3. The responsible government department.
-          4. A severity level (Low, Medium, High, Emergency).
+          2. Category from: Pothole, Garbage, Water Leakage, Streetlight, Road Damage, Drain Blockage, Corruption.
+          3. Responsible department (e.g., PWD, Municipal, Electricity Dept, Vigilance).
+          4. Priority (Low, Medium, High, Emergency).
 
-          Return the result in JSON format:
+          Return ONLY valid JSON:
           {
-            "title": "Concise Title",
-            "category": "Detected Category",
-            "department": "Detected Department",
-            "priority": "Detected Priority"
+            "title": "Title",
+            "category": "Category",
+            "department": "Department",
+            "priority": "Priority"
           }`
                 },
                 { role: "user", content: description }
