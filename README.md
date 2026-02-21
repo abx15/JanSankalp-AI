@@ -1,164 +1,294 @@
 <div align="center">
   <img src="public/logojansanklp.png" alt="JanSankalp AI Logo" width="180" />
 
-# 🇮🇳 JanSankalp AI: Smart Urban Governance
+# 🇮🇳 JanSankalp AI — Smart Civic Governance Platform
 
-### **Bridging the gap between Citizens and Authorities with AI-Driven Intelligence.**
+### _AI · Federated Learning · IoT · Satellite · Real-Time_
 
-[![Build & Build](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml)
-[![Dockerized](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](file:///c:/Users/arunk/Desktop/ReactProjects25-26/JanSankalp%20AI/docker/docker-compose.yml)
+[![Build](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/abx15/JanSankalp-AI/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](docker/docker-compose.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Documentation](https://img.shields.io/badge/Docs-Comprehensive-green)](docs/architecture.md)
-
----
-
-[Overview](#-overview) • [Core Features](#-core-features) • [Tech Stack](#-tech-stack) • [System Flow](#-system-flow) • [Documentation](#-documentation) • [Getting Started](#-getting-started) • [Deployment](#-deployment)
+[![AI Engine](https://img.shields.io/badge/FastAPI-AI%20Engine-green?logo=fastapi)](ai-engine/)
 
 </div>
 
 ---
 
-## 🏗️ Overview
+## ✅ How to Run Everything (Step by Step)
 
-**JanSankalp AI** is a state-of-the-art civic grievance redressal platform. Unlike traditional systems that are buried in bureaucracy and language barriers, JanSankalp AI uses **multilingual Voice AI** and **Geo-spatial clustering** to streamline the resolution of municipal issues.
-
-### Why JanSankalp?
-
-- **Language Inclusivity**: Reporting issues in 18+ Indian languages via Voice AI.
-- **Automated Triage**: No manual sorting; AI routes complaints to the correct department.
-- **Transparency**: Every step is tracked in real-time on a community-driven map.
+> Follow these steps **in order**. All services connect to each other via `.env` files.
 
 ---
 
-## 🚀 Core Features
+### 🗂️ Step 1 — Clone the Repository
 
-### 🎙️ Multilingual Voice-First Reporting
-
-Citizens can record their complaints in their mother tongue. Our pipeline transcribes (Whisper AI) and translates (GPT-4) the content instantly.
-
-- **Accuracy**: 95%+ for major Indian dialects.
-- **Automation**: Transcriptions are automatically summarized for the Quick-View dashboard.
-
-### 🧠 AI-Powered Intelligence
-
-Every complaint undergoes a deep analysis process:
-
-- **Severity Scoring**: Quantifies the urgency (1-5) based on text context.
-- **Category Detection**: Automatically tags issues (e.g., Road, Sanitation, Water).
-- **Duplicate Detection**: Uses geo-spatial proximity and semantic similarity to prevent redundant case files.
-
-### 📍 Geo-Spatial Governance
-
-Interactive maps provide high-fidelity visibility:
-
-- **Heatmaps**: Identifying systemic infrastructure failures.
-- **Radius-Based Tracking**: Officers see issues within their assigned territory.
-- **Status Markers**: Real-time color coding (Resolved: Green, Pending: Red, In-Progress: Amber).
-
-### 👮 Officer & Admin Portals
-
-- **Role-Based Workflows**: Dedicated dashboards for Field Officers and City Administrators.
-- **Performance Analytics**: Track resolution efficiency by department.
-- **PDF Reports**: One-click generation of official complaint receipts and closure reports.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer              | Technologies                             |
-| :----------------- | :--------------------------------------- |
-| **Framework**      | Next.js 14 (App Router), TypeScript      |
-| **Styling**        | Tailwind CSS, Framer Motion (Animations) |
-| **Database**       | PostgreSQL, Prisma ORM                   |
-| **Authentication** | NextAuth.js (v5 Beta)                    |
-| **Real-time**      | Pusher (WebSockets)                      |
-| **AI Services**    | OpenAI GPT-4o, OpenAI Whisper            |
-| **Storage**        | Cloudinary / ImageKit                    |
-| **Maps**           | Leaflet.js                               |
-
----
-
-## 📂 System Architecture & Folder Structure
-
-We follow a modular, scalable architecture:
-
-```text
-├── .github/          # CI/CD pipelines & open-source templates
-├── config/           # Centralized project configuration
-├── docs/             # Technical Deep-dives (Architecture, API, Setup)
-├── docker/           # Production containerization (Multi-stage)
-├── prisma/           # Database schemas, migrations, and seed scripts
-├── public/           # Static assets (logos, images, fonts)
-├── scripts/          # Automation tools (setup, build, clean)
-└── src/
-    ├── app/          # Next.js App Router (UI & API Routes)
-    ├── components/   # Reusable Atomic UI units
-    ├── lib/          # Core logic (AI, Notifications, PDF, Database)
-    └── types/        # Global TypeScript interfaces
+```bash
+git clone https://github.com/abx15/JanSankalp-AI.git
+cd JanSankalp-AI
 ```
 
 ---
 
-## 📘 Documentation Central
+### 🔑 Step 2 — Setup Frontend `.env.local`
 
-For detailed technical information, refer to the following guides:
+```bash
+cp .env.example .env.local
+```
 
-| Document            | Description                                | Link                                 |
-| :------------------ | :----------------------------------------- | :----------------------------------- |
-| **Architecture**    | System design and data flow patterns.      | [View Docs](docs/architecture.md)    |
-| **Environment**     | Required API keys and secrets.             | [View Docs](docs/environment.md)     |
-| **Local Setup**     | Step-by-step developer installation.       | [View Docs](docs/setup.md)           |
-| **Deployment**      | Vercel and Docker deployment instructions. | [View Docs](docs/deployment.md)      |
-| **API Reference**   | Detailed list of REST endpoints.           | [View Docs](docs/api.md)             |
-| **Troubleshooting** | Solutions for common setup issues.         | [View Docs](docs/troubleshooting.md) |
+Open `.env.local` and fill in these **required** values:
+
+| Variable                                                                 | Where to Get                                                           | Purpose                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------- |
+| `DATABASE_URL`                                                           | [neon.tech](https://neon.tech) → New Project → Connection String       | Stores all complaints, users, sessions |
+| `AUTH_SECRET`                                                            | [generate-secret.vercel.app/32](https://generate-secret.vercel.app/32) | Encrypts sessions                      |
+| `NEXTAUTH_SECRET`                                                        | Same as above (can be same value)                                      | NextAuth security                      |
+| `NEXTAUTH_URL`                                                           | `http://localhost:3000` (dev)                                          | Auth redirect base                     |
+| `NEXT_PUBLIC_AI_ENGINE_URL`                                              | `http://localhost:10000`                                               | Connects frontend → AI engine          |
+| `OPENAI_API_KEY`                                                         | [platform.openai.com/api-keys](https://platform.openai.com/api-keys)   | AI suggestions                         |
+| `RESEND_API_KEY`                                                         | [resend.com/api-keys](https://resend.com/api-keys)                     | OTP emails                             |
+| `NEXT_PUBLIC_PUSHER_KEY` + `PUSHER_SECRET`                               | [dashboard.pusher.com](https://dashboard.pusher.com)                   | Real-time updates                      |
+| `IMAGEKIT_PRIVATE_KEY` + `IMAGEKIT_PUBLIC_KEY` + `IMAGEKIT_URL_ENDPOINT` | [imagekit.io](https://imagekit.io/dashboard)                           | Photo uploads                          |
 
 ---
 
-## 🚀 Getting Started
+### 🐍 Step 3 — Setup AI Engine `.env`
 
-### 1. Zero-Install with Docker
+```bash
+cp ai-engine/.env.example ai-engine/.env
+```
 
-The fastest way to get started is using our pre-configured Docker stack:
+Open `ai-engine/.env` and fill in:
+
+| Variable                  | Where to Get                                                             | Purpose                        |
+| ------------------------- | ------------------------------------------------------------------------ | ------------------------------ |
+| `OPENAI_API_KEY`          | [platform.openai.com/api-keys](https://platform.openai.com/api-keys)     | Complaint classification, chat |
+| `ASSEMBLY_AI_API_KEY`     | [assemblyai.com/app/account](https://www.assemblyai.com/app/account)     | Voice transcription            |
+| `COHERE_API_KEY`          | [dashboard.cohere.com](https://dashboard.cohere.com/api-keys)            | Multi-language translation     |
+| `HUGGINGFACE_API_KEY`     | [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) | CV (image analysis)            |
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` (local) or Upstash Kafka URL                            | Real-time streaming            |
+| `WEAVIATE_URL`            | `http://localhost:8080` (local)                                          | Duplicate detection            |
+
+---
+
+### 📦 Step 4 — Install Dependencies
+
+**Frontend:**
+
+```bash
+npm install
+```
+
+**AI Engine:**
+
+```bash
+cd ai-engine
+python -m venv venv
+
+# Windows:
+venv\Scripts\activate
+
+# Mac/Linux:
+source venv/bin/activate
+
+pip install -r requirements.txt
+cd ..
+```
+
+---
+
+### 🗄️ Step 5 — Setup Database
+
+```bash
+# Run migrations to create all tables
+npx prisma migrate dev --name init
+
+# Seed with test data (Admin, Officer, Citizen accounts)
+npx prisma db seed
+```
+
+Test credentials after seeding → see [LOGIN_DETAILS.md](LOGIN_DETAILS.md)
+
+---
+
+### 🚀 Step 6 — Run All Services
+
+Open **3 terminals** simultaneously:
+
+**Terminal 1 — Next.js Frontend:**
+
+```bash
+npm run dev
+# → Runs at http://localhost:3000
+```
+
+**Terminal 2 — AI Engine:**
+
+```bash
+cd ai-engine
+venv\Scripts\activate     # Windows
+python -m app.main
+# → Runs at http://localhost:10000
+```
+
+**Terminal 3 — Kafka (Optional, for real-time streaming):**
+
+```bash
+docker run -d -p 9092:9092 apache/kafka:latest
+```
+
+---
+
+### 🐳 Option B — Run Everything with Docker (Easiest)
 
 ```bash
 docker compose -f docker/docker-compose.yml up
 ```
 
-### 2. Manual Installation
+> This starts: Next.js + AI Engine + Kafka + Weaviate together.
 
-For active development, use our automation scripts:
+---
 
-```bash
-# Clone and enter the repo
-git clone https://github.com/abx15/JanSankalp-AI.git
-cd JanSankalp-AI
+## 🔌 How All Services Are Connected
 
-# Run the automated setup (installs deps, generates prisma)
-./scripts/setup.sh
-
-# Start development server
-./scripts/dev.sh
+```
+.env.local                      .env (ai-engine)
+─────────────────────────────────────────────────────
+NEXT_PUBLIC_AI_ENGINE_URL  ──▶  FastAPI (Port 10000)
+DATABASE_URL               ──▶  PostgreSQL (Prisma ORM)
+PUSHER keys                ──▶  Real-time WebSockets
+IMAGEKIT keys              ──▶  Photo upload & storage
+OPENAI_API_KEY             ──▶  AI Suggestions API
+RESEND_API_KEY             ──▶  OTP Email delivery
+                                ↕
+                       KAFKA_BOOTSTRAP_SERVERS
+                       (sensor_telemetry, vision_event topics)
+                       WEAVIATE_URL
+                       (vector search for duplicates)
+                       HUGGINGFACE_API_KEY
+                       (CV models: pothole, garbage)
+                       ASSEMBLY_AI_API_KEY
+                       (voice → text transcription)
 ```
 
 ---
 
-## 🤝 Contributing & Community
+## 🏗️ Full System Architecture
 
-We believe in open-source for public good.
+```
+┌────────────────────────────────────────────────────────────────────┐
+│             JANSANKALP AI — COMPLETE CONNECTED SYSTEM              │
+│                                                                    │
+│  Citizens / Officers / Admins                                      │
+│      │                                                             │
+│      ▼                                                             │
+│  Next.js Frontend  (:3000)      ←── .env.local                    │
+│  ├── /dashboard (Admin)                                            │
+│  │     ├── FLDashboard (Federated AI)                             │
+│  │     └── InfraDashboard (IoT + Satellite)                       │
+│  ├── /dashboard/officer                                            │
+│  └── /api/*  (Next.js API Routes)                                 │
+│      │  PostgreSQL via Prisma                                      │
+│      │  Pusher WebSockets                                          │
+│      │  ImageKit Uploads                                           │
+│      │                                                             │
+│      ▼  HTTP / REST                                                │
+│  FastAPI AI Engine  (:10000)    ←── ai-engine/.env                │
+│  ├── /process-workflow          (Spam→Classify→Route→ETA)          │
+│  ├── /federated/train-round     (FL Training)                      │
+│  ├── /analytics/federated       (FL Dashboard data)                │
+│  ├── /iot/ingest                (Sensor telemetry)                 │
+│  ├── /vision/analyze            (CV: Satellite/CCTV)               │
+│  └── /analytics/infrastructure  (Risk heatmap)                    │
+│      │                                                             │
+│      ▼  Apache Kafka                                               │
+│  ┌─────────────────────────────────────────────────────┐          │
+│  │  Topics: complaint_submitted | sensor_telemetry      │          │
+│  │          vision_event | system_alert                 │          │
+│  └────────────────────────┬────────────────────────────┘          │
+│                           ▼                                        │
+│  stream_processor.py  → Flood Risk → Power Alerts → Auto-Escalate │
+│                                                                    │
+│  Data Layer                                                        │
+│  ├── PostgreSQL (NeonDB)  — users, complaints, sessions            │
+│  ├── Weaviate Vector DB   — semantic duplicate detection           │
+│  └── Sensor buffer        — IoT time-series data                  │
+└────────────────────────────────────────────────────────────────────┘
+```
 
-1. Review the [CONTRIBUTING.md](CONTRIBUTING.md).
-2. Follow our [Conventional Commits](https://www.conventionalcommits.org/).
-3. Be respectful in our [Code of Conduct](CODE_OF_CONDUCT.md).
+---
+
+## 📂 Project Structure
+
+```
+JanSankalp AI/
+│
+├── .env.example             ← Frontend env template  ← START HERE
+├── ai-engine/.env.example   ← AI Engine env template ← COPY THIS TOO
+│
+├── ai-engine/               ← FastAPI Python AI Backend
+│   ├── app/main.py          ← All API endpoints
+│   ├── app/federated/       ← Federated Learning (coordinator, nodes, aggregator)
+│   ├── app/services/
+│   │   ├── iot_service.py       ← Water/Air/Electricity sensors
+│   │   ├── vision_service.py    ← Satellite + CCTV CV models
+│   │   ├── risk_service.py      ← Flood + Power outage predictor
+│   │   └── analytics_service.py ← Dashboard data generator
+│   └── app/events/
+│       ├── kafka_client.py      ← Kafka producer/consumer
+│       └── stream_processor.py  ← Real-time event handler
+│
+├── src/                     ← Next.js Frontend
+│   ├── app/dashboard/page.tsx       ← Admin dashboard (FL + Infra sections)
+│   ├── components/dashboard/
+│   │   ├── FLDashboard.tsx          ← Federated Learning UI
+│   │   └── InfraDashboard.tsx       ← Live IoT / Risk Map UI
+│   └── lib/ai-service.ts            ← All AI Engine API calls
+│
+├── prisma/schema.prisma     ← Database schema
+├── docs/IOT_ARCHITECTURE.md ← IoT sensor + Kafka connection guide
+├── docker-compose.yml       ← Run everything with one command
+└── render.yaml              ← One-click Render.com deployment
+```
+
+---
+
+## 🛠️ Full Tech Stack
+
+| Layer            | Technology                           | Purpose                               |
+| ---------------- | ------------------------------------ | ------------------------------------- |
+| **Frontend**     | Next.js 14, TypeScript, Tailwind CSS | UI, routing, API handlers             |
+| **AI Engine**    | FastAPI (Python), PyTorch            | ML models, LLM API, FL coordinator    |
+| **Database**     | PostgreSQL (NeonDB), Prisma ORM      | Persistent data                       |
+| **Vector DB**    | Weaviate                             | Semantic duplicate detection          |
+| **Streaming**    | Apache Kafka (`aiokafka`)            | Real-time sensor + complaint pipeline |
+| **Real-time**    | Pusher WebSockets                    | Live dashboard updates                |
+| **Auth**         | NextAuth.js v5, OTP via Resend       | Secure role-based login               |
+| **Storage**      | ImageKit                             | Complaint photo uploads               |
+| **Federated ML** | PyTorch + Differential Privacy       | Privacy-safe district AI training     |
+| **CV / IoT**     | OpenCV, Pillow, HuggingFace          | Pothole/flood/garbage detection       |
+| **Deployment**   | Docker, Render.com, Vercel           | Production ready                      |
+
+---
+
+## 📚 Documentation
+
+| File                                                 | Description                                         |
+| ---------------------------------------------------- | --------------------------------------------------- |
+| [docs/IOT_ARCHITECTURE.md](docs/IOT_ARCHITECTURE.md) | IoT sensor formats, Kafka topics, API curl examples |
+| [DEPLOYMENT.md](DEPLOYMENT.md)                       | Docker, Render.com, Vercel, Kubernetes guide        |
+| [LOGIN_DETAILS.md](LOGIN_DETAILS.md)                 | Test credentials (Admin, Officer, Citizen)          |
+| [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md) | Security analysis & compliance                      |
+| [CHANGELOG.md](CHANGELOG.md)                         | Feature history                                     |
 
 ---
 
 ## ⚖️ License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+MIT License — see [LICENSE](LICENSE)
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by <a href="https://github.com/abx15"><strong>Arun Kumar</strong></a></p>
-  <p>For a Smarter, Faster, and More Transparent India. 🇮🇳</p>
+  <p>Built with ❤️ by <a href="https://github.com/abx15"><strong>Arun Kumar Bind</strong></a></p>
+  <p><em>AI · Federated Learning · IoT · Satellite · For a Smarter India 🇮🇳</em></p>
 </div>
