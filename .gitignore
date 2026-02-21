@@ -40,10 +40,18 @@ seed.json
 /prisma/large_seed.js
 
 # Logs and Errors
-*.txt
+# *.txt (Removed to allow requirements.txt)
 *error.txt
 lint_output.txt
 tatus
+
+# Python
+ai-engine/venv/
+ai-engine/.env
+ai-engine/__pycache__/
+ai-engine/*.pyc
+ai-engine/app/ml_models/*.pkl
+!ai-engine/requirements.txt
 
 # Login Credentials
 LOGIN_DETAILS.md
