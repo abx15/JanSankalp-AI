@@ -13,17 +13,24 @@ export default function OfficerDashboard() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Officer Dashboard - Session Status:", status);
+    console.log("Officer Dashboard - User Role:", session?.user?.role);
+    
     if (status === "loading") return;
 
     if (!session) {
+      console.log("No session found, redirecting to signin...");
       router.push("/auth/signin");
       return;
     }
 
     if (session?.user?.role !== "OFFICER" && session?.user?.role !== "ADMIN") {
+      console.log("Access denied - User role:", session?.user?.role);
       router.push("/dashboard");
       return;
     }
+    
+    console.log("Officer dashboard access granted for:", session?.user?.role);
   }, [session, status, router]);
 
   if (status === "loading") {
