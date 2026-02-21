@@ -222,24 +222,24 @@ RESEND_API_KEY             ──▶  OTP Email delivery
 📖 **Explore our comprehensive documentation suite:**
 
 ### 🚀 Quick Start
-- **[📋 Setup Guide](docs-new/guides/setup.md)** - Complete installation & configuration
-- **[🔧 Environment Setup](docs-new/guides/environment.md)** - Environment variables & configuration
-- **[🐳 Docker Setup](docs-new/guides/setup.md#-docker-setup-recommended)** - One-command deployment
+- **[📋 Setup Guide](docs/guides/setup.md)** - Complete installation & configuration
+- **[🔧 Environment Setup](docs/guides/environment.md)** - Environment variables & configuration
+- **[🐳 Docker Setup](docs/guides/setup.md#-docker-setup-recommended)** - One-command deployment
 
 ### 👥 User Guides
-- **[👤 Citizen Guide](docs-new/guides/citizen-guide.md)** - Complete citizen user manual
-- **[👮 Officer Guide](docs-new/guides/officer-guide.md)** - Officer training & operations
-- **[👨‍💼 Admin Guide](docs-new/guides/admin-guide.md)** - System administration guide
+- **[👤 Citizen Guide](docs/guides/citizen-guide.md)** - Complete citizen user manual
+- **[👮 Officer Guide](docs/guides/officer-guide.md)** - Officer training & operations
+- **[👨‍💼 Admin Guide](docs/guides/admin-guide.md)** - System administration guide
 
 ### 🏗️ Technical Documentation
-- **[📊 System Architecture](docs-new/architecture/system-overview.md)** - Complete technical architecture
-- **[🌐 IoT Integration](docs-new/architecture/iot-architecture.md)** - Sensors & streaming setup
-- **[🔌 API Documentation](docs-new/api/README.md)** - Complete REST API reference
+- **[📊 System Architecture](docs/architecture/system-overview.md)** - Complete technical architecture
+- **[🌐 IoT Integration](docs/architecture/iot-architecture.md)** - Sensors & streaming setup
+- **[🔌 API Documentation](docs/api/README.md)** - Complete REST API reference
 
 ### 📞 Support & Contact
-- **[📞 Contact Center](docs-new/contact.md)** - Complete support directory
-- **[🌐 Project Overview](docs-new/project-overview.md)** - Project vision & features
-- **[🔧 Troubleshooting](docs-new/troubleshooting/overview.md)** - Common issues & solutions
+- **[📞 Contact Center](docs/contact.md)** - Complete support directory
+- **[🌐 Project Overview](docs/project-overview.md)** - Project vision & features
+- **[🔧 Troubleshooting](docs/troubleshooting/overview.md)** - Common issues & solutions
 
 ---
 
