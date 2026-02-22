@@ -4,18 +4,26 @@ Handles loading and initialization of all AI/ML models
 """
 
 import logging
-import torch
 import asyncio
 from typing import Dict, Any, Optional
-from pathlib import Path
-import joblib
-from transformers import AutoTokenizer, AutoModel
+import os
 
-# Import our custom models
-from app.models.complaint_models import ComplaintClassifier, ETAPredictor, DuplicateDetector
-from app.models.nlp_models import MultilingualNLP, TextEmbedding
-from app.models.vision_models import InfrastructureAnalyzer
-from app.models.prediction_models import RiskPredictor, ResourceOptimizer, PredictiveMaintenance
+# Check if we're in production environment
+IS_PRODUCTION = os.getenv("RENDER") == "true" or os.getenv("ENV") == "production"
+
+if not IS_PRODUCTION:
+    # Only import heavy ML libraries in development
+    try:
+        import torch
+        import joblib
+        from transformers import AutoTokenizer, AutoModel
+        ML_AVAILABLE = True
+    except ImportError:
+        ML_AVAILABLE = False
+else:
+    # Production environment - skip ML models for now
+    ML_AVAILABLE = False
+    print("Production environment: ML models disabled for faster deployment")
 
 logger = logging.getLogger("ai-engine.model-loader")
 
@@ -26,14 +34,29 @@ class ModelLoader:
     
     def __init__(self):
         self.models: Dict[str, Any] = {}
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model_dir = Path("/app/models")  # Docker mount path
         self.is_loaded = False
+        self.device = "cpu"  # Use CPU for production
+        
+        if IS_PRODUCTION:
+            # Skip ML models in production
+            self.is_loaded = True
+            logger.info("Production mode: ML models disabled")
+            return
+            
+        # Development mode - load ML models
+        import torch
+        from pathlib import Path
+        self.model_dir = Path("/app/models")  # Docker mount path
+        self.device = "cpu"  # Use CPU for now
         
     async def load_all_models(self) -> bool:
         """
         Load all AI/ML models asynchronously
         """
+        if IS_PRODUCTION:
+            logger.info("Production mode: Skipping ML model loading")
+            return True
+            
         try:
             logger.info(f"Loading models on device: {self.device}")
             

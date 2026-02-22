@@ -6,6 +6,8 @@ openai
 assemblyai
 cohere
 huggingface_hub
+transformers
+tokenizers
 scikit-learn
 pandas
 numpy
