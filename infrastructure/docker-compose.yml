@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # ─── Next.js Frontend ──────────────────────────────────────────────
+  client:
+    build:
+      context: ../client
+      dockerfile: Dockerfile
+    container_name: jansankalp-client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AI_SERVICE_URL=http://server:8000
+      - NEXT_PUBLIC_AI_ENGINE_URL=http://localhost:8000
+      - KAFKA_BROKERS=kafka:9092
+      - PUSHER_APP_ID=${PUSHER_APP_ID}
+      - NEXT_PUBLIC_PUSHER_APP_ID=${NEXT_PUBLIC_PUSHER_APP_ID}
+      - NEXT_PUBLIC_PUSHER_KEY=${NEXT_PUBLIC_PUSHER_KEY}
+      - PUSHER_SECRET=${PUSHER_SECRET}
+      - NEXT_PUBLIC_PUSHER_CLUSTER=${NEXT_PUBLIC_PUSHER_CLUSTER}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=${NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY}
+      - IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY}
+      - NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=${NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-900000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      server:
+        condition: service_started
+    networks:
+      - jansankalp-net
+
+  # ─── FastAPI AI Engine ──────────────────────────────────────────────
+  server:
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    container_name: jansankalp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
+      - WEAVIATE_URL=http://vector-db:8080
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC_COMPLAINTS=complaints
+      - KAFKA_TOPIC_NOTIFICATIONS=notifications
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ASSEMBLY_AI_API_KEY=${ASSEMBLY_AI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET:-jansankalp-jwt-secret-2024-super-secure-key}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRE_MINUTES=1440
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      vector-db:
+        condition: service_started
+    volumes:
+      - ai-models:/app/models
+    networks:
+      - jansankalp-net
+
+  # ─── PostgreSQL ─────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: jansankalp-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=jansankalp_pass
+      - POSTGRES_DB=jansankalp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d jansankalp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-net
+
+  # ─── Redis ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: jansankalp-redis
+    restart: unless-stopped
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-net
+
+  # ─── Weaviate Vector DB ─────────────────────────────────────────────
+  vector-db:
+    image: semitechnologies/weaviate:1.24.1
+    container_name: jansankalp-weaviate
+    restart: unless-stopped
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=text2vec-openai
+      - ENABLE_MODULES=text2vec-openai
+      - OPENAI_APIKEY=${OPENAI_API_KEY}
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    networks:
+      - jansankalp-net
+
+  # ─── Zookeeper (for Kafka) ──────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: jansankalp-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - jansankalp-net
+
+  # ─── Kafka ──────────────────────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: jansankalp-kafka
+    restart: unless-stopped
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+    networks:
+      - jansankalp-net
+
+  # ─── Nginx Reverse Proxy ────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: jansankalp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - jansankalp-net
+
+networks:
+  jansankalp-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  weaviate-data:
+  ai-models:

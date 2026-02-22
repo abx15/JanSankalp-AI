@@ -1,109 +1,182 @@
 version: '3.8'
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PRODUCTION DOCKER COMPOSE - Complete JanSankalp AI Stack
+# Run with: docker compose up --build -d
+# ─────────────────────────────────────────────────────────────────────────────
+
 services:
-  frontend:
+  # ─── Next.js Frontend (Production) ───────────────────────────────────
+  client:
     build:
-      context: .
+      context: ./client
       dockerfile: Dockerfile
-    restart: always
-    environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/jansankalp
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=http://localhost:3000
-      - AI_SERVICE_URL=http://ai-engine:8000
-    depends_on:
-      - postgres
-      - redis
-      - ai-engine
-    networks:
-      - jansankalp-net
-
-  ai-engine:
-    build:
-      context: ./ai-engine
-      dockerfile: Dockerfile
-    restart: always
+    container_name: jansankalp-client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
     env_file:
-      - ./ai-engine/.env
+      - ./client/.env
     environment:
-      - PORT=8000
-      - WEAVIATE_URL=http://vector-db:8080
+      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
+      - AI_SERVICE_URL=http://server:8000
+      - NEXTAUTH_URL=http://localhost:3000
+      - NODE_ENV=production
     depends_on:
-      - vector-db
-    volumes:
-      - ai-models:/app/models
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      server:
+        condition: service_healthy
     networks:
       - jansankalp-net
 
+  # ─── FastAPI AI Engine (Production) ──────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: jansankalp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    environment:
+      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
+      - REDIS_URL=redis://redis:6379
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./server/models:/app/server/models:ro  # Mount models directory
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - jansankalp-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── PostgreSQL Database ───────────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
-    restart: always
+    container_name: jansankalp-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=jansankalp
+      - POSTGRES_PASSWORD=jansankalp_pass
       - POSTGRES_DB=jansankalp
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jansankalp -d jansankalp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - jansankalp-net
 
+  # ─── Redis Cache & Session Store ──────────────────────────────────────
   redis:
     image: redis:7-alpine
-    restart: always
-    networks:
-      - jansankalp-net
-
-  vector-db:
-    image: semitechnologies/weaviate:1.24.1
-    restart: always
-    environment:
-      - QUERY_DEFAULTS_LIMIT=25
-      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
-      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
-      - DEFAULT_VECTORIZER_MODULE=text2vec-openai
-      - ENABLE_MODULES=text2vec-openai
+    container_name: jansankalp-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
     volumes:
-      - weaviate-data:/var/lib/weaviate
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - jansankalp-net
 
-  zookeeper:
-    image: bitnami/zookeeper:latest
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-    networks:
-      - jansankalp-net
-
-  kafka:
-    image: bitnami/kafka:latest
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_ANONYMOUS_LOGIN=yes
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-    depends_on:
-      - zookeeper
-    networks:
-      - jansankalp-net
-
+  # ─── Nginx Reverse Proxy (Optional) ───────────────────────────────────
   nginx:
     image: nginx:alpine
-    restart: always
+    container_name: jansankalp-nginx
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - frontend
-      - ai-engine
+      - client
+      - server
     networks:
       - jansankalp-net
+    profiles:
+      - production
+
+  # ─── Prometheus Monitoring ─────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: jansankalp-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - jansankalp-net
+    profiles:
+      - monitoring
+
+  # ─── Grafana Dashboard ─────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: jansankalp-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=jansankalp123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - jansankalp-net
+    profiles:
+      - monitoring
 
 networks:
   jansankalp-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 volumes:
   postgres-data:
-  weaviate-data:
-  ai-models:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

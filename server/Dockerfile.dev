@@ -1,0 +1,26 @@
+# ─── Dev Dockerfile for FastAPI (auto-reload enabled) ────────────────
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+COPY requirements.docker.txt .
+RUN pip install --no-cache-dir --timeout=300 --retries=5 -r requirements.docker.txt
+
+# Source copied via volume in dev, but needed for image to be valid
+COPY . .
+
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
+
+EXPOSE 8000
+
+# --reload flag enables hot-reload on code changes
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

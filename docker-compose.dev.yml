@@ -1,0 +1,104 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIMPLE DEVELOPMENT STACK — Kafka aur Weaviate nahi hain, local dev ke liye
+# Chalane ke liye:  docker compose -f docker-compose.dev.yml up --build
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ─── Next.js Frontend (Dev Mode) ───────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: jansankalp-client-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client/.env
+    environment:
+      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
+      - AI_SERVICE_URL=http://server:8000
+      - NEXTAUTH_URL=http://localhost:3000
+      - KAFKA_BROKERS=localhost:9092
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - jansankalp-dev-net
+
+  # ─── FastAPI AI Engine (Dev Mode) ──────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: jansankalp-server-dev
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    environment:
+      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
+      - REDIS_URL=redis://redis:6379
+      - WEAVIATE_URL=http://localhost:8080
+      - KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+    volumes:
+      - ./server:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - jansankalp-dev-net
+
+  # ─── PostgreSQL ─────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: jansankalp-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=jansankalp_pass
+      - POSTGRES_DB=jansankalp
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d jansankalp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-dev-net
+
+  # ─── Redis ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: jansankalp-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-dev-net
+
+networks:
+  jansankalp-dev-net:
+    driver: bridge
+
+volumes:
+  postgres-dev-data:
