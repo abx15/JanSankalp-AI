@@ -158,7 +158,7 @@ export default function TransparencyPage() {
         <section>
           <h2 className="text-3xl font-black mb-2">How the AI Works</h2>
           <p className="text-muted-foreground mb-8">
-            A step-by-step explanation of every complaint's journey through our
+            A step-by-step explanation of every complaint&apos;s journey through our
             AI systems journey.
           </p>
           <div className="space-y-4">
