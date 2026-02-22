@@ -372,8 +372,8 @@ export default function IncidentCommandDashboard() {
                 </span>
               </h3>
               <p className="text-slate-400 font-medium leading-relaxed">
-                The Sovereign AI is monitoring all complaints for "National
-                Security" keywords. In "Protocol Alpha", complaints involving
+                The Sovereign AI is monitoring all complaints for &quot;National
+                Security&quot; keywords. In &quot;Protocol Alpha&quot;, complaints involving
                 public utilities or critical infrastructure are automatically
                 escalated to the
                 <span className="text-white font-black">
