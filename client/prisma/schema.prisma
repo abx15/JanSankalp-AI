@@ -1,0 +1,564 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  OFFICER
+  STATE_ADMIN
+  DISTRICT_ADMIN
+  CITY_ADMIN
+  ADMIN // System Global Admin
+}
+
+enum ComplaintStatus {
+  PENDING
+  RESUMED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id            String      @id @default(cuid())
+  name          String?
+  email         String      @unique
+  password      String?
+  emailVerified DateTime?
+  role          Role        @default(CITIZEN)
+  points        Int         @default(0)
+  phone         String?
+  address       String?
+  bio           String?
+  latitude      Float?
+  longitude     Float?
+  avatarUrl     String?
+  
+  // Tenancy
+  tenant        Tenant?     @relation(fields: [tenantId], references: [id])
+  tenantId      String?
+  state         State?      @relation(fields: [stateId], references: [id])
+  stateId       String?
+  district      District?   @relation(fields: [districtId], references: [id])
+  districtId    String?
+  city          City?       @relation(fields: [cityId], references: [id])
+  cityId        String?
+  ward          Ward?       @relation(fields: [wardId], references: [id])
+  wardId        String?
+
+  complaints    Complaint[]
+  assignedTasks Complaint[] @relation("AssignedTo")
+  managedDept   Department? @relation("DeptHead")
+  notifications Notification[]
+  conversations UserConversation[]
+  threatLogs    ThreatLog[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Tenant {
+  id            String      @id @default(cuid())
+  name          String      @unique // e.g., "New York City"
+  subdomain     String      @unique // e.g., "nyc"
+  countryCode   String      @default("IN") // ISO alpha-2
+  brandColor    String      @default("#3b82f6")
+  logoUrl       String?
+  status        String      @default("ACTIVE") // ACTIVE, SUSPENDED
+  
+  subscription  Subscription?
+  users         User[]
+  complaints    Complaint[]
+  departments   Department[]
+  budgetForecasts BudgetForecast[]
+  costOptimizations CostOptimization[]
+  threatLogs    ThreatLog[]
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Subscription {
+  id            String      @id @default(cuid())
+  tenantId      String      @unique
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  plan          String      @default("BASIC") // BASIC, PREMIUM, ENTERPRISE
+  status        String      @default("ACTIVE")
+  billingCycle  String      @default("MONTHLY")
+  usageLimit    Int         @default(1000)
+  currentUsage  Int         @default(0)
+  stripeId      String?
+  expiresAt     DateTime?
+}
+
+model State {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  districts District[]
+  users     User[]
+  complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
+}
+
+model District {
+  id        String     @id @default(cuid())
+  name      String
+  state     State      @relation(fields: [stateId], references: [id])
+  stateId   String
+  cities    City[]
+  users     User[]
+  complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
+
+  @@unique([name, stateId])
+}
+
+model City {
+  id         String     @id @default(cuid())
+  name       String
+  district   District   @relation(fields: [districtId], references: [id])
+  districtId String
+  wards      Ward[]
+  users      User[]
+  complaints Complaint[]
+
+  @@unique([name, districtId])
+}
+
+model Ward {
+  id         String     @id @default(cuid())
+  name       String
+  city       City       @relation(fields: [cityId], references: [id])
+  cityId     String
+  users      User[]
+  complaints Complaint[]
+
+  @@unique([name, cityId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model Complaint {
+  id                  String          @id @default(cuid())
+  ticketId            String          @unique
+  title               String
+  description         String
+  originalText        String?
+  originalLanguage    String?
+  translatedText      String?
+  status              ComplaintStatus @default(PENDING)
+  severity            Int             @default(1) // 1-5
+  category            String
+  confidenceScore     Float?
+  imageUrl            String?
+  latitude            Float
+  longitude           Float
+  author              User            @relation(fields: [authorId], references: [id])
+  authorId            String
+  assignedTo          User?           @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedToId        String?
+  department          Department?     @relation(fields: [departmentId], references: [id])
+  departmentId        String?
+  
+  // Tenancy
+  tenant              Tenant?         @relation(fields: [tenantId], references: [id])
+  tenantId            String?
+  state               State?          @relation(fields: [stateId], references: [id])
+  stateId             String?
+  district            District?       @relation(fields: [districtId], references: [id])
+  districtId          String?
+  city                City?           @relation(fields: [cityId], references: [id])
+  cityId              String?
+  ward                Ward?           @relation(fields: [wardId], references: [id])
+  wardId              String?
+
+  remarks             Remark[]
+  notifications       Notification[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  duplicateOf         String?
+  receiptId           String?         @unique
+  
+  // AI Governance Fields
+  aiAnalysis          Json?           // Stores classification, confidence, category, reasoning
+  spamScore           Float?          @default(0)
+  isDuplicate         Boolean         @default(false)
+  resolutionVerified  Boolean?
+  verificationLog     String?
+  
+  // Security Ledger
+  decisionHash        String?         // Hashed decision for defense-grade integrity
+  blockchainTxId      String?         // Simulated blockchain link
+}
+
+model Department {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  head       User?       @relation("DeptHead", fields: [headId], references: [id])
+  headId     String?     @unique
+  complaints Complaint[]
+  budgetForecasts BudgetForecast[]
+  budgetActuals    BudgetActual[]
+  costOptimizations CostOptimization[]
+  demandSurges     DemandSurge[]
+  
+  // Tenancy
+  tenant              Tenant?         @relation(fields: [tenantId], references: [id])
+  tenantId            String?
+  
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Remark {
+  id          String    @id @default(cuid())
+  text        String
+  authorName  String
+  authorRole  Role
+  imageUrl    String?
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+  complaintId String
+  createdAt   DateTime  @default(now())
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // "COMPLAINT_REGISTERED", "STATUS_UPDATE", "RESOLVED"
+  title       String
+  message     String
+  complaintId String?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+// Security & Threat Detection
+model ThreatLog {
+  id          String   @id @default(cuid())
+  type        String   // "BOT_SPAM", "SQL_INJECTION", "PROMPT_INJECTION", "ANOMALY"
+  severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  payload     Json?    // Request details
+  sourceIp    String?
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  tenantId    String?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  actionTaken String   // "BLOCKED", "FLAGGED", "CHALLENGED"
+  createdAt   DateTime @default(now())
+}
+
+// Conversational AI Assistant
+model Conversation {
+  id          String   @id @default(cuid())
+  title       String?
+  participants UserConversation[]
+  messages    Message[]
+  summary     String?  // AI-generated long-term summary
+  metadata    Json?    // Tone, preferences, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserConversation {
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([userId, conversationId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String?      // Null if sent by System AI
+  text           String
+  isBot          Boolean      @default(false)
+  audioUrl       String?      // For voice follow-ups
+  sentiment      String?
+  createdAt      DateTime     @default(now())
+}
+
+// Budget Forecasting Models
+model BudgetForecast {
+  id              String   @id @default(cuid())
+  period          String   // "2024-01", "2024-Q1", "2024-Annual"
+  periodType      String   // "MONTHLY", "QUARTERLY", "ANNUAL"
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Tenancy
+  tenantId        String?
+  tenant          Tenant?      @relation(fields: [tenantId], references: [id])
+
+  // Forecast values
+  predictedAmount  Float
+  actualAmount     Float?
+  confidence       Float   // 0-1 confidence score
+  modelVersion     String  // Version of forecasting model
+  
+  // Breakdown
+  personnelCost    Float?
+  infrastructureCost Float?
+  operationalCost  Float?
+  emergencyFund    Float?
+  
+  // Metadata
+  forecastDate     DateTime @default(now())
+  lastUpdated      DateTime @updatedAt
+  createdBy        String
+  status           String   @default("ACTIVE") // ACTIVE, ARCHIVED, SUPERSEDED
+  
+  // AI Insights
+  insights         Json?    // AI-generated insights
+  riskFactors      Json?    // Risk assessment
+  recommendations  Json?    // Cost optimization recommendations
+  
+  @@unique([period, periodType, departmentId, stateId, districtId])
+}
+
+model BudgetActual {
+  id              String   @id @default(cuid())
+  period          String   // "2024-01", "2024-Q1", "2024-Annual"
+  periodType      String   // "MONTHLY", "QUARTERLY", "ANNUAL"
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Actual spending
+  totalAmount     Float
+  personnelCost    Float?
+  infrastructureCost Float?
+  operationalCost  Float?
+  emergencySpent  Float?
+  
+  // Context
+  complaintCount   Int?
+  resolvedCount    Int?
+  emergencyEvents  Int?
+  
+  recordedAt       DateTime @default(now())
+  verifiedBy       String?
+  notes            String?
+}
+
+model CostOptimization {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  category        String   // "PERSONNEL", "INFRASTRUCTURE", "OPERATIONAL", "PROCUREMENT"
+  priority        String   // "HIGH", "MEDIUM", "LOW"
+  
+  // Impact metrics
+  potentialSavings Float
+  implementationCost Float
+  roi             Float    // Return on Investment
+  timeframe       String   // "SHORT_TERM", "MEDIUM_TERM", "LONG_TERM"
+  
+  // Target scope
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Tenancy
+  tenantId        String?
+  tenant          Tenant?      @relation(fields: [tenantId], references: [id])
+
+  // Status
+  status          String   @default("PROPOSED") // PROPOSED, APPROVED, IMPLEMENTED, REJECTED
+  approvedBy      String?
+  approvedAt      DateTime?
+  implementedBy   String?
+  implementedAt   DateTime?
+  
+  // AI analysis
+  aiConfidence    Float?
+  aiReasoning     Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model DemandSurge {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  severity        String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  
+  // Prediction details
+  predictedStart  DateTime
+  predictedEnd    DateTime
+  confidence      Float   // 0-1 confidence score
+  
+  // Scope
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  stateId         String?
+  state           State?       @relation(fields: [stateId], references: [id])
+  districtId      String?
+  district        District?    @relation(fields: [districtId], references: [id])
+  
+  // Impact assessment
+  estimatedComplaints Int?
+  estimatedCost       Float?
+  affectedAreas       Json?   // Geographic or service areas affected
+  
+  // Contributing factors
+  factors         Json?   // Weather, events, seasonal trends, etc.
+  
+  // Status
+  status          String   @default("PREDICTED") // PREDICTED, ACTIVE, RESOLVED, FALSE_ALARM
+  actualStart     DateTime?
+  actualEnd       DateTime?
+  actualImpact    Json?
+  
+  // AI analysis
+  modelVersion    String
+  aiInsights      Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ==========================================
+// GEOPOLITICAL SOVEREIGN AI MODELS
+// ==========================================
+
+enum GovernanceLevel {
+  GLOBAL
+  NATIONAL
+  STATE
+  CITY
+}
+
+model SovereignNode {
+  id              String          @id @default(cuid())
+  name            String
+  level           GovernanceLevel
+  countryCode     String?         // ISO alpha-2
+  parentId        String?
+  parent          SovereignNode?  @relation("NodeHierarchy", fields: [parentId], references: [id])
+  children        SovereignNode[] @relation("NodeHierarchy")
+  
+  // Associations
+  sdgTargets      SDGTarget[]
+  simulations     PolicySimulation[]
+  digitalTwin     DigitalTwinNode[]
+  crises          NationalCrisis[]
+  
+  metadata        Json?           // Population, land area, economic data
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model SDGTarget {
+  id              String          @id @default(cuid())
+  nodeId          String
+  node            SovereignNode   @relation(fields: [nodeId], references: [id])
+  goalNumber      Int             // UN SDG 1-17
+  title           String
+  description     String
+  targetValue     Float
+  currentValue    Float
+  unit            String          // "%", "USD", "Metric Tons"
+  status          String          @default("ON_TRACK") // ON_TRACK, AT_RISK, BEHIND
+  
+  lastMeasured    DateTime        @default(now())
+  history         Json?           // Time-series data points
+}
+
+model PolicySimulation {
+  id              String          @id @default(cuid())
+  nodeId          String
+  node            SovereignNode   @relation(fields: [nodeId], references: [id])
+  title           String
+  description     String
+  baselineValues  Json            // Starting parameters
+  modifiedValues  Json            // User-simulated overrides
+  outcomes        Json            // AI-predicted results
+  approvalRating  Float?          // Predicted citizen approval
+  riskScore       Float?          // Forecasted policy risk
+  
+  status          String          @default("DRAFT") // DRAFT, SIMULATING, COMPLETED
+  createdAt       DateTime        @default(now())
+}
+
+model DigitalTwinNode {
+  id              String          @id @default(cuid())
+  nodeId          String
+  node            SovereignNode   @relation(fields: [nodeId], references: [id])
+  name            String          // "Grid Alpha", "North Station Bridge"
+  type            String          // INFRA, ENERGY, TRANSPORT, WATER
+  healthScore     Float           @default(100)
+  lastSync        DateTime        @default(now())
+  sensorMetrics   Json?           // Real-time telemetry data
+  status          String          @default("OPERATIONAL") // OPERATIONAL, MAINTENANCE, CRITICAL
+  
+  anomalies       Json?           // List of detected irregularities
+}
+
+model NationalCrisis {
+  id              String          @id @default(cuid())
+  nodeId          String
+  node            SovereignNode   @relation(fields: [nodeId], references: [id])
+  type            String          // NATURAL_DISASTER, PANDEMIC, ECONOMIC, SECURITY
+  severity        String          // LOW, MEDIUM, HIGH, CRITICAL
+  status          String          @default("ACTIVE") // ACTIVE, CONTAINED, RESOLVED
+  impactZone      Json?           // Geographic coordinates or regions
+  
+  resourcesDepl   Json?           // Personnel, funds, equipment deployed
+  aiRecommendations Json?         // Next strategic moves
+  createdAt       DateTime        @default(now())
+  resolvedAt      DateTime?
+}
