@@ -5,6 +5,7 @@ import { Image as ImageIcon, X, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageKitProvider, IKUpload } from "imagekitio-next";
 import Image from "next/image";
+import janSankalpLogo from "../../../public/faviconjan.png";
 
 interface ImageUploadProps {
   onUpload: (url: string) => void;
@@ -98,6 +99,16 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
               height={450}
               className="w-full h-full object-cover"
             />
+            {/* JanSankalp Logo Watermark */}
+            <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg">
+              <Image 
+                src={janSankalpLogo} 
+                alt="JanSankalp AI" 
+                width={40} 
+                height={40}
+                className="w-10 h-10 object-contain"
+              />
+            </div>
             <Button
               type="button"
               onClick={() => onUpload("")}
@@ -124,8 +135,18 @@ export function ImageUpload({ onUpload, value }: ImageUploadProps) {
                   </>
                 ) : (
                   <>
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform border border-slate-100">
+                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform border border-slate-100 relative">
                       <ImageIcon className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors" />
+                      {/* JanSankalp Logo Icon */}
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                        <Image 
+                          src={janSankalpLogo} 
+                          alt="JanSankalp" 
+                          width={16} 
+                          height={16}
+                          className="w-4 h-4 object-contain"
+                        />
+                      </div>
                     </div>
                     <p className="mb-1 text-sm font-bold text-slate-900">
                       <span className="text-primary underline decoration-2 underline-offset-4">

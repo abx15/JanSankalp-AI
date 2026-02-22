@@ -47,7 +47,7 @@ export const metadata: Metadata = {
       "Empowering citizens and administration with AI-driven public grievance redressal. Experience transparent, efficient, and responsive governance with JanSankalp AI.",
     images: [
       {
-        url: "/logojansanklp.png",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "JanSankalp AI - Smart Governance Platform",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "JanSankalp AI | Smart Governance Platform",
     description:
       "Revolutionizing public grievance redressal with AI. Transparent, efficient, and accountable governance for everyone.",
-    images: ["/logojansanklp.png"],
+    images: ["/twitter-image"],
   },
   icons: {
     icon: "/faviconjan.png",
