@@ -452,9 +452,9 @@ export default function UNGovernanceDashboard() {
                   Decision Pulse
                 </p>
                 <p className="text-[13px] font-bold text-slate-800 leading-relaxed italic">
-                  "Prioritizing SDG 6 (Clean Water) infrastructure in Tokyo node
+                  &quot;Prioritizing SDG 6 (Clean Water) infrastructure in Tokyo node
                   because the predictive anomaly sensor detected a 14% drop in
-                  hydraulic pressure."
+                  hydraulic pressure.&quot;
                 </p>
               </div>
             </div>

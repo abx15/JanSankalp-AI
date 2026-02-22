@@ -438,10 +438,10 @@ export default function NationalCommandCenter() {
                 Command Strategy
               </h5>
               <p className="text-sm font-bold text-slate-300 leading-relaxed italic">
-                "Initiating emergency energy load balancing to Sector 2. Routing
+                &quot;Initiating emergency energy load balancing to Sector 2. Routing
                 medical personnel from Reserves 04 via autonomous VTOL network.
                 ETA: 14 Minutes. Reason: Hurricane surge detected in lower
-                grid."
+                grid.&quot;
               </p>
             </div>
 
