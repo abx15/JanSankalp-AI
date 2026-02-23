@@ -98,6 +98,8 @@ export default function DashboardPage() {
       setComplaints(data.complaints || []);
     } catch (err) {
       console.error(err);
+      const { toast } = await import("sonner");
+      toast.error("Failed to load your reports. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -109,36 +111,13 @@ export default function DashboardPage() {
   const points = session?.user?.points || 0;
 
   useEffect(() => {
-    console.log("Dashboard useEffect - Session Status:", sessionStatus);
-    console.log("Dashboard useEffect - Role:", role);
-    console.log("Dashboard useEffect - Session:", session);
-
-    if (sessionStatus === "loading") return;
-
-    if (sessionStatus === "unauthenticated") {
-      console.log("User not authenticated, redirecting to signin...");
-      router.push("/auth/signin");
-      return;
+    if (
+      sessionStatus === "authenticated" &&
+      (role === "CITIZEN" || !["ADMIN", "OFFICER"].includes(role))
+    ) {
+      fetchComplaints();
     }
-
-    if (sessionStatus === "authenticated") {
-      console.log("User authenticated, checking role...");
-
-      if (role === "ADMIN") {
-        console.log("Redirecting ADMIN to admin dashboard...");
-        router.push("/dashboard/admin");
-      } else if (role === "OFFICER") {
-        console.log("Redirecting OFFICER to officer dashboard...");
-        router.push("/dashboard/officer");
-      } else if (role === "CITIZEN") {
-        console.log("Loading CITIZEN dashboard...");
-        fetchComplaints();
-      } else {
-        console.log("Unknown role, defaulting to citizen dashboard...");
-        fetchComplaints();
-      }
-    }
-  }, [sessionStatus, role, router, session]);
+  }, [sessionStatus, role]);
 
   if (!mounted || loading || sessionStatus === "loading") {
     return <DashboardSkeleton />;
