@@ -41,12 +41,28 @@ export function SheetTrigger({
 export function SheetContent({
   className,
   children,
+  side = "right",
 }: {
   className?: string;
   children: React.ReactNode;
+  side?: "left" | "right" | "top" | "bottom";
 }) {
   const context = React.useContext(SheetContext);
   if (!context) return null;
+
+  const variants = {
+    left: { x: "-100%" },
+    right: { x: "100%" },
+    top: { y: "-100%" },
+    bottom: { y: "100%" },
+  };
+
+  const sideClasses = {
+    left: "left-0 inset-y-0 h-full w-full max-w-sm border-r",
+    right: "right-0 inset-y-0 h-full w-full max-w-sm border-l",
+    top: "top-0 inset-x-0 w-full h-auto border-b",
+    bottom: "bottom-0 inset-x-0 w-full h-auto border-t",
+  };
 
   return (
     <AnimatePresence>
@@ -60,12 +76,13 @@ export function SheetContent({
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
           />
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            initial={variants[side]}
+            animate={{ x: 0, y: 0 }}
+            exit={variants[side]}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={cn(
-              "fixed inset-y-0 right-0 z-50 h-full w-full max-w-sm bg-background p-6 shadow-2xl outline-none sm:max-w-md",
+              "fixed z-50 bg-background p-6 shadow-2xl outline-none sm:max-w-md",
+              sideClasses[side],
               className,
             )}
           >
