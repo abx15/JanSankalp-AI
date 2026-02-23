@@ -46,22 +46,28 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
-    from app.events.stream_processor import start_event_processing
-    from app.services.model_loader import initialize_models
+    # Check if we're in development mode (disable heavy services)
+    dev_mode = os.environ.get("NODE_ENV") == "development" or os.environ.get("PYTHONPATH") == "/app"
     
-    # Start event processing
-    asyncio.create_task(start_event_processing())
-    logger.info("Kafka processing pipeline started in background")
+    if not dev_mode:
+        # Production: Start full event processing
+        try:
+            from app.events.stream_processor import start_event_processing
+            asyncio.create_task(start_event_processing())
+            logger.info("Kafka processing pipeline started in background")
+        except Exception as e:
+            logger.warning(f"Kafka processing disabled: {e}")
     
-    # Initialize AI/ML models
+    # Initialize AI/ML models (with fallback)
     try:
+        from app.services.model_loader import initialize_models
         model_success = await initialize_models()
         if model_success:
             logger.info("AI/ML models initialized successfully")
         else:
-            logger.error("Failed to initialize AI/ML models")
+            logger.warning("AI/ML models failed to initialize - using fallback mode")
     except Exception as e:
-        logger.error(f"Model initialization error: {e}")
+        logger.warning(f"Model initialization error - using fallback mode: {e}")
 
 # ---------------------------------------------------------------------------
 # Middleware

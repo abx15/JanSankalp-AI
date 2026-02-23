@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
+import { ChatBot } from "@/components/ai/ChatBot";
 import {
   Sheet,
   SheetContent,
@@ -106,6 +107,7 @@ export default function DashboardLayout({
           </div>
         </header>
         <main className="p-8">{children}</main>
+        <ChatBot />
       </div>
     </div>
   );

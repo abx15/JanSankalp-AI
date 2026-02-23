@@ -29,7 +29,9 @@ import {
   Globe,
   Crown,
   Target,
+  ShieldAlert,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RealTimeNotifications } from "@/components/dashboard/RealTimeNotifications";
 import {
   BarChart,
@@ -78,6 +80,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [data, setData] = React.useState<AnalyticsData | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null); // New error state
   const [mounted, setMounted] = React.useState(false);
   const [lastUpdated, setLastUpdated] = React.useState<Date>(new Date());
   const [activeTab, setActiveTab] = React.useState<
@@ -90,15 +93,25 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null); // Clear any previous errors
     try {
       const res = await fetch("/api/admin/analytics");
-      if (res.ok) {
-        const analytics = await res.json();
-        setData(analytics);
-        setLastUpdated(new Date());
+      const analytics = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          analytics.message ||
+            analytics.error ||
+            `Failed to fetch analytics: ${res.status}`,
+        );
       }
-    } catch (error) {
-      console.error("Error fetching analytics:", error);
+      setData(analytics);
+      setLastUpdated(new Date());
+    } catch (err: any) {
+      console.error("Error fetching analytics:", err);
+      setError(
+        err.message || "Failed to load management dashboard. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -129,6 +142,38 @@ export default function AdminDashboard() {
           <p className="text-sm font-medium text-muted-foreground animate-pulse">
             Loading Governance Analytics...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || (!loading && !data && mounted)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 px-4 animate-in fade-in duration-500">
+        <div className="w-24 h-24 rounded-[2.5rem] bg-red-50 text-red-500 flex items-center justify-center mb-8 border border-red-100 shadow-xl shadow-red-500/10 active:scale-95 transition-all">
+          <ShieldAlert className="w-12 h-12" />
+        </div>
+        <h2 className="text-3xl font-black text-foreground mb-3 tracking-tight">
+          Governance Sync Failure
+        </h2>
+        <p className="text-muted-foreground text-center max-w-sm mb-10 font-medium leading-relaxed">
+          {error ||
+            "We encountered an issue synchronizing the governance data for your region. Please verify your administrative credentials."}
+        </p>
+        <div className="flex gap-4">
+          <Button
+            onClick={() => fetchData()}
+            className="rounded-2xl px-10 h-14 font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all bg-primary"
+          >
+            Retry Connection
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => (window.location.href = "/dashboard")}
+            className="rounded-2xl px-10 h-14 font-bold text-muted-foreground hover:bg-muted transition-all active:scale-95"
+          >
+            Exit Terminal
+          </Button>
         </div>
       </div>
     );
