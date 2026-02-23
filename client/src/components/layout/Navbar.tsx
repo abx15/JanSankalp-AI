@@ -23,10 +23,10 @@ const NavItem = ({
   <Link
     href={href}
     className={cn(
-      "px-4 py-2 rounded-full text-sm font-bold transition-all uppercase tracking-widest",
+      "px-4 py-2 rounded-lg text-sm font-bold transition-all uppercase tracking-widest",
       active
-        ? "bg-primary text-white shadow-lg shadow-primary/20"
-        : "text-muted-foreground hover:text-primary hover:bg-primary/5",
+        ? "text-white bg-civic-primary/20"
+        : "text-white/80 hover:text-white hover:bg-white/10",
     )}
   >
     {children}
@@ -51,258 +51,233 @@ export const Navbar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full border-b",
+        isScrolled
+          ? "bg-civic-primary/95 backdrop-blur-md py-3 border-white/10 shadow-lg"
+          : "bg-civic-primary py-5 border-transparent",
       )}
     >
-      <motion.div
-        layout
-        transition={{
-          type: "spring",
-          stiffness: 260,
-          damping: 20,
-          mass: 1,
-        }}
-        className={cn(
-          "mt-6 mx-auto transition-all duration-700 pointer-events-auto",
-          isScrolled ? "w-[90%] max-w-[800px]" : "w-[95%] max-w-[1400px]",
-        )}
-      >
-        <motion.div
-          layout
-          className={cn(
-            "relative flex items-center justify-between px-6 py-2 transition-all duration-500",
-            isScrolled
-              ? "bg-background/40 backdrop-blur-2xl saturate-[1.8] border border-white/20 dark:border-white/10 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
-              : "bg-background/20 backdrop-blur-md border border-white/10 rounded-3xl",
-          )}
-        >
-          {/* Inner Glow Border (Premium Hardware Look) */}
-          {isScrolled && (
-            <div className="absolute inset-0 rounded-full border border-primary/20 pointer-events-none -z-10 animate-pulse" />
-          )}
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-10 lg:px-20 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 md:w-12 md:h-12 transition-transform group-hover:scale-105">
+            <Image
+              src="/logo.png"
+              alt="JanSankalp AI Logo"
+              fill
+              sizes="(max-width: 768px) 40px, 48px"
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg md:text-xl font-black text-white leading-none tracking-tight">
+              JanSankalp <span className="text-civic-accent italic">AI</span>
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-civic-accent/80">
+              Civic Intelligence
+            </span>
+          </div>
+        </Link>
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <motion.div
-              layout
-              className="w-10 h-10 md:w-14 md:h-14 bg-transparent rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform p-0.5 relative"
-            >
-              <Image
-                src="/logo.png"
-                alt="JanSankalp AI Logo"
-                fill
-                sizes="(max-width: 768px) 40px, 56px"
-                className="object-contain"
-                priority
-              />
-            </motion.div>
-          </Link>
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-2">
+          <NavItem href="/" active={pathname === "/"}>
+            Home
+          </NavItem>
+          <NavItem href="/about" active={pathname === "/about"}>
+            About
+          </NavItem>
+          <NavItem href="/features" active={pathname === "/features"}>
+            Features
+          </NavItem>
+          <NavItem href="/how-it-works" active={pathname === "/how-it-works"}>
+            How It Works
+          </NavItem>
+          {session && (
+            <NavItem href="/dashboard" active={pathname === "/dashboard"}>
+              Dashboard
+            </NavItem>
+          )}
+        </div>
 
-          {/* Desktop Nav - Dynamic Dock Appearance */}
-          <div className="hidden md:flex items-center bg-foreground/5 dark:bg-white/5 rounded-full px-2 py-1 gap-1 border border-white/5">
-            <NavItem href="/" active={pathname === "/"}>
-              Home
-            </NavItem>
-            <NavItem href="/about" active={pathname === "/about"}>
-              About
-            </NavItem>
-            <NavItem href="/features" active={pathname === "/features"}>
-              Features
-            </NavItem>
-            <NavItem href="/how-it-works" active={pathname === "/how-it-works"}>
-              How It Works
-            </NavItem>
-            {session && (
-              <NavItem href="/dashboard" active={pathname === "/dashboard"}>
-                Dashboard
-              </NavItem>
-            )}
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-3">
+            <ThemeToggle />
+            <div className="h-6 w-[1px] bg-white/20 mx-1" />
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2">
-              <ThemeToggle />
-              <div className="h-4 w-[1px] bg-foreground/10 mx-1" />
+          {session?.user ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex flex-col items-end">
+                <span className="text-[10px] font-black uppercase text-civic-accent tracking-widest leading-none mb-0.5">
+                  Authorized
+                </span>
+                <span className="text-xs font-bold text-white">
+                  {session.user.name?.split(" ")[0]}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
             </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-lg font-bold text-xs h-10 px-4 text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href="/auth/signin">Login</Link>
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-lg font-bold text-xs h-10 px-6 bg-civic-accent hover:bg-civic-accent/90 text-white shadow-lg shadow-civic-accent/20 transition-all active:scale-95"
+                asChild
+              >
+                <Link href="/auth/signup">Join Now</Link>
+              </Button>
+            </div>
+          )}
 
-            {session?.user ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden lg:flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest leading-none mb-0.5">
-                    Live
-                  </span>
-                  <span className="text-xs font-bold truncate max-w-[80px]">
-                    {session.user.name?.split(" ")[0]}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-9 h-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full font-bold text-xs h-9 px-4 hover:bg-primary/5"
-                  asChild
-                >
-                  <Link href="/auth/signin">Login</Link>
-                </Button>
-                <Button
-                  size="sm"
-                  className="rounded-full font-bold text-xs h-9 px-5 shadow-lg shadow-primary/20 bg-primary hover:scale-105 transition-transform"
-                  asChild
-                >
-                  <Link href="/auth/signup">Join</Link>
-                </Button>
-              </div>
-            )}
+          {/* Mobile Menu Trigger */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden w-10 h-10 rounded-xl bg-white/5 text-white border border-white/10"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+        </div>
+      </div>
 
-            {/* Mobile Menu Trigger */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden w-9 h-9 rounded-full hover:bg-primary/10"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-civic-primary border-t border-white/10 overflow-hidden"
+          >
+            <div className="px-6 py-8 flex flex-col gap-4">
+              <Link
+                href="/"
+                className={cn(
+                  "text-lg font-bold uppercase tracking-tight p-3 rounded-lg",
+                  pathname === "/" ? "bg-white/10 text-white" : "text-white/70",
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                Home
+              </Link>
+              <Link
+                href="/about"
+                className={cn(
+                  "text-lg font-bold uppercase tracking-tight p-3 rounded-lg",
+                  pathname === "/about"
+                    ? "bg-white/10 text-white"
+                    : "text-white/70",
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/features"
+                className={cn(
+                  "text-lg font-bold uppercase tracking-tight p-3 rounded-lg",
+                  pathname === "/features"
+                    ? "bg-white/10 text-white"
+                    : "text-white/70",
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="/how-it-works"
+                className={cn(
+                  "text-lg font-bold uppercase tracking-tight p-3 rounded-lg",
+                  pathname === "/how-it-works"
+                    ? "bg-white/10 text-white"
+                    : "text-white/70",
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                How It Works
+              </Link>
+              {session && (
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "text-lg font-bold uppercase tracking-tight p-3 rounded-lg",
+                    pathname === "/dashboard"
+                      ? "bg-white/10 text-white"
+                      : "text-white/70",
+                  )}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </Link>
               )}
-            </Button>
-          </div>
-        </motion.div>
 
-        {/* Mobile Menu - Aero Glass Overlay */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="md:hidden mt-2 bg-background/60 backdrop-blur-3xl border border-white/20 rounded-[1.5rem] p-4 shadow-2xl pointer-events-auto"
-            >
-              <div className="flex flex-col gap-1">
-                <Link
-                  href="/"
-                  className={cn(
-                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
-                    pathname === "/"
-                      ? "bg-primary text-white"
-                      : "hover:bg-primary/5",
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/about"
-                  className={cn(
-                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
-                    pathname === "/about"
-                      ? "bg-primary text-white"
-                      : "hover:bg-primary/5",
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/features"
-                  className={cn(
-                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
-                    pathname === "/features"
-                      ? "bg-primary text-white"
-                      : "hover:bg-primary/5",
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  Features
-                </Link>
-                <Link
-                  href="/how-it-works"
-                  className={cn(
-                    "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
-                    pathname === "/how-it-works"
-                      ? "bg-primary text-white"
-                      : "hover:bg-primary/5",
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  How It Works
-                </Link>
-                {session && (
-                  <Link
-                    href="/dashboard"
-                    className={cn(
-                      "text-lg font-bold uppercase tracking-tight p-3 rounded-xl transition-colors",
-                      pathname === "/dashboard"
-                        ? "bg-primary text-white"
-                        : "hover:bg-primary/5",
-                    )}
+              <div className="h-[1px] bg-white/10 my-2" />
+
+              {session?.user ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div className="w-10 h-10 bg-civic-accent rounded-lg flex items-center justify-center text-white">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase text-civic-accent tracking-widest">
+                        Resident Account
+                      </span>
+                      <span className="text-base font-bold text-white">
+                        {session.user.name}
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full rounded-xl font-bold py-4 h-auto text-sm bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl font-bold py-4 h-auto text-base border-white/20 text-white bg-white/5 hover:bg-white/10"
+                    asChild
                     onClick={() => setIsOpen(false)}
                   >
-                    Dashboard
-                  </Link>
-                )}
-
-                <div className="h-[1px] bg-foreground/10 w-full my-1" />
-
-                {session?.user ? (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-3 p-2 bg-primary/5 rounded-xl">
-                      <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
-                        <User className="w-5 h-5" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase text-primary tracking-widest">
-                          Authorized
-                        </span>
-                        <span className="text-base font-bold">
-                          {session.user.name}
-                        </span>
-                      </div>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      className="w-full rounded-xl font-bold py-4 h-auto text-sm"
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" /> Logout
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2 mt-1">
-                    <Button
-                      variant="outline"
-                      className="flex-1 rounded-xl font-bold py-3 h-auto text-base border-2"
-                      asChild
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Link href="/auth/signin">Login</Link>
-                    </Button>
-                    <Button
-                      className="flex-1 rounded-xl font-bold py-3 h-auto text-base shadow-lg shadow-primary/20"
-                      asChild
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Link href="/auth/signup">Join</Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+                    <Link href="/auth/signin">Login</Link>
+                  </Button>
+                  <Button
+                    className="w-full rounded-xl font-bold py-4 h-auto text-base bg-civic-accent hover:bg-civic-accent/90 text-white shadow-xl shadow-civic-accent/20"
+                    asChild
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Link href="/auth/signup">Join JanSankalp</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

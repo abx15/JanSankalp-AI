@@ -141,106 +141,91 @@ export default function Home() {
 
   return (
     <LiveEventProvider>
-      <main className="min-h-screen bg-slate-950 selection:bg-primary/30 text-slate-100">
-        {/* Futuristic Hero Section: Civilizational OS */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-          {/* Advanced Background Layer */}
+      <main className="min-h-screen bg-civic-background text-civic-text selection:bg-civic-primary/10">
+        {/* Immersive Hero Section */}
+        <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white">
+          {/* Subtle Background Elements */}
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-slate-900" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 brightness-100 contrast-150 mix-blend-overlay" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900 to-slate-900 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_90%,transparent_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,95,70,0.05),transparent)]" />
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-[0.03]" />
           </div>
 
-          <GovWaveBackground />
-          {[...Array(20)].map((_, i) => (
-            <FloatingParticle key={i} delay={i * 0.3} />
-          ))}
-
-          <motion.div
-            className="max-w-6xl mx-auto text-center z-10"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <motion.div variants={itemVariants} className="mb-8">
-              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 shadow-2xl backdrop-blur-xl px-6 py-2 rounded-full text-[10px] font-black tracking-[0.3em] uppercase mb-8">
-                Next-Gen Sovereign Intelligence
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-10 lg:px-20 py-32 md:py-48 flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8"
+            >
+              <Badge className="bg-civic-primary/10 text-civic-primary border-civic-primary/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6">
+                Next-Gen Civic Operating System
               </Badge>
-              <h1 className="text-5xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-8 bg-gradient-to-b from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
-                JanSankalp <br />
-                <span className="italic bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Sovereign AI</span>
+              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tight leading-[0.9] text-civic-text mb-8">
+                Empowering <br />
+                <span className="text-civic-primary">Governance</span> <br />
+                With <span className="text-civic-accent italic">Civic AI</span>
               </h1>
+              <p className="text-lg md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                The world&apos;s first{" "}
+                <span className="text-civic-secondary font-bold">
+                  Civic Intelligence Platform
+                </span>{" "}
+                designed to bridge the gap between citizens and administration
+                through real-time automation.
+              </p>
             </motion.div>
 
-            <motion.p
-              variants={itemVariants}
-              className="text-xl md:text-3xl font-semibold bg-gradient-to-r from-blue-100 via-purple-100 to-blue-200 bg-clip-text text-transparent max-w-4xl mx-auto mb-12 leading-relaxed"
-            >
-              The world&apos;s first{" "}
-              <span className="font-bold text-blue-600">
-                Civilizational Operating System
-              </span>
-              {" "}. Bridging the gap between{" "}
-              <span className="font-bold text-purple-600">
-                1.4 Billion voices
-              </span>
-              {" "}and{" "}
-              <span className="font-bold text-blue-600">
-                autonomous smart governance.
-              </span>
-              {" "}🏛️
-            </motion.p>
-
             <motion.div
-              variants={itemVariants}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
               className="flex flex-wrap justify-center gap-6"
             >
               <a
                 href="#report"
-                className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-black text-xl shadow-2xl hover:from-blue-700 hover:to-purple-700 hover:shadow-3xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
+                className="group relative px-10 py-5 bg-civic-accent text-white rounded-xl font-bold text-xl shadow-2xl shadow-civic-accent/20 hover:shadow-civic-accent/40 hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                Report Crisis Now
+                Report Issue Now
               </a>
               <a
                 href="/dashboard/admin"
-                className="px-12 py-6 bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700 backdrop-blur-xl rounded-full font-black text-lg hover:from-slate-700 hover:to-slate-800 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                className="px-10 py-5 bg-white text-civic-primary border-2 border-civic-primary/10 rounded-xl font-bold text-xl hover:bg-civic-primary/5 hover:border-civic-primary/20 transition-all duration-300"
               >
-                Enter Command Hub
+                Admin Command Hub
               </a>
             </motion.div>
 
             <motion.div
-              variants={itemVariants}
-              className="mt-20 flex flex-wrap justify-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+              className="mt-24 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400"
             >
               {[
-                "Defense Grade Security",
-                "Edge Computing",
-                "Neural Triage",
-                "Real-time Mesh",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/5"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  {tag}
+                { label: "Secure", icon: Shield },
+                { label: "Real-time", icon: Activity },
+                { label: "Multilingual", icon: Globe },
+                { label: "Automated", icon: BrainCircuit },
+              ].map((item) => (
+                <span key={item.label} className="flex items-center gap-2">
+                  <item.icon className="w-3 h-3 text-civic-primary" />
+                  {item.label}
                 </span>
               ))}
             </motion.div>
-          </motion.div>
+          </div>
 
-          {/* Abstract Interface Preview */}
-          <div className="absolute -bottom-64 left-1/2 -translate-x-1/2 w-full max-w-5xl h-screen bg-primary/5 rounded-[5rem] blur-[80px] -z-10" />
+          {/* Bottom Fade */}
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-civic-background to-transparent" />
         </section>
 
+        {/* Live Complaint Stream */}
         <LiveComplaintStream />
 
-        {/* Live Sovereignty Pulse Stats */}
-        <section className="py-20 bg-black/40 border-y border-white/5 backdrop-blur-2xl relative z-20">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+        {/* Stats Section: High Contrast Professional Bar */}
+        <section className="relative z-20 w-full bg-civic-background py-0 md:-mt-20">
+          <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-20">
+            <div className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-slate-200 shadow-2xl rounded-3xl overflow-hidden divide-x divide-slate-100">
               {stats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -248,22 +233,15 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="group"
+                  className="p-10 md:p-12 flex flex-col items-center text-center group hover:bg-slate-50 transition-colors"
                 >
-                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 group-hover:text-primary transition-colors">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 group-hover:text-civic-primary transition-colors">
                     {stat.label}
-                  </div>
-                  <div className="text-4xl md:text-5xl font-black text-white tabular-nums tracking-tighter mb-1">
+                  </span>
+                  <span className="text-4xl md:text-5xl font-black text-civic-text tracking-tighter mb-2">
                     {stat.value}
-                  </div>
-                  <div className="w-12 h-1 bg-primary/20 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-primary"
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "100%" }}
-                      transition={{ duration: 1.5, delay: i * 0.2 }}
-                    />
-                  </div>
+                  </span>
+                  <div className="w-10 h-1 bg-civic-accent/20 rounded-full group-hover:w-full transition-all duration-500" />
                 </motion.div>
               ))}
             </div>
@@ -271,77 +249,85 @@ export default function Home() {
         </section>
 
         {/* Automation Flow Section */}
-        <section className="py-20 md:py-32 px-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950/20">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-4xl md:text-5xl font-black mb-6">
+        <section className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-white border-y border-slate-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
                 How it Works:{" "}
-                <span className="text-primary italic">
-                  Automation in Action
+                <span className="text-civic-primary italic">
+                  Digital Automation
                 </span>
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
-                From your voice to the officer&apos;s desk – see how our AI
-                engine packages, routes, and resolves issues in real-time.
+              <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto font-medium">
+                From your voice to officer&apos;s desk – our AI packages,
+                routes, and resolves issues with zero human friction.
               </p>
             </div>
             <AutomationEngine />
           </div>
         </section>
 
-        {/* SECTION 2: LIVE MAP ACTIVITY (After How It Works) */}
-        <section className="bg-white border-b relative z-20">
-          <LiveCityMap />
+        {/* Live Map Activity */}
+        <section className="w-full bg-slate-50 border-b">
+          <div className="w-full">
+            <LiveCityMap />
+          </div>
         </section>
 
-        {/* Traditional Process Flow Section */}
-        <section className="py-20 md:py-32 px-6 relative overflow-hidden">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20 text-balance">
-              <h2 className="text-3xl md:text-5xl font-black mb-6 uppercase tracking-tighter">
-                Awasthi Se Mukti (आज़ादी अव्यवस्था से)
+        {/* Process Flow Section */}
+        <section className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter">
+                Awasthi Se Mukti
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
+              <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto font-medium">
                 Bridging the gap between citizens and administration with
-                transparency and speed.
+                national-grade transparency.
               </p>
             </div>
             <ProcessFlow />
           </div>
         </section>
 
-        {/* Reporting Section (Glassmorphic) */}
-        <section id="report" className="relative py-16 md:py-24 px-6 z-30">
+        {/* Reporting Section (Professional Card) */}
+        <section
+          id="report"
+          className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-slate-50 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-civic-accent/30 to-transparent" />
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <span className="text-primary font-bold text-sm tracking-widest uppercase">
-                Take Action
-              </span>
-              <h2 className="text-4xl font-black mt-2">
-                Report an Issue Today
+            <div className="text-center mb-16">
+              <Badge className="bg-civic-accent/10 text-civic-accent border-none mb-4">
+                Direct Action
+              </Badge>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tight">
+                Submit Your Report
               </h2>
             </div>
             <motion.div
               initial={{ y: 40, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
-              className="rounded-[2.5rem] bg-card/40 backdrop-blur-xl border-2 border-primary/5 p-1 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)]"
+              className="rounded-[2.5rem] bg-white border border-slate-200 p-2 shadow-3xl"
             >
-              <ComplaintForm />
+              <div className="bg-white rounded-[2rem] p-6 md:p-12">
+                <ComplaintForm />
+              </div>
             </motion.div>
           </div>
         </section>
 
         {/* Technical Engine Section */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[120px] pointer-events-none" />
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-black mb-8 leading-tight">
-                The AI Engine Under <br />
-                <span className="text-primary italic">The Hood</span>
+        <section className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-civic-primary text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 blur-[120px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+            <div className="space-y-12">
+              <h2 className="text-4xl md:text-6xl font-black leading-tight">
+                The Neural Core <br />
+                <span className="text-civic-accent italic">Under The Hood</span>
               </h2>
-              <div className="space-y-8">
+              <div className="space-y-10">
                 {ENGINE_SPECS.map((spec, i) => (
                   <motion.div
                     key={spec.title}
@@ -349,14 +335,16 @@ export default function Home() {
                     whileInView={{ x: 0, opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.2 }}
-                    className="flex gap-6"
+                    className="flex gap-8 group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0 border border-primary/30">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-civic-accent shrink-0 border border-white/10 group-hover:bg-civic-accent/20 transition-all">
                       {spec.icon}
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold mb-1">{spec.title}</h4>
-                      <p className="text-slate-400 text-sm leading-relaxed">
+                      <h4 className="text-2xl font-bold mb-2 text-white">
+                        {spec.title}
+                      </h4>
+                      <p className="text-white/60 text-base leading-relaxed">
                         {spec.desc}
                       </p>
                     </div>
@@ -365,73 +353,70 @@ export default function Home() {
               </div>
             </div>
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              className="bg-slate-900 border border-primary/20 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group"
+              className="bg-slate-900/50 border border-white/10 rounded-[3rem] p-10 md:p-14 shadow-4xl backdrop-blur-xl group"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
-              <div className="font-mono text-sm text-primary/80 space-y-2">
-                <p className="text-slate-500">{"// AI Triage Pipeline"}</p>
-                <p>const report = await processVoice(citizenAudio);</p>
-                <p>const embedding = AI.cluster(report.location);</p>
-                <p className="text-green-400">
-                  if (embedding.isDuplicate()) {"{"}
+              <div className="font-mono text-sm text-civic-accent/80 space-y-4">
+                <p className="text-slate-500">
+                  {"// AI Triage Pipeline Layer"}
                 </p>
-                <p className="pl-4">
-                  Citizen.notify(&quot;Similar issue nearby tagged!&quot;);
-                </p>
-                <p>
-                  {"}"} else {"{"}
-                </p>
-                <p className="pl-4">
-                  Officer.assign(report.category, report.urgency);
-                </p>
-                <p>{"}"}</p>
-              </div>
-              <motion.div
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="mt-8 pt-8 border-t border-slate-800"
-              >
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">
-                    Active Models
-                  </span>
-                  <div className="flex gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                  </div>
+                <div className="space-y-1">
+                  <p>const report = await processVoice(citizenAudio);</p>
+                  <p>const embedding = AI.cluster(report.location);</p>
                 </div>
-              </motion.div>
+                <div className="space-y-1 text-emerald-400">
+                  <p>if (embedding.isDuplicate()) {"{"}</p>
+                  <p className="pl-6">
+                    Citizen.notify(&quot;Issue localized!&quot;);
+                  </p>
+                  <p>
+                    {"}"} else {"{"}
+                  </p>
+                  <p className="pl-6">Officer.assign(report.category);</p>
+                  <p>{"}"}</p>
+                </div>
+              </div>
+              <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Model: Civic-GPT v4.0
+                </span>
+                <div className="flex gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/30" />
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* SECTION 5: DASHBOARD SIMULATION */}
-        <section className="bg-slate-50 border-y relative z-20">
-          <DashboardSimulation />
+        {/* Dashboard Simulation */}
+        <section className="w-full bg-white border-y">
+          <div className="w-full">
+            <DashboardSimulation />
+          </div>
         </section>
 
-        {/* Sovereign Command Hubs Preview */}
-        <section className="py-32 px-6 relative overflow-hidden bg-slate-900/20">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
+        {/* Command Hubs Bento */}
+        <section className="w-full py-24 md:py-48 px-4 md:px-10 lg:px-20 bg-slate-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-24">
+              <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tight">
                 Sovereign{" "}
-                <span className="text-primary italic">Command Hubs</span>
+                <span className="text-civic-primary italic">Hubs</span>
               </h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+              <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto font-medium">
                 Access the multi-layered neural network of national and global
-                governance.
+                governance centers.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
               {[
                 {
                   title: "UN Governance",
-                  desc: "Global SDG alignment and international municipal benchmarking.",
+                  desc: "Global SDG alignment and international municipal benchmarking portal.",
                   icon: Globe,
                   link: "/dashboard/admin/un-governance",
                   tag: "Global",
@@ -439,7 +424,7 @@ export default function Home() {
                 },
                 {
                   title: "National Command",
-                  desc: "Strategic crisis management and digital twin infrastructure health.",
+                  desc: "Strategic crisis management and digital twin infrastructure health monitoring.",
                   icon: Shield,
                   link: "/dashboard/admin/national-command",
                   tag: "National",
@@ -447,7 +432,7 @@ export default function Home() {
                 },
                 {
                   title: "AI Mayor Console",
-                  desc: "Hyper-local municipal optimization and citizen resonance metrics.",
+                  desc: "Hyper-local municipal optimization and citizen resonance metrics dashboard.",
                   icon: Landmark,
                   link: "/dashboard/admin",
                   tag: "Municipal",
@@ -461,28 +446,22 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  whileHover={{ y: -10 }}
-                  className="group p-8 rounded-[3rem] bg-white/5 border border-white/5 hover:border-primary/50 transition-all backdrop-blur-3xl overflow-hidden relative"
+                  className="group p-10 md:p-12 rounded-[3.5rem] bg-white border border-slate-200 hover:border-civic-primary hover:shadow-3xl transition-all duration-500 flex flex-col h-full"
                 >
-                  <div
-                    className={`absolute top-0 right-0 w-32 h-32 bg-${hub.color}-500/10 blur-[60px] -z-10`}
-                  />
-                  <div
-                    className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-white/5 group-hover:bg-${hub.color}-500/20 transition-colors`}
-                  >
-                    <hub.icon
-                      className={`w-8 h-8 text-${hub.color === "blue" ? "primary" : hub.color + "-500"}`}
-                    />
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 bg-slate-50 group-hover:bg-civic-primary/10 transition-colors">
+                    <hub.icon className="w-8 h-8 text-civic-primary" />
                   </div>
-                  <Badge className="mb-4 bg-white/5 text-slate-400 border-none uppercase tracking-widest text-[9px] font-black">
+                  <Badge className="w-fit mb-6 bg-slate-100 text-slate-500 border-none uppercase tracking-widest text-[9px] font-black group-hover:bg-civic-primary/5 transition-colors">
                     {hub.tag} Node
                   </Badge>
-                  <h3 className="text-2xl font-black mb-4">{hub.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed mb-8 flex-grow">
+                  <h3 className="text-2xl font-black mb-4 text-civic-text">
+                    {hub.title}
+                  </h3>
+                  <p className="text-slate-500 text-base leading-relaxed mb-10 flex-grow">
                     {hub.desc}
                   </p>
-                  <div className="flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
-                    Initialize Link <ArrowUpRight className="w-4 h-4" />
+                  <div className="flex items-center gap-3 text-civic-primary font-black text-xs uppercase tracking-widest group-hover:gap-6 transition-all">
+                    Initialize Access <ArrowUpRight className="w-4 h-4" />
                   </div>
                 </motion.a>
               ))}
@@ -490,19 +469,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Core Capabilities Bento Grid */}
-        <section className="py-16 md:py-24 px-6 relative overflow-hidden">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-black mb-4 tracking-tight">
-                System Core Capabilities
+        {/* Capabilities Grid */}
+        <section className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20 text-balance">
+              <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+                National Edge Capabilities
               </h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                Advanced neural layers powering the modern digital nation.
+              <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto">
+                Advanced structural layers powering the modern digital nation.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {FEATURES.map((feature, i) => (
                 <motion.div
                   key={feature.title}
@@ -510,15 +489,15 @@ export default function Home() {
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2 }}
-                  className="group relative p-10 rounded-[2.5rem] bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                  className="p-10 md:p-14 rounded-[3rem] bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-2xl transition-all h-full"
                 >
-                  <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-primary/10 text-primary`}
-                  >
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-civic-primary/5 text-civic-primary">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">
+                  <h3 className="text-2xl font-bold mb-4 text-civic-text">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-500 text-base leading-relaxed">
                     {feature.desc}
                   </p>
                 </motion.div>
@@ -527,150 +506,67 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Impact Section */}
-        <section className="py-16 md:py-24 px-6 bg-primary text-primary-foreground relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
+        {/* Dynamic Impact Section */}
+        <section className="w-full py-32 md:py-48 px-4 md:px-10 lg:px-20 bg-civic-secondary text-white relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-white rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
           </div>
 
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black mb-8">
-              Building a Smarter Tomorrow
+          <div className="max-w-5xl mx-auto text-center relative z-10">
+            <h2 className="text-5xl md:text-8xl font-black mb-12 tracking-tighter">
+              A Smarter Bharat <br /> Starts Here.
             </h2>
-            <p className="text-xl opacity-90 mb-12 leading-relaxed">
-              Join thousands of citizens who are using JanSankalp AI to
-              transform their neighborhoods. Real-time data meets human
-              governance.
+            <p className="text-xl md:text-3xl font-medium opacity-80 mb-20 leading-relaxed">
+              Join millions using JanSankalp AI to transform neighborhoods.
+              Real-time data meets deep structural governance for a better
+              tomorrow.
             </p>
-            <div className="flex flex-wrap justify-center gap-8">
-              <div className="flex items-center gap-3">
-                <BarChart3 className="w-8 h-8 opacity-70" />
-                <span className="font-bold text-lg">Data-Driven</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <MessageSquare className="w-8 h-8 opacity-70" />
-                <span className="font-bold text-lg">Transparent</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Users className="w-8 h-8 opacity-70" />
-                <span className="font-bold text-lg">Community Oriented</span>
-              </div>
+            <div className="flex flex-wrap justify-center gap-12 md:gap-20">
+              {[
+                { icon: BarChart3, label: "Data-Driven" },
+                { icon: MessageSquare, label: "Transparent" },
+                { icon: Users, label: "Citizen-Led" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-4"
+                >
+                  <item.icon className="w-12 h-12 opacity-50" />
+                  <span className="font-bold text-xl uppercase tracking-widest">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Why Choose Us Section */}
-        <section className="py-16 md:py-24 px-6 bg-muted/30">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-6">
-                Why Choose JanSankalp AI? (क्यों चुनें?)
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                The smart choice for modern civic engagement.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Proven Results</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  15,000+ complaints resolved with 98% satisfaction rate across
-                  12 cities.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                  <Zap className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Lightning Fast</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Average resolution time of just 24 hours vs weeks in
-                  traditional systems.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Precision AI</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  99% classification accuracy ensures your complaint reaches the
-                  right department.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="p-6 rounded-2xl bg-card border hover:border-primary/30 transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                  <BarChart3 className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">
-                  Continuous Improvement
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  AI learns from every complaint to get smarter and more
-                  efficient over time.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section: Neural Command Style */}
-        <section className="py-24 px-6 bg-slate-900/50">
+        {/* Responsive FAQ */}
+        <section className="w-full py-24 md:py-32 px-4 md:px-10 lg:px-20 bg-white">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter">
-                Resonance <span className="text-primary italic">Protocol</span>{" "}
-                (FAQ)
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+                Citizens’{" "}
+                <span className="text-civic-primary italic">Protocol</span>
               </h2>
-              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
-                System Briefing & Common Inquiries
+              <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">
+                Common Briefing & System Queries
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {[
                 {
                   q: "How do I file a complaint?",
-                  a: "Simply use the complaint form on this page. You can type or use voice input in any of 22+ Indian languages. Upload photos/videos as evidence, and our AI will handle the rest.",
+                  a: "Simply use the portal above. Our AI understands 22+ Indian languages via voice or text. Upload proof, and your case is triaged instantly.",
                 },
                 {
-                  q: "How long does it take to resolve a complaint?",
-                  a: "On average, complaints are resolved within 24 hours. Critical issues are prioritized and addressed even faster. You'll receive real-time updates throughout the process.",
+                  q: "What is the resolution TAT?",
+                  a: "Average resolution is 24 hours. Critical issues like water or power failures are prioritized for faster human-AI response.",
                 },
                 {
-                  q: "Is my data secure and private?",
-                  a: "Absolutely. All data is encrypted (TLS 1.3 in transit, AES-256 at rest), and we follow strict defense-grade compliance protocols.",
+                  q: "Is my identity secure?",
+                  a: "JanSankalp AI uses defense-grade encryption. Your personal data is only visible to authorized municipal officers on a need-to-know basis.",
                 },
               ].map((faq, i) => (
                 <motion.div
@@ -679,13 +575,13 @@ export default function Home() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="p-8 rounded-[2rem] bg-slate-950/50 border border-white/5 hover:border-primary/20 transition-all cursor-crosshair group"
+                  className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:border-civic-primary/20 transition-all cursor-crosshair group"
                 >
-                  <h3 className="text-lg font-black mb-3 flex items-center gap-3 group-hover:text-primary transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary" />
+                  <h3 className="text-xl font-black mb-4 flex items-center gap-4 group-hover:text-civic-primary transition-colors">
+                    <div className="w-2.5 h-2.5 rounded-full bg-slate-300 group-hover:bg-civic-primary transition-colors" />
                     {faq.q}
                   </h3>
-                  <p className="text-slate-400 text-sm leading-relaxed pl-5 border-l border-white/5">
+                  <p className="text-slate-500 text-lg leading-relaxed pl-6 border-l-2 border-slate-200">
                     {faq.a}
                   </p>
                 </motion.div>
@@ -694,55 +590,50 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 4: LIVE ACTIVITY COUNTER (Before CTA) */}
+        {/* Live Counters */}
         <section className="bg-slate-50 border-y relative z-20">
           <LiveCounters />
         </section>
 
-        {/* Call to Action */}
-        <section className="py-16 md:py-24 px-6 bg-gradient-to-br from-primary to-primary/80 text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
-          </div>
-
-          <div className="max-w-4xl mx-auto text-center relative z-10">
+        {/* Final CTA */}
+        <section className="w-full py-32 md:py-48 px-4 md:px-10 lg:px-20 bg-white relative overflow-hidden">
+          <div className="max-w-6xl mx-auto text-center relative z-10">
             <motion.h2
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-black mb-6"
+              className="text-5xl md:text-8xl font-black mb-10 tracking-tight"
             >
-              Ready to Transform Your City?
+              Ready to <span className="text-civic-accent">Transform?</span>
             </motion.h2>
             <motion.p
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-xl opacity-90 mb-8 leading-relaxed"
+              className="text-xl md:text-3xl text-slate-600 mb-16 max-w-3xl mx-auto leading-relaxed"
             >
-              Join thousands of citizens using JanSankalp AI to make their
-              voices heard and drive real change in their communities.
+              Become part of the most advanced civic movement in the world. Real
+              change, powered by AI.
             </motion.p>
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="flex flex-wrap justify-center gap-4"
+              className="flex flex-wrap justify-center gap-6"
             >
               <a
                 href="#report"
-                className="px-8 py-4 bg-white text-primary rounded-full font-bold text-lg shadow-xl hover:scale-105 transition-transform"
+                className="px-12 py-6 bg-civic-primary text-white rounded-2xl font-bold text-xl shadow-3xl hover:bg-civic-primary/95 hover:-translate-y-1 transition-all"
               >
-                File a Complaint Now
+                Start Reporting
               </a>
               <a
                 href="/how-it-works"
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-colors"
+                className="px-12 py-6 bg-slate-100 text-civic-text rounded-2xl font-bold text-xl hover:bg-slate-200 transition-all"
               >
-                Learn More
+                Documentation
               </a>
             </motion.div>
           </div>

@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-2xl border-0 bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl shadow-2xl hover:shadow-3xl transition-all duration-300 border border-white/10",
+      "rounded-lg border border-civic-primary/20 bg-card shadow-sm hover:shadow-lg hover:border-civic-primary/30 transition-all duration-300",
       className,
     )}
     {...props}
@@ -22,7 +22,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-2 p-8 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-t-2xl border-b border-white/20", className)}
+    className={cn("flex flex-col space-y-2 p-6 bg-civic-background/50 rounded-t-lg border-b border-civic-primary/20", className)}
     {...props}
   />
 ));
@@ -34,7 +34,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight tracking-tight", className)}
+    className={cn("text-xl font-bold text-civic-secondary leading-tight tracking-tight", className)}
     {...props}
   />
 ));
@@ -46,7 +46,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-base text-gray-600 leading-relaxed", className)}
+    className={cn("text-base text-civic-text leading-relaxed", className)}
     {...props}
   />
 ));
@@ -56,7 +56,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-8 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -66,7 +66,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center justify-between p-8 pt-0 bg-gradient-to-r from-gray-50/50 to-white/50 rounded-b-2xl border-t border-white/20", className)}
+    className={cn("flex items-center justify-between p-6 pt-0 bg-civic-background/30 rounded-b-lg border-t border-civic-primary/20", className)}
     {...props}
   />
 ));
