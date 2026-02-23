@@ -173,7 +173,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-xs text-muted-foreground/60">
-              Architected by{" "}
+              Architected & Developed by{" "}
               <a
                 href="https://github.com/abx15"
                 target="_blank"
@@ -181,6 +181,15 @@ export const Footer = () => {
                 className="underline hover:text-foreground transition-colors"
               >
                 Arun Kumar Bind
+              </a>{" "}
+              &{" "}
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground transition-colors"
+              >
+                TriFusion Dynamics Team
               </a>
             </p>
           </div>
