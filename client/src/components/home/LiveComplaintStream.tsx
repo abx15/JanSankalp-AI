@@ -22,10 +22,10 @@ const CATEGORY_ICONS = {
 };
 
 const STATUS_COLORS = {
-  Registered: "bg-slate-100 text-slate-600 border-slate-200",
-  Assigned: "bg-blue-50 text-blue-600 border-blue-100",
-  "In Progress": "bg-orange-50 text-orange-600 border-orange-100",
-  Resolved: "bg-green-50 text-green-600 border-green-100",
+  Registered: "bg-muted text-muted-foreground border-border",
+  Assigned: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  "In Progress": "bg-orange-500/10 text-orange-500 border-orange-500/20",
+  Resolved: "bg-green-500/10 text-green-500 border-green-500/20",
 };
 
 export const LiveComplaintStream = () => {
@@ -57,8 +57,8 @@ export const LiveComplaintStream = () => {
           onClick={() => setShowStream(!showStream)}
           className={`flex items-center gap-2 px-5 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shadow-2xl ${
             showStream
-              ? "bg-slate-900 text-white border border-white/10"
-              : "bg-white text-slate-900 border border-slate-200"
+              ? "bg-foreground text-background border border-border/10"
+              : "bg-background text-foreground border border-border"
           }`}
         >
           <span className="relative flex h-2 w-2">
@@ -82,18 +82,18 @@ export const LiveComplaintStream = () => {
             className="fixed bottom-20 right-6 md:top-24 md:right-6 md:bottom-auto z-[100] w-[calc(100%-3rem)] md:w-full md:max-w-[320px] pointer-events-none"
           >
             <div className="flex flex-col gap-3">
-              <div className="bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-white/10 shadow-2xl mb-2 pointer-events-auto hidden md:block">
+              <div className="bg-card/90 backdrop-blur-xl p-3 rounded-2xl border border-border shadow-2xl mb-2 pointer-events-auto hidden md:block">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-foreground uppercase tracking-widest">
                       Live Signals
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-white/5 rounded-full uppercase tracking-tighter">
+                  <span className="text-[10px] font-bold text-muted-foreground px-2 py-0.5 bg-muted rounded-full uppercase tracking-tighter">
                     {complaints.length} active
                   </span>
                 </div>
@@ -112,7 +112,7 @@ export const LiveComplaintStream = () => {
                       transition: { duration: 0.2 },
                     }}
                     layout
-                    className="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-xl pointer-events-auto group relative overflow-hidden"
+                    className="bg-card/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-xl pointer-events-auto group relative overflow-hidden"
                   >
                     {/* Progress Bar Background */}
                     {c.status !== "Resolved" && (
@@ -125,22 +125,22 @@ export const LiveComplaintStream = () => {
                     )}
 
                     <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-primary/5 transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 border border-border group-hover:bg-primary/5 transition-colors">
                         {CATEGORY_ICONS[c.category]}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">
+                          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-tight">
                             {c.id}
                           </span>
-                          <span className="text-[9px] font-bold text-slate-300 uppercase">
+                          <span className="text-[9px] font-bold text-muted-foreground/40 uppercase">
                             {getTimeAgo(c.timestamp)}
                           </span>
                         </div>
-                        <h4 className="text-xs font-black text-slate-800 truncate mb-1 uppercase tracking-tight">
+                        <h4 className="text-xs font-black text-foreground truncate mb-1 uppercase tracking-tight">
                           {c.category} Issue
                         </h4>
-                        <div className="flex items-center gap-1.5 text-slate-400 mb-2">
+                        <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
                           <MapPin className="w-3 h-3" />
                           <span className="text-[10px] font-bold truncate">
                             {c.location}

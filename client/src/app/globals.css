@@ -4,26 +4,32 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%; /* #F8FAFC */
+    --background: 210 40% 98%;
+    /* #F8FAFC */
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%; /* Soft Blue #3B82F6 */
+    --primary: 221.2 83.2% 53.3%;
+    /* Soft Blue #3B82F6 */
     --primary-foreground: 210 40% 98%;
-    --secondary: 173 80% 40%; /* Teal #14B8A6 */
+    --secondary: 173 80% 40%;
+    /* Teal #14B8A6 */
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%; /* #F1F5F9 */
+    --muted: 210 40% 96.1%;
+    /* #F1F5F9 */
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 173 80% 40%; /* Using teal for accent too */
+    --accent: 173 80% 40%;
+    /* Using teal for accent too */
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem; /* 12px */
+    --radius: 0.75rem;
+    /* 12px */
   }
 
   .dark {
@@ -35,11 +41,11 @@
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 173 80% 40%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 25 95% 53%;
+    --accent: 173 80% 40%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -53,7 +59,53 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-2xl;
+  }
+
+  .glass-morphism {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.37)];
+  }
+
+  .mesh-gradient {
+    background-color: hsla(210, 40%, 98%, 1);
+    background-image:
+      radial-gradient(at 0% 0%, hsla(221, 83%, 53%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(173, 80%, 40%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(221, 83%, 53%, 0.1) 0px, transparent 50%);
+  }
+
+  .dark .mesh-gradient {
+    background-color: hsla(222, 84%, 5%, 1);
+    background-image:
+      radial-gradient(at 0% 0%, hsla(217, 91%, 60%, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(173, 80%, 40%, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(217, 91%, 60%, 0.15) 0px, transparent 50%);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto];
+    animation: gradient 8s linear infinite;
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
   }
 }

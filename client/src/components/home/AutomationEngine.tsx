@@ -104,7 +104,7 @@ export const AutomationEngine = () => {
             <ShieldCheck className="w-10 h-10 text-green-600" />
           </motion.div>
           <div className="text-center z-10">
-            <h4 className="font-bold text-green-700">Officer Relay</h4>
+            <h4 className="font-bold text-primary">Officer Relay</h4>
             <p className="text-xs text-muted-foreground mt-1">
               Auto-Assignment
             </p>

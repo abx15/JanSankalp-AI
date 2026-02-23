@@ -123,7 +123,7 @@ export default function AdminDashboard() {
 
   if (status === "loading" || loading || !mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
+      <div className="min-h-screen flex items-center justify-center bg-background/50">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-primary border-t-transparent"></div>
           <p className="text-sm font-medium text-muted-foreground animate-pulse">
@@ -160,40 +160,40 @@ export default function AdminDashboard() {
   }));
 
   return (
-    <div className="space-y-8 p-8 animate-in fade-in duration-700 bg-slate-50/30 min-h-screen">
+    <div className="space-y-8 p-8 animate-in fade-in duration-700 bg-background/30 min-h-screen">
       <RealTimeNotifications
         userId={session?.user?.id}
         onNewComplaint={fetchData}
       />
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white/50 p-6 rounded-[2.5rem] border border-white shadow-sm backdrop-blur-md gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-card/50 p-6 rounded-[2.5rem] border border-border/50 shadow-sm backdrop-blur-md gap-6">
         <div>
-          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 text-slate-900">
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 text-foreground">
             <Layers className="w-10 h-10 text-primary" />
             Governance Console
           </h1>
           <div className="flex items-center gap-3 mt-2">
-            <div className="flex p-1 bg-slate-200/50 rounded-2xl">
+            <div className="flex p-1 bg-muted rounded-2xl">
               <button
                 onClick={() => setActiveTab("analytics")}
-                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "analytics" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "analytics" ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Analytics
               </button>
               <button
                 onClick={() => setActiveTab("ai")}
-                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "ai" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "ai" ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Sovereign AI
               </button>
               <button
                 onClick={() => setActiveTab("optimization")}
-                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "optimization" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "optimization" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Optimization
               </button>
             </div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-0.5 rounded">
               Kernel v2.0
             </span>
           </div>
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-4">
           <button
             onClick={fetchData}
-            className="rounded-2xl border-2 border-slate-200 hover:border-primary hover:text-primary transition-all flex items-center gap-2 px-6 py-3 font-bold text-sm bg-white"
+            className="rounded-2xl border border-border hover:border-primary hover:text-primary transition-all flex items-center gap-2 px-6 py-3 font-bold text-sm bg-card"
           >
             <Activity className="w-4 h-4" />
             Sync Data
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
       ) : (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200 rounded-[2rem]">
+            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-border rounded-[2rem]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   User Base
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200 rounded-[2rem]">
+            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-border rounded-[2.5rem]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   Total Reports
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200 rounded-[2rem]">
+            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-border rounded-[2.5rem]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   Avg. Severity
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-slate-200 rounded-[2rem]">
+            <Card className="hover:shadow-xl transition-all border-none shadow-sm ring-1 ring-border rounded-[2.5rem]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   Health

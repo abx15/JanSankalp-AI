@@ -157,7 +157,7 @@ export default function MyReportsPage() {
                         {item.status}
                       </div>
                     </div>
-                    <PDFDownloader 
+                    <PDFDownloader
                       complaint={item}
                       className="rounded-xl gap-2 text-[10px] font-black uppercase tracking-widest h-10 shadow-lg shadow-primary/20"
                     />
@@ -168,8 +168,8 @@ export default function MyReportsPage() {
                   <p className="text-muted-foreground text-sm line-clamp-2 mb-6 leading-relaxed">
                     {item.description}
                   </p>
-                  <div className="flex flex-wrap items-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    <div className="flex items-center gap-2 px-2 py-1 bg-slate-100 rounded">
+                  <div className="flex flex-wrap items-center gap-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <div className="flex items-center gap-2 px-2 py-1 bg-muted rounded">
                       <MapPin className="w-3 h-3" />
                       {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
                     </div>
