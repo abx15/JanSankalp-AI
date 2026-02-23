@@ -124,21 +124,21 @@ export function UserListTable() {
     switch (role) {
       case "ADMIN":
         return (
-          <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-none font-bold gap-1">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-bold">
             <ShieldAlert className="w-3 h-3" /> ADMIN
-          </Badge>
+          </div>
         );
       case "OFFICER":
         return (
-          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-bold gap-1">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
             <Shield className="w-3 h-3" /> OFFICER
-          </Badge>
+          </div>
         );
       default:
         return (
-          <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none font-bold gap-1">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold">
             <UserIcon className="w-3 h-3" /> CITIZEN
-          </Badge>
+          </div>
         );
     }
   };
@@ -146,53 +146,56 @@ export function UserListTable() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative w-full md:w-96 group">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
           <Input
-            placeholder="Search users by name or email..."
-            className="pl-10 rounded-xl"
+            placeholder="Search users..."
+            className="pl-11 h-11 rounded-xl border-slate-200 bg-white focus:bg-white focus:border-primary/30 focus:ring-primary/5 transition-all text-sm font-medium"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex gap-3 w-full md:w-auto">
           <select
-            className="bg-background border rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+            className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
-            <option value="all">All Roles</option>
+            <option value="all">Every Role</option>
             <option value="ADMIN">Admins</option>
             <option value="OFFICER">Officers</option>
             <option value="CITIZEN">Citizens</option>
           </select>
-          <Button variant="outline" className="rounded-xl font-bold gap-2">
+          <Button
+            variant="outline"
+            className="rounded-xl h-11 px-5 border-slate-200 font-semibold gap-2 hover:bg-slate-50 transition-all active:scale-95 text-sm"
+          >
             Export CSV
           </Button>
         </div>
       </div>
 
-      <div className="border rounded-2xl overflow-hidden bg-card shadow-sm">
+      <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-soft">
         <Table>
-          <TableHeader className="bg-muted/30">
-            <TableRow>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider pl-6 text-muted-foreground/70">
-                User Profile
+          <TableHeader className="bg-slate-50/80 border-b border-slate-100">
+            <TableRow className="hover:bg-transparent border-none">
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider pl-6 h-12 text-slate-500">
+                Identity Profile
               </TableHead>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                Role
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider h-12 text-slate-500">
+                Governance Role
               </TableHead>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                Reports
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider h-12 text-slate-500">
+                Engagement
               </TableHead>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                Joined Date
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider h-12 text-slate-500">
+                Registration
               </TableHead>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider text-muted-foreground/70">
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider h-12 text-slate-500">
                 Status
               </TableHead>
-              <TableHead className="font-black text-[10px] uppercase tracking-wider text-right pr-6 text-muted-foreground/70">
-                Actions
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider text-right pr-6 h-12 text-slate-500">
+                Administrative
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -221,16 +224,16 @@ export function UserListTable() {
                   key={user.id}
                   className="hover:bg-muted/10 transition-colors"
                 >
-                  <TableCell className="pl-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black shadow-sm">
+                  <TableCell className="pl-6 py-5">
+                    <div className="flex items-center gap-4 group">
+                      <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-300">
                         {user.name?.[0] || user.email[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-sm truncate">
-                          {user.name || "Anonymous User"}
+                        <p className="font-semibold text-[13px] text-slate-900 truncate mb-0.5">
+                          {user.name || "Anonymous Citizen"}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-[11px] text-slate-400 font-medium truncate">
                           {user.email}
                         </p>
                       </div>
@@ -238,29 +241,26 @@ export function UserListTable() {
                   </TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      <Badge
-                        variant="outline"
-                        className="rounded-md font-black text-[10px]"
-                      >
-                        {user._count.complaints} FILED
-                      </Badge>
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-bold border border-slate-100">
+                      {user._count.complaints} REPORTS
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="text-xs font-medium text-muted-foreground">
+                    <p className="text-[12px] font-medium text-slate-500">
                       {format(new Date(user.createdAt), "MMM d, yyyy")}
                     </p>
                   </TableCell>
                   <TableCell>
                     {user.emailVerified ? (
-                      <Badge className="bg-green-500/10 text-green-600 border-none font-bold text-[10px]">
-                        VERIFIED
-                      </Badge>
+                      <div className="inline-flex items-center gap-1.5 text-green-600 font-bold text-[10px] uppercase">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        Verified
+                      </div>
                     ) : (
-                      <Badge className="bg-orange-500/10 text-orange-600 border-none font-bold text-[10px]">
-                        PENDING
-                      </Badge>
+                      <div className="inline-flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                        Pending
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="text-right pr-6">
