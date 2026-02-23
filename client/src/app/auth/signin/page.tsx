@@ -47,9 +47,12 @@ function SignInForm() {
 
     if (result.error) {
       // Handle email not verified
-      if (result.error.includes("EMAIL_NOT_VERIFIED")) {
+      if (
+        typeof result.error === "string" &&
+        result.error.includes("EMAIL_NOT_VERIFIED")
+      ) {
         const emailAddr = result.error.split(":")[1] || email;
-        window.location.href = `/auth/verify-otp?email=${encodeURIComponent(emailAddr)}`;
+        window.location.href = `/verify?email=${encodeURIComponent(emailAddr)}`;
         return;
       }
       setError("Invalid email or password");

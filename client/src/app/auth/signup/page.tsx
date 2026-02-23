@@ -41,7 +41,23 @@ export default function SignUpPage() {
       if (res.ok) {
         router.push(`/verify?email=${email}`);
       } else {
-        setError(data.error || "Something went wrong");
+        // Handle specific error for email not verified
+        if (data.error) {
+          if (
+            typeof data.error === "string" &&
+            data.error.includes("EMAIL_NOT_VERIFIED")
+          ) {
+            const emailAddr = data.error.split(":")[1] || email;
+            router.push(`/verify?email=${encodeURIComponent(emailAddr)}`);
+            return;
+          }
+        }
+
+        const errorMessage =
+          typeof data.error === "object" && data.error.message
+            ? data.error.message
+            : data.error || "Something went wrong";
+        setError(errorMessage);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
