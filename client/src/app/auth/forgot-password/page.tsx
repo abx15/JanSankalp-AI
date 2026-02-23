@@ -44,21 +44,25 @@ export default function ForgotPasswordPage() {
         setMessage(data.message);
         // For development, show the OTP (remove in production)
         if (data.debug?.otp) {
-          setMessage(`${data.message} Development OTP: ${data.debug.otp}`);
+          setMessage(
+            `${data.message || "OTP sent"}. Development OTP: ${data.debug.otp}`,
+          );
         }
         // Redirect to OTP verification page after 2 seconds
         setTimeout(() => {
           router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`);
         }, 2000);
       } else {
+        const errorMessage =
+          typeof data.error === "object" && data.error.message
+            ? data.error.message
+            : data.error || "Something went wrong";
+
+        setError(errorMessage);
+
         if (data.needsRegistration) {
-          setError(`${data.error}. ${data.suggestion}`);
-          // Add a link to register page
-          setTimeout(() => {
-            router.push('/auth/signup');
-          }, 3000);
-        } else {
-          setError(data.error || "Something went wrong");
+          // SUGGESTION: Don't redirect automatically if they need to see the error
+          // user can click the link manually
         }
       }
     } catch (error) {
@@ -86,15 +90,16 @@ export default function ForgotPasswordPage() {
             </CardTitle>
           </div>
           <CardDescription className="text-center">
-            Enter your email address and we&apos;ll send you an OTP to reset your password
+            Enter your email address and we&apos;ll send you an OTP to reset
+            your password
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {message && (
+            {message && typeof message === "string" && (
               <div className="bg-green-50 text-green-700 text-sm p-3 rounded-md text-center">
                 {message}
-                {message.includes('Development OTP') && (
+                {message.toLowerCase().includes("development otp") && (
                   <div className="mt-2 text-xs">
                     <strong>For Testing:</strong> Use the OTP shown above
                   </div>
@@ -103,17 +108,18 @@ export default function ForgotPasswordPage() {
             )}
             {error && (
               <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md text-center">
-                {error}
-                {error.includes('register') && (
-                  <div className="mt-2">
-                    <Link
-                      href="/auth/signup"
-                      className="text-blue-600 hover:underline font-medium"
-                    >
-                      Create an account →
-                    </Link>
-                  </div>
-                )}
+                {typeof error === "string" ? error : "An error occurred"}
+                {typeof error === "string" &&
+                  error.toLowerCase().includes("register") && (
+                    <div className="mt-2">
+                      <Link
+                        href="/auth/signup"
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        Create an account →
+                      </Link>
+                    </div>
+                  )}
               </div>
             )}
             <div className="space-y-2">
@@ -127,11 +133,13 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
               />
             </div>
-            
+
             {/* Development testing section */}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === "development" && (
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                <p className="text-xs text-blue-700 font-medium mb-2">🧪 Development Testing:</p>
+                <p className="text-xs text-blue-700 font-medium mb-2">
+                  🧪 Development Testing:
+                </p>
                 <button
                   type="button"
                   onClick={async () => {

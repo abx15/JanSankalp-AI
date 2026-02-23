@@ -59,7 +59,11 @@ function VerifyForm() {
         router.push("/auth/signin");
       }, 2000);
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage =
+        typeof err.error === "object" && err.error.message
+          ? err.error.message
+          : err.message || "Verification failed";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -91,7 +95,11 @@ function VerifyForm() {
         setResendMessage(`Code sent! (Dev: ${data.debug.token})`);
       }
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage =
+        typeof err.error === "object" && err.error.message
+          ? err.error.message
+          : err.message || "Failed to resend";
+      setError(errorMessage);
     } finally {
       setResendLoading(false);
     }

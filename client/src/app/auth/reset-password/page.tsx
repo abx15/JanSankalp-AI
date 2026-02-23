@@ -11,7 +11,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Lock, Loader2, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
+import {
+  Lock,
+  Loader2,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -37,11 +45,11 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     // Check if user has valid reset token
-    const resetToken = localStorage.getItem('resetToken');
-    const resetEmail = localStorage.getItem('resetEmail');
-    
+    const resetToken = localStorage.getItem("resetToken");
+    const resetEmail = localStorage.getItem("resetEmail");
+
     if (!resetToken || !resetEmail) {
-      router.push('/auth/forgot-password');
+      router.push("/auth/forgot-password");
       return;
     }
   }, [router]);
@@ -58,7 +66,8 @@ export default function ResetPasswordPage() {
   }, [newPassword]);
 
   const isPasswordStrong = Object.values(passwordStrength).every(Boolean);
-  const isPasswordMatch = newPassword === confirmPassword && newPassword.length > 0;
+  const isPasswordMatch =
+    newPassword === confirmPassword && newPassword.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,8 +88,8 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      const resetToken = localStorage.getItem('resetToken');
-      const resetEmail = localStorage.getItem('resetEmail');
+      const resetToken = localStorage.getItem("resetToken");
+      const resetEmail = localStorage.getItem("resetEmail");
 
       const response = await fetch("/api/auth/reset-password", {
         method: "POST",
@@ -99,14 +108,20 @@ export default function ResetPasswordPage() {
       if (response.ok) {
         setMessage(data.message);
         // Clear reset tokens
-        localStorage.removeItem('resetToken');
-        localStorage.removeItem('resetEmail');
+        localStorage.removeItem("resetToken");
+        localStorage.removeItem("resetEmail");
         // Redirect to sign in page after 2 seconds
         setTimeout(() => {
-          router.push('/auth/signin?message=Password reset successfully. Please sign in with your new password.');
+          router.push(
+            "/auth/signin?message=Password reset successfully. Please sign in with your new password.",
+          );
         }, 2000);
       } else {
-        setError(data.error || "Failed to reset password");
+        const errorMessage =
+          typeof data.error === "object" && data.error.message
+            ? data.error.message
+            : data.error || "Failed to reset password";
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Network error. Please try again.");
@@ -115,7 +130,13 @@ export default function ResetPasswordPage() {
     setLoading(false);
   };
 
-  const PasswordRequirement = ({ met, text }: { met: boolean; text: string }) => (
+  const PasswordRequirement = ({
+    met,
+    text,
+  }: {
+    met: boolean;
+    text: string;
+  }) => (
     <div className="flex items-center gap-2 text-sm">
       {met ? (
         <CheckCircle className="w-4 h-4 text-green-500" />
@@ -159,7 +180,7 @@ export default function ResetPasswordPage() {
                 {message}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">New Password</label>
               <div className="relative">
@@ -220,11 +241,26 @@ export default function ResetPasswordPage() {
               <div className="space-y-2 p-3 bg-muted rounded-md">
                 <p className="text-sm font-medium">Password Requirements:</p>
                 <div className="space-y-1">
-                  <PasswordRequirement met={passwordStrength.length} text="At least 8 characters" />
-                  <PasswordRequirement met={passwordStrength.uppercase} text="One uppercase letter" />
-                  <PasswordRequirement met={passwordStrength.lowercase} text="One lowercase letter" />
-                  <PasswordRequirement met={passwordStrength.number} text="One number" />
-                  <PasswordRequirement met={passwordStrength.special} text="One special character" />
+                  <PasswordRequirement
+                    met={passwordStrength.length}
+                    text="At least 8 characters"
+                  />
+                  <PasswordRequirement
+                    met={passwordStrength.uppercase}
+                    text="One uppercase letter"
+                  />
+                  <PasswordRequirement
+                    met={passwordStrength.lowercase}
+                    text="One lowercase letter"
+                  />
+                  <PasswordRequirement
+                    met={passwordStrength.number}
+                    text="One number"
+                  />
+                  <PasswordRequirement
+                    met={passwordStrength.special}
+                    text="One special character"
+                  />
                 </div>
               </div>
             )}
@@ -236,8 +272,14 @@ export default function ResetPasswordPage() {
                 ) : (
                   <XCircle className="w-4 h-4 text-red-500" />
                 )}
-                <span className={isPasswordMatch ? "text-green-700" : "text-red-700"}>
-                  {isPasswordMatch ? "Passwords match" : "Passwords do not match"}
+                <span
+                  className={
+                    isPasswordMatch ? "text-green-700" : "text-red-700"
+                  }
+                >
+                  {isPasswordMatch
+                    ? "Passwords match"
+                    : "Passwords do not match"}
                 </span>
               </div>
             )}
@@ -256,7 +298,7 @@ export default function ResetPasswordPage() {
                 </>
               )}
             </Button>
-            
+
             <Link
               href="/auth/signin"
               className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"

@@ -50,7 +50,7 @@ function VerifyOTPForm() {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,13 +73,17 @@ function VerifyOTPForm() {
       if (response.ok) {
         setMessage(data.message);
         // Store reset token and redirect to reset password page
-        localStorage.setItem('resetToken', data.resetToken);
-        localStorage.setItem('resetEmail', email || "");
+        localStorage.setItem("resetToken", data.resetToken);
+        localStorage.setItem("resetEmail", email || "");
         setTimeout(() => {
           router.push("/auth/reset-password");
         }, 1000);
       } else {
-        setError(data.error || "Invalid OTP");
+        const errorMessage =
+          typeof data.error === "object" && data.error.message
+            ? data.error.message
+            : data.error || "Invalid OTP";
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Network error. Please try again.");
@@ -109,7 +113,11 @@ function VerifyOTPForm() {
         setTimeLeft(600); // Reset timer to 10 minutes
         setOtp(""); // Clear OTP input
       } else {
-        setError(data.error || "Failed to resend OTP");
+        const errorMessage =
+          typeof data.error === "object" && data.error.message
+            ? data.error.message
+            : data.error || "Failed to resend OTP";
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Network error. Please try again.");
@@ -120,7 +128,7 @@ function VerifyOTPForm() {
 
   const handleOtpChange = (value: string) => {
     // Only allow numbers and max 6 digits
-    const numericValue = value.replace(/\D/g, '').slice(0, 6);
+    const numericValue = value.replace(/\D/g, "").slice(0, 6);
     setOtp(numericValue);
   };
 
@@ -196,7 +204,7 @@ function VerifyOTPForm() {
                 </>
               )}
             </Button>
-            
+
             <div className="flex flex-col gap-2 w-full">
               <Button
                 type="button"
@@ -214,7 +222,7 @@ function VerifyOTPForm() {
                   </>
                 )}
               </Button>
-              
+
               <Link
                 href="/auth/forgot-password"
                 className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -232,7 +240,13 @@ function VerifyOTPForm() {
 
 export default function VerifyOTPPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      }
+    >
       <VerifyOTPForm />
     </Suspense>
   );
