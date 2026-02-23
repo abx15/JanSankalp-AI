@@ -9,15 +9,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-civic-accent text-white shadow-lg hover:bg-civic-accent-hover hover:shadow-xl transform hover:scale-105 transition-all duration-200",
+          "bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl transform hover:scale-105 transition-all duration-200",
         destructive:
-          "bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg hover:from-red-700 hover:to-pink-700 hover:shadow-xl transform hover:scale-105 transition-all duration-200",
+          "bg-destructive text-destructive-foreground shadow-lg hover:bg-destructive/90 hover:shadow-xl transform hover:scale-105 transition-all duration-200",
         outline:
-          "border-2 border-civic-primary bg-civic-background text-civic-primary shadow-md hover:bg-civic-primary/10 hover:border-civic-primary/30 hover:shadow-lg transform hover:scale-105 transition-all duration-200",
+          "border border-border bg-background text-foreground shadow-md hover:bg-muted hover:border-primary/30 hover:shadow-lg transform hover:scale-105 transition-all duration-200",
         secondary:
-          "bg-civic-secondary text-white shadow-lg hover:bg-civic-primary hover:shadow-xl transform hover:scale-105 transition-all duration-200",
-        ghost: "bg-transparent text-civic-primary border border-civic-primary/20 hover:bg-civic-primary/10 hover:border-civic-primary/40 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
-        link: "text-civic-secondary underline-offset-4 hover:underline hover:text-civic-primary transition-all duration-200",
+          "bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/80 hover:shadow-xl transform hover:scale-105 transition-all duration-200",
+        ghost:
+          "bg-transparent text-foreground hover:bg-muted hover:text-primary transition-all duration-200",
+        link: "text-primary underline-offset-4 hover:underline transition-all duration-200",
       },
       size: {
         default: "h-11 px-6 py-3 text-base font-semibold shadow-lg",

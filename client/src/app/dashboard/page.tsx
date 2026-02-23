@@ -161,7 +161,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-4xl font-bold text-foreground tracking-tight">
               Officer Command
             </h1>
             <p className="text-slate-500 font-medium mt-2">
@@ -171,7 +171,7 @@ export default function DashboardPage() {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              className="rounded-xl h-11 px-5 border-slate-200 font-semibold gap-2 hover:bg-slate-50 transition-all active:scale-95"
+              className="rounded-xl h-11 px-5 border-border font-semibold gap-2 hover:bg-muted transition-all active:scale-95"
               onClick={fetchComplaints}
             >
               <History className="w-4 h-4" /> Refresh
@@ -203,7 +203,7 @@ export default function DashboardPage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all"
+              className="p-8 rounded-[2rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all"
             >
               <div
                 className={cn(
@@ -222,7 +222,7 @@ export default function DashboardPage() {
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                 {stat.label}
               </p>
-              <div className="text-4xl font-bold text-slate-900">
+              <div className="text-4xl font-bold text-foreground">
                 {stat.value}
               </div>
             </div>
@@ -324,7 +324,7 @@ function AdminDashboard({
       {/* Header & Quick Actions */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
             Operations Command
           </h2>
           <p className="text-slate-500 font-medium">
@@ -335,7 +335,7 @@ function AdminDashboard({
           <Button
             onClick={refresh}
             variant="outline"
-            className="rounded-xl h-11 px-5 border-slate-200 font-semibold gap-2 hover:bg-slate-50 transition-all active:scale-95"
+            className="rounded-xl h-11 px-5 border-border font-semibold gap-2 hover:bg-muted transition-all active:scale-95"
           >
             <History className="w-4 h-4" /> Refresh
           </Button>
@@ -366,7 +366,7 @@ function AdminDashboard({
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden"
+            className="p-8 rounded-[2rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-6">
               <div
@@ -403,7 +403,7 @@ function AdminDashboard({
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
               {stat.label}
             </p>
-            <div className="text-4xl font-bold text-slate-900 tracking-tight tabular-nums">
+            <div className="text-4xl font-bold text-foreground tracking-tight tabular-nums">
               {stat.value}
             </div>
           </div>
@@ -432,7 +432,7 @@ function AdminDashboard({
           </div>
         </div>
 
-        <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[80px] -mr-16 -mt-16 group-hover:bg-secondary/10 transition-all duration-500" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-8">
@@ -441,7 +441,7 @@ function AdminDashboard({
                   <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">
+                  <h3 className="text-xl font-bold text-foreground">
                     Infrastructure Monitor
                   </h3>
                   <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1 text-emerald-500/80">
@@ -458,10 +458,10 @@ function AdminDashboard({
       <div className="grid gap-8 lg:grid-cols-7 mb-12">
         {/* Charts Section */}
         <div className="lg:col-span-4 space-y-8">
-          <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all">
+          <div className="p-8 rounded-[2.5rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
               <div>
-                <h3 className="text-xl font-bold text-slate-900">
+                <h3 className="text-xl font-bold text-foreground">
                   Issue Trajectory
                 </h3>
                 <p className="text-slate-500 text-sm font-medium mt-1">
@@ -482,11 +482,11 @@ function AdminDashboard({
             <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-secondary/20 transition-all">
               <div className="flex items-center gap-3 mb-6">
                 <MapPin className="w-5 h-5 text-secondary" />
-                <h3 className="font-bold text-slate-900">
+                <h3 className="font-bold text-foreground">
                   Spatial Distribution
                 </h3>
               </div>
-              <div className="h-[200px] flex items-center justify-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+              <div className="h-[200px] flex items-center justify-center bg-muted rounded-2xl border border-dashed border-border">
                 <div className="text-center">
                   <MapPin className="w-10 h-10 mx-auto text-slate-300 mb-3" />
                   <p className="text-xs font-bold text-slate-400">
@@ -498,7 +498,7 @@ function AdminDashboard({
             <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all">
               <div className="flex items-center gap-3 mb-6">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-slate-900">Sector Audit</h3>
+                <h3 className="font-bold text-foreground">Sector Audit</h3>
               </div>
               <div className="h-[200px] w-full">
                 <DepartmentChart />
@@ -509,8 +509,8 @@ function AdminDashboard({
 
         {/* Priority Triage Feed */}
         <div className="lg:col-span-3">
-          <div className="rounded-[2.5rem] bg-white border border-slate-100 shadow-soft overflow-hidden h-full flex flex-col">
-            <div className="p-8 bg-slate-50/50 border-b border-slate-100">
+          <div className="rounded-[2.5rem] bg-card border border-border shadow-soft overflow-hidden h-full flex flex-col">
+            <div className="p-8 bg-muted/30 border-b border-border">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3 text-red-600">
                   <AlertTriangle className="w-6 h-6" />
@@ -538,7 +538,7 @@ function AdminDashboard({
                   >
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="min-w-0">
-                        <h4 className="font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
+                        <h4 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">
                           {item.title}
                         </h4>
                         <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider">
@@ -601,10 +601,10 @@ function CitizenDashboard({
   ).length;
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
         {/* Elegant Hero Section */}
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-slate-100 p-10 md:p-16 shadow-soft group">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-card border border-border p-10 md:p-16 shadow-soft group">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[100px] -mr-16 -mt-16 group-hover:bg-primary/10 transition-all duration-700" />
           <div className="absolute bottom-0 left-0 w-1/4 h-full bg-secondary/5 blur-[100px] -ml-16 -mb-16 group-hover:bg-secondary/10 transition-all duration-700" />
 
@@ -613,7 +613,7 @@ function CitizenDashboard({
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest border border-primary/10">
                 Citizen Portal Active
               </div>
-              <h2 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-tight">
+              <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight leading-tight">
                 Jai Hind, <br />
                 <span className="text-primary italic font-serif">
                   {session?.user?.name || "Citizen"}
@@ -630,7 +630,7 @@ function CitizenDashboard({
                 <Trophy className="w-8 h-8" />
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-slate-900 leading-none mb-2">
+                <p className="text-4xl font-bold text-foreground leading-none mb-2">
                   {points}
                 </p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -644,7 +644,7 @@ function CitizenDashboard({
         {/* Stats Grid */}
         <div className="grid gap-8 md:grid-cols-3">
           <Link href="/dashboard/my-reports">
-            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden">
+            <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden">
               <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
                 <ClipboardList className="w-6 h-6" />
               </div>
@@ -810,7 +810,7 @@ function CitizenDashboard({
 
           {/* Quick Actions / Impact Section */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">
+            <h3 className="text-xl font-bold text-foreground">
               Digital Stewardship
             </h3>
             <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-soft relative overflow-hidden group">
@@ -829,7 +829,7 @@ function CitizenDashboard({
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Button
-                    className="rounded-xl h-12 px-8 font-bold bg-white text-slate-900 hover:bg-slate-100 transition-all active:scale-95 shadow-soft"
+                    className="rounded-xl h-12 px-8 font-bold bg-foreground text-background hover:bg-foreground/90 transition-all active:scale-95 shadow-soft"
                     asChild
                   >
                     <Link href="/dashboard/complaints">New Report</Link>
@@ -846,20 +846,20 @@ function CitizenDashboard({
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="p-6 rounded-[2rem] bg-white border border-slate-100 shadow-soft">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center mb-4">
+              <div className="p-6 rounded-[2rem] bg-card border border-border shadow-soft">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
                   <Award className="w-5 h-5" />
                 </div>
-                <h5 className="font-bold text-slate-900 mb-1">Badges</h5>
+                <h5 className="font-bold text-foreground mb-1">Badges</h5>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                   4 Earned
                 </p>
               </div>
-              <div className="p-6 rounded-[2rem] bg-white border border-slate-100 shadow-soft">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
+              <div className="p-6 rounded-[2rem] bg-card border border-border shadow-soft">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4">
                   <Users className="w-5 h-5" />
                 </div>
-                <h5 className="font-bold text-slate-900 mb-1">Impact</h5>
+                <h5 className="font-bold text-foreground mb-1">Impact</h5>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                   124 Citizens Helped
                 </p>
@@ -873,7 +873,7 @@ function CitizenDashboard({
           {role === "ADMIN" && (
             <Button
               variant="outline"
-              className="rounded-xl font-bold gap-2 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-gray-50 shadow-lg"
+              className="rounded-xl font-bold gap-2 bg-background/80 backdrop-blur-sm border-border hover:bg-muted shadow-lg"
               asChild
             >
               <Link href="/dashboard/admin">
@@ -884,7 +884,7 @@ function CitizenDashboard({
           {role === "OFFICER" && (
             <Button
               variant="outline"
-              className="rounded-xl font-bold gap-2 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-gray-50 shadow-lg"
+              className="rounded-xl font-bold gap-2 bg-background/80 backdrop-blur-sm border-border hover:bg-muted shadow-lg"
               asChild
             >
               <Link href="/dashboard/officer">

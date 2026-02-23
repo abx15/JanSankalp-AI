@@ -118,8 +118,8 @@ export const LiveCityMap = () => {
 
   if (!mounted)
     return (
-      <div className="w-full h-[500px] bg-slate-50 animate-pulse rounded-[3rem] border border-slate-100 flex items-center justify-center">
-        <span className="text-slate-400 font-bold uppercase tracking-widest text-xs">
+      <div className="w-full h-[500px] bg-muted animate-pulse rounded-[3rem] border border-border flex items-center justify-center">
+        <span className="text-muted-foreground font-bold uppercase tracking-widest text-xs">
           Initializing Satellite Link...
         </span>
       </div>
@@ -131,14 +131,14 @@ export const LiveCityMap = () => {
         <h2 className="text-4xl font-black mb-4 uppercase tracking-tight">
           Dynamic Civic Activity
         </h2>
-        <p className="text-slate-500 max-w-xl mx-auto font-medium">
+        <p className="text-muted-foreground max-w-xl mx-auto font-medium">
           Watching the &ldquo;Civic Operating System&rdquo; respond to citizens
           across India in real-time.
         </p>
       </div>
 
       <div
-        className="relative h-[500px] md:h-[600px] bg-slate-100 rounded-[3rem] border-4 border-white shadow-2xl overflow-hidden group mb-6 z-10"
+        className="relative h-[500px] md:h-[600px] bg-muted rounded-[3rem] border-4 border-background shadow-2xl overflow-hidden group mb-6 z-10"
         onMouseDown={pauseAutoPan}
         onWheel={pauseAutoPan}
         onTouchStart={pauseAutoPan}
@@ -217,13 +217,13 @@ export const LiveCityMap = () => {
 
         {/* Global UI Overlays */}
         <div className="absolute top-6 left-6 z-[1000] flex flex-col gap-2">
-          <div className="px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl pointer-events-none">
+          <div className="px-4 py-2 bg-card/90 backdrop-blur-md rounded-2xl border border-border shadow-xl pointer-events-none">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+              <span className="text-[10px] font-black text-foreground uppercase tracking-widest">
                 Control Center India
               </span>
             </div>
@@ -265,7 +265,7 @@ export const LiveCityMap = () => {
               className="w-2.5 h-2.5 rounded-full"
               style={{ backgroundColor: color }}
             />
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
               {status}
             </span>
           </div>
@@ -280,7 +280,9 @@ export const LiveCityMap = () => {
           border-radius: 1rem;
           padding: 0;
           overflow: hidden;
-          border: 1px solid rgba(0, 0, 0, 0.05);
+          background: hsl(var(--card));
+          color: hsl(var(--foreground));
+          border: 1px solid hsl(var(--border));
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         .custom-popup .leaflet-popup-content {

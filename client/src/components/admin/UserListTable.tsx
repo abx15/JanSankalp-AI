@@ -136,7 +136,7 @@ export function UserListTable() {
         );
       default:
         return (
-          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted text-muted-foreground text-[10px] font-bold">
             <UserIcon className="w-3 h-3" /> CITIZEN
           </div>
         );
@@ -150,14 +150,14 @@ export function UserListTable() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
           <Input
             placeholder="Search users..."
-            className="pl-11 h-11 rounded-xl border-slate-200 bg-white focus:bg-white focus:border-primary/30 focus:ring-primary/5 transition-all text-sm font-medium"
+            className="pl-11 h-11 rounded-xl border-border bg-card focus:bg-background focus:border-primary/30 focus:ring-primary/5 transition-all text-sm font-medium"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <select
-            className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all cursor-pointer"
+            className="bg-card border border-border rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -175,9 +175,9 @@ export function UserListTable() {
         </div>
       </div>
 
-      <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-soft">
+      <div className="border border-border rounded-2xl overflow-hidden bg-card shadow-soft">
         <Table>
-          <TableHeader className="bg-slate-50/80 border-b border-slate-100">
+          <TableHeader className="bg-muted/30 border-b border-border">
             <TableRow className="hover:bg-transparent border-none">
               <TableHead className="font-semibold text-[10px] uppercase tracking-wider pl-6 h-12 text-slate-500">
                 Identity Profile
@@ -230,10 +230,10 @@ export function UserListTable() {
                         {user.name?.[0] || user.email[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-[13px] text-slate-900 truncate mb-0.5">
+                        <p className="font-semibold text-[13px] text-foreground truncate mb-0.5">
                           {user.name || "Anonymous Citizen"}
                         </p>
-                        <p className="text-[11px] text-slate-400 font-medium truncate">
+                        <p className="text-[11px] text-muted-foreground font-medium truncate">
                           {user.email}
                         </p>
                       </div>
@@ -241,12 +241,12 @@ export function UserListTable() {
                   </TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-bold border border-slate-100">
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[10px] font-bold border border-border">
                       {user._count.complaints} REPORTS
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="text-[12px] font-medium text-slate-500">
+                    <p className="text-[12px] font-medium text-muted-foreground">
                       {format(new Date(user.createdAt), "MMM d, yyyy")}
                     </p>
                   </TableCell>

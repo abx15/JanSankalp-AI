@@ -112,7 +112,7 @@ export default function RewardsPage() {
         <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-primary/20 to-transparent pointer-events-none" />
         <CardHeader>
           <CardTitle className="text-2xl font-black">How it works?</CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-muted-foreground/60">
             Your points are a reflection of your commitment to the city.
           </CardDescription>
         </CardHeader>
@@ -140,7 +140,7 @@ export default function RewardsPage() {
               3
             </div>
             <h4 className="font-bold">Redeem Benefits</h4>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground/60">
               Spend points on municipal discounts and travel passes.
             </p>
           </div>

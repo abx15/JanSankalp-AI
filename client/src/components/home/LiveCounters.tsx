@@ -24,8 +24,8 @@ const Counter = ({
   }, [value, count]);
 
   return (
-    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group hover:border-primary/30 transition-all">
-      <div className="absolute top-0 right-0 p-8 opacity-5 text-slate-900 group-hover:scale-110 group-hover:opacity-10 transition-all duration-700">
+    <div className="bg-card p-8 rounded-[2.5rem] border border-border shadow-soft relative overflow-hidden group hover:border-primary/30 transition-all">
+      <div className="absolute top-0 right-0 p-8 opacity-5 text-foreground group-hover:scale-110 group-hover:opacity-10 transition-all duration-700">
         <Icon className="w-24 h-24" />
       </div>
       <div className="relative z-10">
@@ -33,21 +33,21 @@ const Counter = ({
           <Icon className="w-6 h-6" />
         </div>
         <div className="flex items-baseline gap-1 mb-2">
-          <motion.span className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+          <motion.span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
             {display}
           </motion.span>
           <span className="text-xl font-black text-primary">{suffix}</span>
         </div>
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
           {label}
         </p>
 
         <div className="mt-8 flex items-center gap-2">
-          <div className="flex items-center gap-1 text-[10px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full">
+          <div className="flex items-center gap-1 text-[10px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
             <TrendingUp className="w-3 h-3" />
             +2.4%
           </div>
-          <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
             Since last hour
           </span>
         </div>

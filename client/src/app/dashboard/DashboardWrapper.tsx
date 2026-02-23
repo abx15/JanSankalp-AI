@@ -60,7 +60,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-68 border-r bg-white hidden md:flex flex-col sticky top-0 h-screen">
+      <aside className="w-68 border-r bg-card hidden md:flex flex-col sticky top-0 h-screen">
         <SidebarContent
           role={role}
           pathname={pathname}
@@ -70,7 +70,7 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 border-b bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 sticky top-0 z-10 shadow-sm">
+        <header className="h-16 border-b bg-background/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center gap-4 flex-1">
             <div className="md:hidden">
               <Sheet>
@@ -93,7 +93,7 @@ export default function DashboardLayout({
               <input
                 type="search"
                 placeholder="Search..."
-                className="w-full bg-muted/30 border border-transparent focus:bg-white focus:border-primary/20 pl-10 pr-4 py-2 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/5"
+                className="w-full bg-muted/30 border border-transparent focus:bg-background focus:border-primary/20 pl-10 pr-4 py-2 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/5"
               />
             </div>
           </div>
