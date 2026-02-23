@@ -48,6 +48,8 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (pathname?.startsWith("/dashboard")) return null;
+
   return (
     <nav
       className={cn(

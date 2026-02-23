@@ -21,8 +21,10 @@ export default function UsersPage() {
       </div>
     );
 
+  // Role-based access control for User Directory
+  const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
   // @ts-ignore
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session || !allowedRoles.includes(session.user?.role || "")) {
     redirect("/dashboard");
   }
 

@@ -67,9 +67,12 @@ export function UserListTable() {
       const res = await fetch(`/api/admin/users?${params}`);
       const data = await res.json();
       setUsers(data.users || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load users");
+    } catch (err: any) {
+      console.error("USER_FETCH_ERROR:", err);
+      toast.error(
+        err.message ||
+          "Failed to synchronize user directory. Please check your connection.",
+      );
     } finally {
       setLoading(false);
     }
@@ -227,7 +230,10 @@ export function UserListTable() {
                   <TableCell className="pl-6 py-5">
                     <div className="flex items-center gap-4 group">
                       <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                        {user.name?.[0] || user.email[0].toUpperCase()}
+                        {user.name?.[0] ||
+                          (user.email && user.email[0]
+                            ? user.email[0].toUpperCase()
+                            : "?")}
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-[13px] text-foreground truncate mb-0.5">

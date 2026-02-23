@@ -58,17 +58,22 @@ export function ChatBot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/ai/chat", {
+      // Call our FastAPI backend
+      const response = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          message: input,
+          history: messages.filter(m => m.role !== "assistant" || m.content !== "Namaste! I am JanSankalp AI. How can I help you regarding civic issues or governance today?")
+                     .map(m => ({ role: m.role, content: m.content }))
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         const assistantMessage: Message = {
           role: "assistant",
-          content: data.choices[0].message.content,
+          content: data.response || data.message || "I'm here to help!",
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
@@ -83,11 +88,12 @@ export function ChatBot() {
       }
     } catch (error) {
       console.error("Chat Error:", error);
+      // Fallback response
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Something went wrong. Please try again later.",
+          content: "I'm having trouble connecting to my AI services. I can still help you with basic information about filing complaints, tracking status, and our services. What would you like to know?",
         },
       ]);
     } finally {

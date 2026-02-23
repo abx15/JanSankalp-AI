@@ -36,8 +36,9 @@ export class UserController {
     async getAllUsers(req: Request) {
         try {
             const session = await auth();
-            if (!session || session.user?.role !== "ADMIN") {
-                throw new AppError("Forbidden: Admin only", 403);
+            const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
+            if (!session || !allowedRoles.includes(session.user?.role || "")) {
+                throw new AppError("Forbidden: Admin access required", 403);
             }
 
             const { searchParams } = new URL(req.url);
@@ -65,8 +66,9 @@ export class UserController {
     async deleteUser(req: Request, { params }: { params: { id: string } }) {
         try {
             const session = await auth();
-            if (!session || session.user?.role !== "ADMIN") {
-                throw new AppError("Forbidden: Admin only", 403);
+            const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
+            if (!session || !allowedRoles.includes(session.user?.role || "")) {
+                throw new AppError("Forbidden: Admin access required", 403);
             }
 
             await userService.deleteUser(params.id);
@@ -79,8 +81,9 @@ export class UserController {
     async getById(req: Request, { params }: { params: { id: string } }) {
         try {
             const session = await auth();
-            if (!session || session.user?.role !== "ADMIN") {
-                throw new AppError("Forbidden: Admin only", 403);
+            const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
+            if (!session || !allowedRoles.includes(session.user?.role || "")) {
+                throw new AppError("Forbidden: Admin access required", 403);
             }
 
             const user = await userService.getProfile(params.id);
@@ -93,8 +96,9 @@ export class UserController {
     async handleAdminUserAction(req: Request, { params }: { params: { id: string } }) {
         try {
             const session = await auth();
-            if (!session || session.user?.role !== "ADMIN") {
-                throw new AppError("Forbidden: Admin only", 403);
+            const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
+            if (!session || !allowedRoles.includes(session.user?.role || "")) {
+                throw new AppError("Forbidden: Admin access required", 403);
             }
 
             const body = await req.json();
@@ -112,8 +116,9 @@ export class UserController {
     async handleAdminUserActionFromBody(req: Request) {
         try {
             const session = await auth();
-            if (!session || session.user?.role !== "ADMIN") {
-                throw new AppError("Forbidden: Admin only", 403);
+            const allowedRoles = ["ADMIN", "STATE_ADMIN", "DISTRICT_ADMIN", "CITY_ADMIN"];
+            if (!session || !allowedRoles.includes(session.user?.role || "")) {
+                throw new AppError("Forbidden: Admin access required", 403);
             }
 
             const body = await req.json();
