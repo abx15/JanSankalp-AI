@@ -40,6 +40,9 @@ export class UserRepository {
                 role: true,
                 createdAt: true,
                 emailVerified: true,
+                _count: {
+                    select: { complaints: true }
+                }
             },
             orderBy: { createdAt: "desc" }
         });

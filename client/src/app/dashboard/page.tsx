@@ -25,6 +25,7 @@ import {
   ClipboardList,
   FileDown,
   Cpu,
+  Zap,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -157,83 +158,94 @@ export default function DashboardPage() {
 
   if (role === "OFFICER") {
     return (
-      <div className="space-y-6 p-6">
-        <div>
-          <h1 className="text-3xl font-bold">Officer Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage assigned complaints and department tasks
-          </p>
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+              Officer Command
+            </h1>
+            <p className="text-slate-500 font-medium mt-2">
+              Operational oversight and assigned civic resolutions.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="rounded-xl h-11 px-5 border-slate-200 font-semibold gap-2 hover:bg-slate-50 transition-all active:scale-95"
+              onClick={fetchComplaints}
+            >
+              <History className="w-4 h-4" /> Refresh
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Assigned Cases
-              </CardTitle>
-              <ClipboardList className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">
-                Active assignments
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              label: "Assigned Cases",
+              value: "12",
+              icon: ClipboardList,
+              color: "blue",
+            },
+            {
+              label: "Resolved",
+              value: "8",
+              icon: CheckCircle,
+              color: "green",
+            },
+            { label: "Pending", value: "4", icon: Clock, color: "orange" },
+            {
+              label: "High Priority",
+              value: "2",
+              icon: AlertTriangle,
+              color: "red",
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all"
+            >
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-all",
+                  stat.color === "blue"
+                    ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
+                    : stat.color === "green"
+                      ? "bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white"
+                      : stat.color === "orange"
+                        ? "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white"
+                        : "bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white",
+                )}
+              >
+                <stat.icon className="w-6 h-6" />
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                {stat.label}
               </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">8</div>
-              <p className="text-xs text-muted-foreground">This month</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">4</div>
-              <p className="text-xs text-muted-foreground">Awaiting action</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                High Priority
-              </CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">2</div>
-              <p className="text-xs text-muted-foreground">
-                Immediate attention
-              </p>
-            </CardContent>
-          </Card>
+              <div className="text-4xl font-bold text-slate-900">
+                {stat.value}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-4 pt-4">
           <Button
-            className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
+            className="rounded-xl h-12 px-8 font-bold bg-primary hover:bg-primary/90 text-white shadow-soft transition-all active:scale-95 gap-2"
             asChild
           >
             <Link href="/dashboard/officer/complaints">
-              <ClipboardList className="w-4 h-4" /> Manage Assigned Cases
+              <ClipboardList className="w-4 h-4" /> Resolve Assigned Cases
             </Link>
           </Button>
           <Button
             variant="outline"
-            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            className="rounded-xl h-12 px-8 font-bold border-slate-200 hover:bg-slate-50 transition-all active:scale-95 gap-2 text-slate-600"
             asChild
           >
-            <Link href="/dashboard/complaints">View All Complaints</Link>
+            <Link href="/dashboard/complaints">
+              <Users className="w-4 h-4" /> Global Command Feed
+            </Link>
           </Button>
         </div>
       </div>
@@ -310,262 +322,261 @@ function AdminDashboard({
       />
 
       {/* Header & Quick Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
-          <h2 className="text-4xl font-black tracking-tight text-primary">
-            Governance Dashboard
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+            Operations Command
           </h2>
-          <p className="text-muted-foreground mt-1 font-medium">
-            Administrative oversight and real-time civic intelligence.
+          <p className="text-slate-500 font-medium">
+            Real-time administrative oversight and civic intelligence.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
             onClick={refresh}
             variant="outline"
-            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+            className="rounded-xl h-11 px-5 border-slate-200 font-semibold gap-2 hover:bg-slate-50 transition-all active:scale-95"
           >
             <History className="w-4 h-4" /> Refresh
           </Button>
           {role === "ADMIN" && (
             <Button
-              variant="outline"
-              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
+              variant="secondary"
+              className="rounded-xl h-11 px-5 font-semibold gap-2 transition-all active:scale-95"
               asChild
             >
               <Link href="/dashboard/admin">
-                <Users className="w-4 h-4" /> Admin Panel
-              </Link>
-            </Button>
-          )}
-          {role === "OFFICER" && (
-            <Button
-              variant="outline"
-              className="rounded-xl font-bold gap-2 bg-background shadow-sm"
-              asChild
-            >
-              <Link href="/dashboard/officer">
-                <ClipboardList className="w-4 h-4" /> Officer Panel
+                <Users className="w-4 h-4" /> Admin Console
               </Link>
             </Button>
           )}
           <Button
-            className="rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
+            className="rounded-xl h-11 px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 shadow-soft transition-all active:scale-95"
             asChild
           >
             <Link href="/dashboard/complaints">
-              <ClipboardList className="w-4 h-4" /> Manage All
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-xl font-bold gap-2 bg-background shadow-sm"
-            asChild
-          >
-            <Link href="/dashboard/map">
-              <MapPin className="w-4 h-4" /> Spatial View
+              <ClipboardList className="w-4 h-4" /> Open Command Feed
             </Link>
           </Button>
         </div>
       </div>
 
       {/* Primary Stats */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
         {stats.map((stat) => (
-          <Card
+          <div
             key={stat.label}
-            className="hover:shadow-2xl transition-all border-none bg-card shadow-sm group rounded-3xl overflow-hidden relative"
+            className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden"
           >
-            <div
-              className={`absolute top-0 left-0 w-1 h-full ${stat.color.replace("text", "bg")}`}
-            />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                {stat.label}
-              </CardTitle>
-              <stat.icon
-                className={`h-5 w-5 ${stat.color} group-hover:scale-110 transition-transform`}
-              />
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-black tabular-nums tracking-tighter">
-                {stat.value}
+            <div className="flex items-center justify-between mb-6">
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
+                  stat.color.includes("blue")
+                    ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
+                    : stat.color.includes("green")
+                      ? "bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white"
+                      : stat.color.includes("orange")
+                        ? "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white"
+                        : "bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white",
+                )}
+              >
+                <stat.icon className="h-6 w-6" />
               </div>
-              <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-2">
-                <span
+              <div
+                className={cn(
+                  "px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1",
+                  stat.trend.startsWith("+")
+                    ? "bg-green-50 text-green-600"
+                    : "bg-red-50 text-red-600",
+                )}
+              >
+                <ArrowUpRight
                   className={cn(
-                    "flex items-center font-black",
-                    stat.trend.startsWith("+")
-                      ? "text-green-600"
-                      : "text-red-600",
+                    "w-3 h-3",
+                    !stat.trend.startsWith("+") && "rotate-90",
                   )}
-                >
-                  <ArrowUpRight
-                    className={cn(
-                      "w-3 h-3 mr-0.5",
-                      !stat.trend.startsWith("+") && "rotate-90",
-                    )}
-                  />
-                  {stat.trend}
-                </span>{" "}
-                vs last month
-              </p>
-            </CardContent>
-          </Card>
+                />
+                {stat.trend}
+              </div>
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+              {stat.label}
+            </p>
+            <div className="text-4xl font-bold text-slate-900 tracking-tight tabular-nums">
+              {stat.value}
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Federated Learning Monitor */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black tracking-tight text-primary flex items-center gap-2">
-            <Cpu className="w-6 h-6 text-blue-500" /> Decentralized AI Consensus
-          </h2>
-          <span className="text-[10px] font-black bg-blue-500/10 text-blue-500 px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">
-            Federated Mode Active
-          </span>
-        </div>
-        <FLDashboard />
-      </div>
-
-      {/* IoT & Infrastructure Monitoring */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black tracking-tight text-primary flex items-center gap-2">
-            <MapPin className="w-6 h-6 text-emerald-500" /> Predictive
-            Infrastructure Monitor
-          </h2>
-          <span className="text-[10px] font-black bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full border border-emerald-500/20 uppercase tracking-widest">
-            IoT + Satellite Active
-          </span>
-        </div>
-        <InfraDashboard />
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-7">
-        {/* Charts Section */}
-        <div className="lg:col-span-4 space-y-8">
-          <Card className="border-none shadow-xl rounded-3xl overflow-hidden bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl hover:shadow-2xl transition-all duration-300 border border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between pb-6 bg-gradient-to-r from-blue-50/50 to-purple-50/50 border-b border-white/20">
-              <div>
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Issue Trajectory
-                </CardTitle>
-                <CardDescription className="text-base text-gray-600">
-                  Daily report volume analysis
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <TrendChart />
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border-none shadow-xl rounded-3xl overflow-hidden bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl hover:shadow-2xl transition-all duration-300 border border-white/10">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Spatial Distribution
-                </CardTitle>
-                <CardDescription className="text-base text-gray-600">
-                  Hotspots by region
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-[200px] flex items-center justify-center bg-gradient-to-br from-emerald-50/50 to-teal-50/50">
-                <div className="text-center space-y-3">
-                  <MapPin className="w-12 h-12 mx-auto text-emerald-600 opacity-60" />
-                  <p className="text-sm font-bold text-emerald-700">
-                    Map Data Loading...
+      {/* Intelligence & Infrastructure Grid */}
+      <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-soft relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary/40 transition-all duration-500" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary">
+                  <Cpu className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Consensus Core</h3>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">
+                    Federated AI Active
                   </p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-xl rounded-3xl overflow-hidden bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl hover:shadow-2xl transition-all duration-300 border border-white/10">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  Category Audit
-                </CardTitle>
-                <CardDescription className="text-base text-gray-600">
-                  Distribution across sectors
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
+              </div>
+            </div>
+            <FLDashboard />
+          </div>
+        </div>
+
+        <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[80px] -mr-16 -mt-16 group-hover:bg-secondary/10 transition-all duration-500" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">
+                    Infrastructure Monitor
+                  </h3>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1 text-emerald-500/80">
+                    IoT + Satellite Grid
+                  </p>
+                </div>
+              </div>
+            </div>
+            <InfraDashboard />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-7 mb-12">
+        {/* Charts Section */}
+        <div className="lg:col-span-4 space-y-8">
+          <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Issue Trajectory
+                </h3>
+                <p className="text-slate-500 text-sm font-medium mt-1">
+                  Real-time daily volume analysis
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-12 h-1 bg-primary/10 rounded-full" />
+                <div className="w-4 h-1 bg-primary/5 rounded-full" />
+              </div>
+            </div>
+            <div className="h-[300px] w-full">
+              <TrendChart />
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-secondary/20 transition-all">
+              <div className="flex items-center gap-3 mb-6">
+                <MapPin className="w-5 h-5 text-secondary" />
+                <h3 className="font-bold text-slate-900">
+                  Spatial Distribution
+                </h3>
+              </div>
+              <div className="h-[200px] flex items-center justify-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <div className="text-center">
+                  <MapPin className="w-10 h-10 mx-auto text-slate-300 mb-3" />
+                  <p className="text-xs font-bold text-slate-400">
+                    Map Interface Active
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-3 mb-6">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-slate-900">Sector Audit</h3>
+              </div>
+              <div className="h-[200px] w-full">
                 <DepartmentChart />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Priority Triage Feed */}
         <div className="lg:col-span-3">
-          <Card className="border-none shadow-2xl rounded-3xl h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden ring-2 ring-white/10 hover:ring-4 hover:shadow-3xl transition-all duration-300">
-            <CardHeader className="border-b border-white/10 pb-8 bg-gradient-to-r from-slate-800 to-slate-700">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
-                  <AlertTriangle className="w-6 h-6 text-red-400" /> Priority
-                  <span className="ml-2">Triage</span>
-                </CardTitle>
-                <span className="text-[10px] font-black bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-500/30 uppercase tracking-widest">
-                  REQUIRED ATTENTION
+          <div className="rounded-[2.5rem] bg-white border border-slate-100 shadow-soft overflow-hidden h-full flex flex-col">
+            <div className="p-8 bg-slate-50/50 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 text-red-600">
+                  <AlertTriangle className="w-6 h-6" />
+                  <h3 className="text-xl font-bold">Priority Triage</h3>
+                </div>
+                <span className="text-[10px] font-bold bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100 uppercase tracking-widest">
+                  URGENT
                 </span>
               </div>
-              <CardDescription className="text-slate-300">
-                High severity issues requiring immediate resolution.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-white/5">
-                {highPriority.length === 0 ? (
-                  <div className="p-12 text-center text-slate-500">
-                    <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                    <p className="font-bold">No high-priority issues</p>
-                  </div>
-                ) : (
-                  highPriority.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-6 hover:bg-white/5 transition-colors group"
-                    >
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <div className="min-w-0">
-                          <p className="font-black text-sm truncate group-hover:text-primary transition-colors">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1 font-medium">
-                            <MapPin className="w-3 h-3" /> {item.region}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1 bg-red-500/10 text-red-500 px-2 py-0.5 rounded text-[10px] font-black border border-red-500/10">
-                          S{item.severity}
+              <p className="text-slate-500 text-sm font-medium">
+                Critical issues requiring immediate administrative consensus.
+              </p>
+            </div>
+            <div className="flex-1 overflow-y-auto max-h-[600px] divide-y divide-slate-50">
+              {highPriority.length === 0 ? (
+                <div className="p-16 text-center text-slate-400">
+                  <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                  <p className="font-bold">Clear Sky - No critical issues</p>
+                </div>
+              ) : (
+                highPriority.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-8 hover:bg-slate-50/50 transition-all group"
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
+                          {item.title}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {item.region}
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          {format(new Date(item.createdAt), "MMM d, h:mm a")}
-                        </p>
-                        <Link href={`/dashboard/complaints?id=${item.id}`}>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 text-[10px] font-black hover:bg-white/10 text-primary"
-                          >
-                            RESOLVE <ArrowUpRight className="w-3 h-3 ml-1" />
-                          </Button>
-                        </Link>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-[10px] font-bold border border-red-100">
+                        LVL {item.severity}
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-            <div className="p-6 border-t border-white/5 bg-white/5">
-              <Link href="/dashboard/complaints">
-                <Button className="w-full rounded-xl font-black text-xs bg-white text-slate-900 hover:bg-white/90">
-                  VIEW FULL COMMAND FEED
-                </Button>
-              </Link>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-400">
+                        {format(new Date(item.createdAt), "MMM d, h:mm a")}
+                      </span>
+                      <Link href={`/dashboard/complaints?id=${item.id}`}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 rounded-lg text-xs font-bold text-primary hover:bg-primary/5 gap-1"
+                        >
+                          Resolve <ArrowUpRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          </Card>
+            <div className="p-8 bg-slate-50/30 border-t border-slate-100">
+              <Button
+                className="w-full h-12 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-widest shadow-soft transition-all active:scale-[0.98]"
+                asChild
+              >
+                <Link href="/dashboard/complaints">Open Full Command Feed</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -590,36 +601,39 @@ function CitizenDashboard({
   ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* Hero Section with Personalized Welcome */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 md:p-12 shadow-2xl">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
+    <div className="min-h-screen bg-slate-50/50">
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+        {/* Elegant Hero Section */}
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-slate-100 p-10 md:p-16 shadow-soft group">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[100px] -mr-16 -mt-16 group-hover:bg-primary/10 transition-all duration-700" />
+          <div className="absolute bottom-0 left-0 w-1/4 h-full bg-secondary/5 blur-[100px] -ml-16 -mb-16 group-hover:bg-secondary/10 transition-all duration-700" />
 
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-                Welcome back,{" "}
-                <span className="text-yellow-400 capitalize">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
+            <div className="space-y-6 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest border border-primary/10">
+                Citizen Portal Active
+              </div>
+              <h2 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-tight">
+                Jai Hind, <br />
+                <span className="text-primary italic font-serif">
                   {session?.user?.name || "Citizen"}
                 </span>
               </h2>
-              <p className="text-blue-100 text-lg font-medium max-w-xl">
-                Your active participation is shaping a better Bharat. Track your
-                impact and reports below.
+              <p className="text-slate-500 text-lg font-medium max-w-xl leading-relaxed">
+                Your contributions are driving the digital transformation of our
+                administration. Track your impact across the city.
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <Trophy className="w-8 h-8 text-white" />
+
+            <div className="flex flex-col items-center gap-4 p-8 rounded-[2rem] bg-slate-50 border border-slate-100 shadow-sm min-w-[240px]">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-soft text-primary mb-2">
+                <Trophy className="w-8 h-8" />
               </div>
-              <div>
-                <p className="text-3xl font-black text-white leading-none">
+              <div className="text-center">
+                <p className="text-4xl font-bold text-slate-900 leading-none mb-2">
                   {points}
                 </p>
-                <p className="text-sm font-bold text-blue-100 uppercase tracking-wider">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Impact Points
                 </p>
               </div>
@@ -627,334 +641,231 @@ function CitizenDashboard({
           </div>
         </div>
 
-        {/* Stats Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-3">
-          <Link href="/dashboard/my-reports" className="block outline-none">
-            <Card className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-              <div className="absolute -right-8 -bottom-8 opacity-20 group-hover:scale-110 transition-transform duration-500">
-                <Award className="w-40 h-40 text-white" />
+        {/* Stats Grid */}
+        <div className="grid gap-8 md:grid-cols-3">
+          <Link href="/dashboard/my-reports">
+            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden">
+              <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                <ClipboardList className="w-6 h-6" />
               </div>
-              <CardHeader className="relative z-10 pb-3">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-blue-100">
-                  📝 Reports Filed
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="text-5xl font-black text-white mb-2">
-                  {complaints.length}
-                </div>
-                <p className="text-sm text-blue-100 font-medium">
-                  Active contributions to civic progress
-                </p>
-                <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full"
-                    style={{
-                      width: `${Math.min((complaints.length / 10) * 100, 100)}%`,
-                    }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Reports Filed
+              </p>
+              <div className="text-4xl font-bold text-slate-900 mb-2">
+                {complaints.length}
+              </div>
+              <p className="text-xs text-slate-400 font-medium">
+                Active civic contributions
+              </p>
+            </div>
           </Link>
 
-          <Link href="/dashboard/my-reports" className="block outline-none">
-            <Card className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-emerald-500 to-green-600 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-              <div className="absolute -right-8 -bottom-8 opacity-20 group-hover:scale-110 transition-transform duration-500">
-                <CheckCircle className="w-40 h-40 text-white" />
+          <Link href="/dashboard/my-reports">
+            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-secondary/20 transition-all relative overflow-hidden">
+              <div className="w-12 h-12 rounded-2xl bg-secondary/5 text-secondary flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:text-white transition-all">
+                <CheckCircle className="w-6 h-6" />
               </div>
-              <CardHeader className="relative z-10 pb-3">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-green-100">
-                  ✅ Impact Made
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="text-5xl font-black text-white mb-2">
-                  {resolvedCount}
-                </div>
-                <p className="text-sm text-green-100 font-medium">
-                  Issues resolved through your action
-                </p>
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-white rounded-full"
-                      style={{
-                        width: `${complaints.length > 0 ? (resolvedCount / complaints.length) * 100 : 0}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-xs text-green-100 font-bold">
-                    {complaints.length > 0
-                      ? Math.round((resolvedCount / complaints.length) * 100)
-                      : 0}
-                    %
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Resolved Impact
+              </p>
+              <div className="text-4xl font-bold text-slate-900 mb-2">
+                {resolvedCount}
+              </div>
+              <p className="text-xs text-slate-400 font-medium">
+                {complaints.length > 0
+                  ? Math.round((resolvedCount / complaints.length) * 100)
+                  : 0}
+                % success rate
+              </p>
+            </div>
           </Link>
 
-          <Link href="/dashboard/rewards" className="block outline-none">
-            <Card className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-purple-500 to-pink-600 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-              <div className="absolute -right-8 -bottom-8 opacity-20 group-hover:scale-110 transition-transform duration-500">
-                <TrendingUp className="w-40 h-40 text-white" />
+          <Link href="/dashboard/rewards">
+            <div className="p-8 rounded-[2rem] bg-slate-900 text-white shadow-soft group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-[60px] -mr-12 -mt-12 group-hover:bg-primary/40 transition-all" />
+              <div className="w-12 h-12 rounded-2xl bg-white/10 text-primary flex items-center justify-center mb-6">
+                <Award className="w-6 h-6" />
               </div>
-              <CardHeader className="relative z-10 pb-3">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-purple-100">
-                  🏆 Citizen Rank
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="text-5xl font-black text-white mb-2">
-                  Top 5%
-                </div>
-                <p className="text-sm text-purple-100 font-medium">
-                  Leading in city stewardship
-                </p>
-                <div className="mt-3 flex gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className={`h-2 flex-1 rounded-full ${i <= 4 ? "bg-white" : "bg-white/30"}`}
-                    ></div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Citizen Status
+              </p>
+              <div className="text-4xl font-bold text-white mb-2">
+                Elite Rank
+              </div>
+              <p className="text-xs text-slate-400 font-medium">
+                Top 5% of stewards
+              </p>
+            </div>
           </Link>
         </div>
 
-        {/* Recent Reports & Rewards Section */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Recent Reports Card */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                    <History className="w-5 h-5 text-blue-600" />
-                    📋 Your Recent Reports
-                  </CardTitle>
-                  <CardDescription className="text-gray-600 mt-1">
-                    Track the status of your civic contributions
-                  </CardDescription>
-                </div>
-                <Link href="/dashboard/my-reports">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="font-bold text-blue-600 gap-1 border-blue-200 hover:bg-blue-50 rounded-xl"
-                  >
-                    View All <ArrowUpRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+        {/* Recent Activity & Stewardship */}
+        <div className="grid gap-12 lg:grid-cols-2">
+          {/* Recent Reports List */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Recent Activity
+                </h3>
+                <p className="text-slate-500 text-sm font-medium mt-1">
+                  Track the resolution of your filed issues.
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {loading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                  </div>
-                ) : complaints.length === 0 ? (
-                  <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border-2 border-dashed border-blue-200">
-                    <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <ClipboardList className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <h3 className="font-bold text-gray-800 mb-2">
-                      No reports filed yet
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Be the change - start by reporting a city issue!
-                    </p>
+              <Link href="/dashboard/my-reports">
+                <Button
+                  variant="ghost"
+                  className="text-primary font-bold text-xs uppercase tracking-widest hover:bg-primary/5 gap-2"
+                >
+                  View All <ArrowUpRight className="w-3.5 h-3.5" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="space-y-4">
+              {loading ? (
+                <div className="flex items-center justify-center p-20">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : complaints.length === 0 ? (
+                <div className="p-12 text-center rounded-[2rem] bg-slate-50 border border-dashed border-slate-200">
+                  <ClipboardList className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                  <p className="font-bold text-slate-500 mb-6">
+                    No reports filed yet.
+                  </p>
+                  <Button
+                    className="rounded-xl h-11 px-8 font-bold bg-primary hover:bg-primary/90"
+                    asChild
+                  >
                     <Link href="/dashboard/complaints">
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold">
-                        File Your First Report
-                      </Button>
+                      File Your First Report
                     </Link>
-                  </div>
-                ) : (
-                  complaints.slice(0, 3).map((complaint) => (
-                    <div
-                      key={complaint.id}
-                      className="group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-blue-50/30 hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 border border-gray-200 hover:border-blue-300 hover:shadow-lg"
-                    >
-                      <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative group-hover:scale-105 transition-transform">
-                        {complaint.imageUrl ? (
+                  </Button>
+                </div>
+              ) : (
+                complaints.slice(0, 3).map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-6 rounded-[2rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all"
+                  >
+                    <div className="flex gap-6">
+                      <div className="w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden flex-shrink-0 relative border border-slate-100 group-hover:scale-105 transition-transform">
+                        {item.imageUrl ? (
                           <NextImage
-                            src={complaint.imageUrl}
+                            src={item.imageUrl}
                             fill
                             className="object-cover"
                             alt=""
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-                            <MapPin className="w-6 h-6 text-gray-500" />
+                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                            <MapPin className="w-8 h-8 text-slate-300" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-gray-800 truncate group-hover:text-blue-600 transition-colors">
-                          {complaint.title}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <h4 className="font-bold text-slate-900 truncate group-hover:text-primary transition-colors">
+                            {item.title}
+                          </h4>
+                          <div
                             className={cn(
-                              "text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-tighter border",
-                              complaint.status === "RESOLVED"
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : complaint.status === "IN_PROGRESS"
-                                  ? "bg-blue-100 text-blue-700 border-blue-200"
-                                  : "bg-orange-100 text-orange-700 border-orange-200",
+                              "px-2 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider whitespace-nowrap",
+                              item.status === "RESOLVED"
+                                ? "bg-green-50 text-green-600"
+                                : item.status === "PENDING"
+                                  ? "bg-amber-50 text-amber-600"
+                                  : "bg-blue-50 text-blue-600",
                             )}
                           >
-                            {complaint.status === "RESOLVED"
-                              ? "✅ Resolved"
-                              : complaint.status === "IN_PROGRESS"
-                                ? "🔄 In Progress"
-                                : "⏳ Pending"}
+                            {item.status}
+                          </div>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium mb-4 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />{" "}
+                          {item.region}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-slate-400">
+                            {format(new Date(item.createdAt), "MMM d, yyyy")}
                           </span>
-                          <span className="text-[10px] text-gray-500 font-medium">
-                            {format(
-                              new Date(complaint.createdAt),
-                              "MMM d, h:mm a",
-                            )}
-                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-3 rounded-lg text-xs font-bold text-slate-500 hover:text-primary"
+                            asChild
+                          >
+                            <Link href={`/dashboard/complaints?id=${item.id}`}>
+                              Details
+                            </Link>
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="rounded-xl h-8 text-[10px] font-black uppercase tracking-widest gap-2 bg-white border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm"
-                          onClick={() => generateComplaintReceipt(complaint)}
-                        >
-                          <FileDown className="w-3.5 h-3.5" /> Receipt
-                        </Button>
-                      </div>
                     </div>
-                  ))
-                )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Quick Actions / Impact Section */}
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">
+              Digital Stewardship
+            </h3>
+            <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-soft relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/20 blur-[100px] -mr-24 -mt-24 group-hover:bg-secondary/30 transition-all duration-700" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-secondary">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold">Fast-Track Resolution</h4>
+                </div>
+                <p className="text-slate-400 font-medium text-sm leading-relaxed mb-8">
+                  Our new Sovereign AI core prioritizes verified citizen reports
+                  for 2x faster resolution. Keep contributing to maintain your
+                  Elite Steward status.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Button
+                    className="rounded-xl h-12 px-8 font-bold bg-white text-slate-900 hover:bg-slate-100 transition-all active:scale-95 shadow-soft"
+                    asChild
+                  >
+                    <Link href="/dashboard/complaints">New Report</Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="rounded-xl h-12 px-8 font-bold text-white hover:bg-white/5"
+                    asChild
+                  >
+                    <Link href="/about">How It Works</Link>
+                  </Button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Citizen Rewards Card */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-600/10 to-transparent"></div>
-            <CardHeader className="relative z-10 border-b border-white/10">
-              <CardTitle className="text-2xl font-black flex items-center gap-2">
-                🎁 Citizen Rewards
-              </CardTitle>
-              <CardDescription className="text-slate-300">
-                Redeem your impact points for exclusive benefits
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative z-10 p-6 space-y-4">
-              <Link href="/dashboard/rewards" className="block outline-none">
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-white/10 to-white/5 border border-white/20 flex items-center justify-between group cursor-pointer hover:bg-white/15 transition-all duration-300 hover:scale-[1.02]">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                      5%
-                    </div>
-                    <div>
-                      <p className="font-bold text-white text-sm">
-                        Property Tax Discount
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Available at 5,000 Points
-                      </p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-500"
-                            style={{
-                              width: `${Math.min((points / 5000) * 100, 100)}%`,
-                            }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-slate-400 font-bold">
-                          {Math.min(Math.round((points / 5000) * 100), 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <ArrowUpRight className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-opacity" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="p-6 rounded-[2rem] bg-white border border-slate-100 shadow-soft">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center mb-4">
+                  <Award className="w-5 h-5" />
                 </div>
-              </Link>
-
-              <Link
-                href={points >= 1000 ? "/dashboard/rewards" : "#"}
-                className={cn(
-                  "block outline-none",
-                  points < 1000 && "pointer-events-none",
-                )}
-              >
-                <div
-                  className={`p-4 rounded-2xl border flex items-center justify-between group transition-all duration-300 ${
-                    points >= 1000
-                      ? "bg-gradient-to-r from-white/10 to-white/5 border-white/20 cursor-pointer hover:bg-white/15 hover:scale-[1.02]"
-                      : "bg-white/5 border-white/10 opacity-50 cursor-not-allowed"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg shadow-lg ${
-                        points >= 1000
-                          ? "bg-gradient-to-br from-green-400 to-emerald-500 text-white"
-                          : "bg-white/10 text-white/50"
-                      }`}
-                    >
-                      Free
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Metro One-Day Pass</p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {points >= 1000
-                          ? "Available now!"
-                          : `Need ${1000 - points} more points`}
-                      </p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              points >= 1000
-                                ? "bg-gradient-to-r from-green-400 to-emerald-500"
-                                : "bg-white/10"
-                            }`}
-                            style={{
-                              width: `${Math.min((points / 1000) * 100, 100)}%`,
-                            }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-slate-400 font-bold">
-                          {Math.min(Math.round((points / 1000) * 100), 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <ArrowUpRight className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </Link>
-
-              <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Trophy className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="font-bold text-blue-300">Next Milestone</p>
-                </div>
-                <p className="text-sm text-slate-300">
-                  Earn {1000 - (points % 1000)} more points to unlock Premium
-                  Rewards
+                <h5 className="font-bold text-slate-900 mb-1">Badges</h5>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                  4 Earned
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-6 rounded-[2rem] bg-white border border-slate-100 shadow-soft">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h5 className="font-bold text-slate-900 mb-1">Impact</h5>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                  124 Citizens Helped
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}

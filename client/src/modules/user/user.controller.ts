@@ -40,8 +40,23 @@ export class UserController {
                 throw new AppError("Forbidden: Admin only", 403);
             }
 
-            const users = await userService.listUsers();
-            return NextResponse.json(users);
+            const { searchParams } = new URL(req.url);
+            const search = searchParams.get("search");
+            const role = searchParams.get("role");
+
+            const filter: any = {};
+            if (role && role !== "all") {
+                filter.role = role;
+            }
+            if (search) {
+                filter.OR = [
+                    { name: { contains: search, mode: "insensitive" } },
+                    { email: { contains: search, mode: "insensitive" } },
+                ];
+            }
+
+            const users = await userService.listUsers(filter);
+            return NextResponse.json({ users });
         } catch (error) {
             return handleError(error);
         }

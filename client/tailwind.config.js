@@ -18,61 +18,49 @@ module.exports = {
         },
         extend: {
             colors: {
-                // Civic Theme Colors
-                civic: {
-                    primary: "#065F46", // Dark Green
-                    secondary: "#1E3A8A", // Deep Blue
-                    accent: "#F97316", // Orange
-                    background: "#F1F5F9", // Light Neutral Background
-                    text: "#0F172A", // Dark Text
-                },
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 primary: {
-                    DEFAULT: "#065F46",
-                    foreground: "#FFFFFF",
-                    hover: "#047857",
+                    DEFAULT: "hsl(var(--primary))",
+                    foreground: "hsl(var(--primary-foreground))",
+                    hover: "#2563EB",
                 },
                 secondary: {
-                    DEFAULT: "#1E3A8A",
-                    foreground: "#FFFFFF",
-                    hover: "#1E40AF",
+                    DEFAULT: "hsl(var(--secondary))",
+                    foreground: "hsl(var(--secondary-foreground))",
+                    hover: "#0D9488",
                 },
                 accent: {
-                    DEFAULT: "#F97316",
-                    foreground: "#FFFFFF",
-                    hover: "#EA580C",
+                    DEFAULT: "hsl(var(--accent))",
+                    foreground: "hsl(var(--accent-foreground))",
+                    hover: "#0D9488",
                 },
                 destructive: {
-                    DEFAULT: "#DC2626",
+                    DEFAULT: "hsl(var(--destructive))",
                     foreground: "hsl(var(--destructive-foreground))",
                 },
                 muted: {
-                    DEFAULT: "#F1F5F9",
-                    foreground: "#64748B",
-                },
-                accent: {
-                    DEFAULT: "#F97316",
-                    foreground: "hsl(var(--accent-foreground))",
+                    DEFAULT: "hsl(var(--muted))",
+                    foreground: "hsl(var(--muted-foreground))",
                 },
                 popover: {
                     DEFAULT: "hsl(var(--popover))",
                     foreground: "hsl(var(--popover-foreground))",
                 },
                 card: {
-                    DEFAULT: "#FFFFFF",
-                    foreground: "#0F172A",
+                    DEFAULT: "hsl(var(--card))",
+                    foreground: "hsl(var(--card-foreground))",
                 },
-                success: "#16A34A",
+                success: "#10B981",
             },
             borderRadius: {
-                lg: "12px",
-                md: "10px",
-                sm: "8px",
-                xl: "16px",
+                lg: "var(--radius)",
+                md: "calc(var(--radius) - 2px)",
+                sm: "calc(var(--radius) - 4px)",
+                xl: "1rem",
             },
             keyframes: {
                 "accordion-down": {
