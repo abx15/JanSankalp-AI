@@ -1,0 +1,201 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PRODUCTION DOCKER COMPOSE - Complete JanSankalp AI Stack
+# Run with: docker compose up --build -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ─── Next.js Frontend (Production) ───────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: jansankalp-client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client/.env
+    environment:
+      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
+      - AI_SERVICE_URL=http://server:8000
+      - NEXT_PUBLIC_AI_ENGINE_URL=http://server:8000
+      - NEXTAUTH_URL=http://localhost:3000
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GROK_API_KEY=${GROK_API_KEY}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      - ASSEMBLY_AI_API_KEY=e3fe7351ff8147db88e55dcfab61857e
+      - RESEND_API_KEY=re_2zLjYJDC_D4gKhj1B5fXtgn8VS2MaTwtd
+      - NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=public_81Hn+17o1UB5aotmt+2cQrFX2nE=
+      - IMAGEKIT_PRIVATE_KEY=private_8J3leJCTdTVkTx8KnXSev7EtIQk=
+      - NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/er7lmis3j
+      - NEXT_PUBLIC_PUSHER_APP_ID=2115011
+      - NEXT_PUBLIC_PUSHER_KEY=0c8f153ef838e56b4bfc
+      - PUSHER_SECRET=90e0124f48b1acf9d05b
+      - NEXT_PUBLIC_PUSHER_CLUSTER=ap2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    networks:
+      - jansankalp-net
+
+  # ─── FastAPI AI Engine (Production) ──────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: jansankalp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    environment:
+      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
+      - REDIS_URL=redis://redis:6379
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GROK_API_KEY=${GROK_API_KEY}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      - ASSEMBLY_AI_API_KEY=e3fe7351ff8147db88e55dcfab61857e
+    volumes:
+      - ./server/models:/app/server/models:ro  # Mount models directory
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - jansankalp-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── PostgreSQL Database ───────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: jansankalp-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=jansankalp
+      - POSTGRES_PASSWORD=jansankalp_pass
+      - POSTGRES_DB=jansankalp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jansankalp -d jansankalp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-net
+
+  # ─── Redis Cache & Session Store ──────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: jansankalp-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-net
+
+  # ─── Nginx Reverse Proxy (Optional) ───────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: jansankalp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - jansankalp-net
+    profiles:
+      - production
+
+  # ─── Prometheus Monitoring ─────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: jansankalp-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - jansankalp-net
+    profiles:
+      - monitoring
+
+  # ─── Grafana Dashboard ─────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: jansankalp-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=jansankalp123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - jansankalp-net
+    profiles:
+      - monitoring
+
+networks:
+  jansankalp-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
