@@ -31,6 +31,41 @@ interface Message {
   actions?: string[];
 }
 
+const detectLanguage = (text: string): "hi" | "en" => {
+  const hindiChars = text.match(/[\u0900-\u097F]/g);
+  return hindiChars && hindiChars.length > text.length * 0.3 ? "hi" : "en";
+};
+
+const getSystemPrompt = (role: string, lang: "hi" | "en") => {
+  const basePrompts = {
+    CITIZEN: {
+      en: "You are JanSahayak, a helpful AI assistant for Indian citizens. Help people with civic complaints, government schemes, and the JanSankalp platform. Be concise and helpful.",
+      hi: "आप जनसहायक हैं, भारतीय नागरिकों के लिए एक सहायक AI सहायक। नागरिक शिकायतें, सरकारी योजनाओं और जनसंकल्प प्लेटफॉर्म में मदद करें। संक्षिप्त और सहायक रहें।"
+    },
+    OFFICER: {
+      en: "You are GovInsight AI, an assistant for government officers. Help with complaint analysis, governance insights, and administrative procedures.",
+      hi: "आप GovInsight AI हैं, सरकारी अधिकारियों के लिए एक सहायक। शिकायत विश्लेषण, शासन अंतर्दृष्टि और प्रशासनिक प्रक्रियाओं में मदद करें।"
+    }
+  };
+  
+  return basePrompts[role as keyof typeof basePrompts]?.[lang] || basePrompts.CITIZEN.en;
+};
+
+const getGreeting = (role: string, lang: "hi" | "en") => {
+  const greetings = {
+    CITIZEN: {
+      en: "Hello! I am JanSahayak, your official AI Assistant. How can I help you today?",
+      hi: "नमस्ते! मैं जनसहायक हूं, आपका आधिकारिक AI सहायक। मैं आज आपकी क्या सहायता कर सकता हूं?"
+    },
+    OFFICER: {
+      en: "Greetings Officer. GovInsight ready. Awaiting analysis request.",
+      hi: "जय अधिकारी महोदय। GovInsight तैयार है। विश्लेषण अनुरोध की प्रतीक्षा।"
+    }
+  };
+  
+  return greetings[role as keyof typeof greetings]?.[lang] || greetings.CITIZEN.en;
+};
+
 export const AIAssistant = ({
   role = "CITIZEN",
 }: {
@@ -41,10 +76,7 @@ export const AIAssistant = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      text:
-        role === "CITIZEN"
-          ? "Hello! I am JanSahayak, your official AI Assistant. How can I help you today?"
-          : "Greetings Officer. GovInsight ready. Awaiting analysis request.",
+      text: getGreeting(role, "en"),
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -68,22 +100,32 @@ export const AIAssistant = ({
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
     setIsTyping(true);
 
+    // Detect language of user input
+    const detectedLang = detectLanguage(currentInput);
+
     try {
-      const res = await fetch("/api/admin/governance?type=assistant-chat", {
+      const res = await fetch("/api/ai/chat", {
         method: "POST",
-        body: JSON.stringify({ message: input, role }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          messages: [
+            { role: "system", content: getSystemPrompt(role, detectedLang) },
+            { role: "user", content: currentInput }
+          ]
+        }),
       });
 
       const data = await res.json();
       const botMsg: Message = {
         role: "assistant",
-        text: data.data.text,
-        timestamp: new Date(data.data.timestamp).toLocaleTimeString(),
-        sentiment: data.data.sentiment,
-        actions: data.data.suggested_actions,
+        text: data.choices?.[0]?.message?.content || 
+             (detectedLang === "hi" ? "क्षमा करें, मैं अभी आपके अनुरोध को संसाधित करने में परेशानी हो रही हूं।" 
+                                    : "I apologize, but I'm having trouble processing your request right now."),
+        timestamp: new Date().toLocaleTimeString(),
       };
 
       setTimeout(() => {
@@ -92,6 +134,14 @@ export const AIAssistant = ({
       }, 800);
     } catch (e) {
       console.error(e);
+      const fallbackMsg: Message = {
+        role: "assistant",
+        text: detectedLang === "hi" 
+          ? "मैं अभी उपलब्ध नहीं हूं। कृपया बाद में पुन: प्रयास करें।"
+          : "I'm unavailable right now. Please try again later.",
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages((prev) => [...prev, fallbackMsg]);
       setIsTyping(false);
     }
   };
@@ -226,7 +276,7 @@ export const AIAssistant = ({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Talk to AI Assistant..."
+                placeholder="Type your message... / अपना संदेश टाइप करें..."
                 className="w-full bg-slate-100 border-none rounded-2xl py-4 pl-5 pr-24 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">

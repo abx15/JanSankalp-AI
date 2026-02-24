@@ -102,7 +102,7 @@ export default function Home() {
 
   return (
     <LiveEventProvider>
-      <main className="min-h-screen bg-background text-foreground selection:bg-primary/10">
+      <main className="min-h-screen bg-background text-foreground selection:bg-primary/10 overflow-x-hidden">
         {/* Immersive Hero Section */}
         <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden mesh-gradient">
           {/* Animated Background Elements */}
@@ -128,7 +128,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] [mask-image:radial-gradient(ellipse_at_center,black,transparent)]" />
           </div>
 
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-10 lg:px-20 py-32 flex flex-col items-center text-center">
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-20 py-16 sm:py-20 md:py-24 lg:py-28 xl:py-32 flex flex-col items-center text-center overflow-x-hidden">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ export default function Home() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 bg-background/50 backdrop-blur-md text-primary px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.3em] mb-12 border border-primary/20 shadow-xl"
+                className="inline-flex items-center gap-2 bg-background/50 backdrop-blur-md text-primary px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-8 sm:mb-12 border border-primary/20 shadow-xl"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -148,20 +148,20 @@ export default function Home() {
                 Active Governance OS
               </motion.div>
 
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] text-foreground mb-10 max-w-6xl">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-black tracking-tighter leading-[0.9] text-foreground mb-4 sm:mb-6 md:mb-8 lg:mb-10 max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl px-2">
                 JanSankalp <br />
                 <span className="text-gradient">AI</span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold mb-16 opacity-80">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-full sm:max-w-2xl md:max-w-3xl mx-auto leading-relaxed font-semibold mb-8 sm:mb-10 md:mb-12 lg:mb-14 xl:mb-16 opacity-80 px-4">
                 Bridging the gap between citizens and administration through
                 India&apos;s most advanced real-time civic operating system.
               </p>
 
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 px-4 w-full max-w-full">
                 <Button
                   size="lg"
-                  className="rounded-[2.5rem] px-12 h-20 text-xl font-black bg-primary text-white shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] transition-all hover:-translate-y-2 active:scale-95 group relative overflow-hidden"
+                  className="rounded-[2.5rem] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 text-sm sm:text-base md:text-lg lg:text-xl font-black bg-primary text-white shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] transition-all hover:-translate-y-2 active:scale-95 group relative overflow-hidden w-full sm:w-auto"
                   asChild
                 >
                   <a href="#report">
@@ -183,7 +183,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="rounded-[2.5rem] px-12 h-20 text-xl font-black border-border/50 bg-background/50 backdrop-blur-xl hover:bg-muted/80 shadow-2xl transition-all hover:-translate-y-2 active:scale-95"
+                  className="rounded-[2.5rem] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 text-sm sm:text-base md:text-lg lg:text-xl font-black border-border/50 bg-background/50 backdrop-blur-xl hover:bg-muted/80 shadow-2xl transition-all hover:-translate-y-2 active:scale-95 w-full sm:w-auto"
                   asChild
                 >
                   <a href="/how-it-works">Citizen Guide</a>
@@ -220,9 +220,9 @@ export default function Home() {
         </section>
 
         {/* Stats Section */}
-        <section className="relative z-20 w-full py-16 px-4 md:px-10 lg:px-20 -mt-32">
+        <section className="relative z-20 w-full py-12 sm:py-14 md:py-16 lg:py-18 xl:py-20 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-20 -mt-24 sm:-mt-28 md:-mt-32 overflow-x-hidden">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {stats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -230,13 +230,13 @@ export default function Home() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="p-8 rounded-[3rem] glass-card hover:bg-card/80 transition-all text-center group relative overflow-hidden"
+                  className="p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[3rem] glass-card hover:bg-card/80 transition-all text-center group relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 group-hover:text-primary transition-colors relative z-10">
                     {stat.label}
                   </p>
-                  <p className="text-5xl font-black text-foreground tracking-tighter mb-4 relative z-10">
+                  <p className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tighter mb-3 sm:mb-4 relative z-10">
                     {stat.value}
                   </p>
                   <div className="w-12 h-1.5 bg-primary/20 rounded-full mx-auto relative z-10 group-hover:w-24 transition-all duration-500" />
@@ -247,9 +247,9 @@ export default function Home() {
         </section>
 
         {/* Live City Map Section */}
-        <section className="bg-background relative z-10 pt-12">
-          <div className="max-w-4xl mx-auto text-center px-6 mb-8">
-            <h3 className="text-3xl font-black mb-4">JanSankalp Network Connectivity</h3>
+        <section className="bg-background relative z-10 pt-8 sm:pt-10 md:pt-12">
+          <div className="max-w-4xl mx-auto text-center px-3 sm:px-4 md:px-6 lg:px-8 mb-6 sm:mb-8">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4">JanSankalp Network Connectivity</h3>
             <p className="text-muted-foreground font-medium">
               Real-time downlink from the JanSankalp AI network nodes across the country.
             </p>
@@ -262,23 +262,23 @@ export default function Home() {
         </section>
 
         {/* Core Features */}
-        <section className="w-full py-40 px-4 md:px-10 lg:px-20 bg-muted/20 relative overflow-hidden">
+        <section className="w-full py-20 sm:py-24 md:py-32 lg:py-36 xl:py-40 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-20 bg-muted/20 relative overflow-hidden">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 blur-[100px] rounded-full -z-10" />
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-24">
+            <div className="flex flex-col lg:flex-row justify-between items-end gap-8 sm:gap-10 md:gap-12 mb-16 sm:mb-20 md:mb-24">
               <div className="max-w-3xl">
                 <motion.h2
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="text-5xl md:text-7xl font-black tracking-tight text-foreground mb-8 leading-[0.9]"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-foreground mb-6 sm:mb-8 leading-[0.9]"
                 >
                   Intelligent Civic <br />
                   <span className="text-gradient italic font-serif">
                     Resolution Engine
                   </span>
                 </motion.h2>
-                <p className="text-muted-foreground text-xl md:text-2xl font-semibold leading-relaxed">
+                <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed">
                   JanSankalp AI bridges the gap between citizens and
                   administration. We turn raw grievances into structured, actionable data points.
                 </p>
@@ -292,7 +292,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
               {FEATURES.map((feature, i) => (
                 <motion.div
                   key={feature.title}
@@ -301,16 +301,16 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2, duration: 0.6 }}
                   whileHover={{ y: -15 }}
-                  className="p-12 rounded-[3.5rem] glass-card group hover:bg-card transition-all duration-500 relative overflow-hidden"
+                  className="p-6 sm:p-8 md:p-10 lg:p-12 rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] lg:rounded-[3.5rem] glass-card group hover:bg-card transition-all duration-500 relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 bg-primary/10 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mb-6 sm:mb-8 md:mb-10 bg-primary/10 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
                     {feature.icon}
                   </div>
-                  <h3 className="text-2xl font-black mb-4 text-foreground tracking-tight">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-3 sm:mb-4 text-foreground tracking-tight">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-lg leading-relaxed font-medium">
+                  <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed font-medium">
                     {feature.desc}
                   </p>
                 </motion.div>
@@ -320,9 +320,9 @@ export default function Home() {
         </section>
 
         {/* Automation Showcase */}
-        <section className="w-full py-24 px-4 bg-background">
-          <div className="max-w-4xl mx-auto text-center px-6 mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
+        <section className="w-full py-16 sm:py-20 md:py-24 px-3 sm:px-4 md:px-6 lg:px-8 bg-background">
+          <div className="max-w-4xl mx-auto text-center px-3 sm:px-4 md:px-6 mb-12 sm:mb-14 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-3 sm:mb-4">
               The Automation Core
             </h2>
             <p className="text-muted-foreground font-medium">
@@ -335,12 +335,12 @@ export default function Home() {
         {/* Flow Simulation - Report Form */}
         <section
           id="report"
-          className="w-full py-32 px-4 md:px-10 lg:px-20 bg-background"
+          className="w-full py-20 sm:py-24 md:py-28 lg:py-32 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-20 bg-background"
         >
           <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
               <div>
-                <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-6 sm:mb-8">
                   Direct Line to <br />
                   <span className="text-secondary font-serif italic">
                     Resolution

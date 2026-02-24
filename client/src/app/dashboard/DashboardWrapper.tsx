@@ -61,7 +61,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-68 border-r bg-card hidden md:flex flex-col sticky top-0 h-screen">
+      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen">
         <SidebarContent
           role={role}
           pathname={pathname}
@@ -71,16 +71,20 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 border-b bg-background/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center gap-4 flex-1">
-            <div className="md:hidden">
+        <header className="h-16 border-b bg-background/80 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+            <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden h-9 w-9"
+                  >
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="p-0 w-64">
+                <SheetContent side="left" className="p-0 w-64 border-r-0">
                   <SidebarContent
                     role={role}
                     pathname={pathname}
@@ -89,13 +93,18 @@ export default function DashboardLayout({
                 </SheetContent>
               </Sheet>
             </div>
-            <div className="relative max-w-sm w-full">
+            <div className="relative max-w-sm w-full hidden xs:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
               <input
                 type="search"
                 placeholder="Search..."
                 className="w-full bg-muted/30 border border-transparent focus:bg-background focus:border-primary/20 pl-10 pr-4 py-2 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/5"
               />
+            </div>
+            <div className="xs:hidden">
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Search className="h-5 w-5 text-muted-foreground/60" />
+              </Button>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -106,7 +115,7 @@ export default function DashboardLayout({
             </div>
           </div>
         </header>
-        <main className="p-8">{children}</main>
+        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
         <ChatBot />
       </div>
     </div>
@@ -115,7 +124,7 @@ export default function DashboardLayout({
 function SidebarContent({ role, pathname, sidebarItems }: any) {
   return (
     <div className="flex flex-col h-full">
-      <div className="p-8">
+      <div className="p-6">
         <div className="flex items-center gap-2 mb-1 justify-center">
           <div className="relative w-8 h-8">
             <Image

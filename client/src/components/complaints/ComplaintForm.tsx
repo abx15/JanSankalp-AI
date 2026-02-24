@@ -201,16 +201,16 @@ export default function ComplaintForm() {
 
   if (!session) {
     return (
-      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden p-8 text-center transition-all">
+      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-t-4 border-t-primary overflow-hidden p-4 sm:p-6 md:p-8 text-center transition-all">
         <CardContent className="space-y-6 pt-6">
           <motion.div
-            className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Landmark className="w-10 h-10" />
+            <Landmark className="w-8 h-8 sm:w-10 sm:h-10" />
           </motion.div>
-          <h2 className="text-2xl font-bold uppercase tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-tight">
             Please Login to Report
           </h2>
           <p className="text-muted-foreground max-w-sm mx-auto">
@@ -218,11 +218,11 @@ export default function ComplaintForm() {
             <span className="text-primary font-bold">Reward System</span>, you
             must be signed in.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Button asChild className="px-8 rounded-full">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Button asChild className="px-6 sm:px-8 rounded-full text-sm sm:text-base">
               <Link href="/auth/signin">Sign In</Link>
             </Button>
-            <Button variant="outline" asChild className="px-8 rounded-full">
+            <Button variant="outline" asChild className="px-6 sm:px-8 rounded-full text-sm sm:text-base">
               <Link href="/auth/signup">Sign Up</Link>
             </Button>
           </div>

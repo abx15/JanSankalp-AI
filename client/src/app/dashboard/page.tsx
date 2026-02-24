@@ -301,27 +301,27 @@ function AdminDashboard({
       />
 
       {/* Header & Quick Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6 mb-8 sm:mb-12">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">
             Operations Command
           </h2>
           <p className="text-slate-500 font-medium">
             Real-time administrative oversight and civic intelligence.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <Button
             onClick={refresh}
             variant="outline"
-            className="rounded-xl h-11 px-5 border-border font-semibold gap-2 hover:bg-muted transition-all active:scale-95"
+            className="rounded-xl h-10 sm:h-11 px-4 sm:px-5 border-border font-semibold gap-2 hover:bg-muted transition-all active:scale-95 text-sm sm:text-base"
           >
             <History className="w-4 h-4" /> Refresh
           </Button>
           {role === "ADMIN" && (
             <Button
               variant="secondary"
-              className="rounded-xl h-11 px-5 font-semibold gap-2 transition-all active:scale-95"
+              className="rounded-xl h-10 sm:h-11 px-4 sm:px-5 font-semibold gap-2 transition-all active:scale-95 text-sm sm:text-base"
               asChild
             >
               <Link href="/dashboard/admin">
@@ -330,7 +330,7 @@ function AdminDashboard({
             </Button>
           )}
           <Button
-            className="rounded-xl h-11 px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 shadow-soft transition-all active:scale-95"
+            className="rounded-xl h-10 sm:h-11 px-4 sm:px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 shadow-soft transition-all active:scale-95 text-sm sm:text-base"
             asChild
           >
             <Link href="/dashboard/complaints">
@@ -341,11 +341,11 @@ function AdminDashboard({
       </div>
 
       {/* Primary Stats */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8 sm:mb-12">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="p-8 rounded-[2rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden"
+            className="p-4 sm:p-6 lg:p-8 rounded-[2rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-6">
               <div

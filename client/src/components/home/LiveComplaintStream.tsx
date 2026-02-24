@@ -52,10 +52,10 @@ export const LiveComplaintStream = () => {
   return (
     <>
       {/* TOGGLE BUTTON */}
-      <div className="fixed bottom-6 left-6 z-[101] pointer-events-auto">
+      <div className="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-[101] pointer-events-auto">
         <button
           onClick={() => setShowStream(!showStream)}
-          className={`flex items-center gap-2 px-5 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shadow-2xl ${
+          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-3 rounded-full font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all shadow-2xl ${
             showStream
               ? "bg-foreground text-background border border-border/10"
               : "bg-background text-foreground border border-border"
@@ -79,10 +79,10 @@ export const LiveComplaintStream = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-20 right-6 md:top-24 md:right-6 md:bottom-auto z-[100] w-[calc(100%-3rem)] md:w-full md:max-w-[320px] pointer-events-none"
+            className="fixed bottom-16 sm:bottom-20 right-4 sm:right-6 md:top-24 md:right-6 md:bottom-auto z-[100] w-[calc(100%-2rem)] sm:w-[calc(100%-2.5rem)] md:w-full md:max-w-[320px] pointer-events-none"
           >
             <div className="flex flex-col gap-3">
-              <div className="bg-card/90 backdrop-blur-xl p-3 rounded-2xl border border-border shadow-2xl mb-2 pointer-events-auto hidden md:block">
+              <div className="bg-card/90 backdrop-blur-xl p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-border shadow-2xl mb-2 pointer-events-auto hidden md:block">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
@@ -112,7 +112,7 @@ export const LiveComplaintStream = () => {
                       transition: { duration: 0.2 },
                     }}
                     layout
-                    className="bg-card/95 backdrop-blur-md p-4 rounded-2xl border border-border shadow-xl pointer-events-auto group relative overflow-hidden"
+                    className="bg-card/95 backdrop-blur-md p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border shadow-xl pointer-events-auto group relative overflow-hidden"
                   >
                     {/* Progress Bar Background */}
                     {c.status !== "Resolved" && (
@@ -125,7 +125,7 @@ export const LiveComplaintStream = () => {
                     )}
 
                     <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 border border-border group-hover:bg-primary/5 transition-colors">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-muted/50 flex items-center justify-center shrink-0 border border-border group-hover:bg-primary/5 transition-colors">
                         {CATEGORY_ICONS[c.category]}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -167,7 +167,7 @@ export const LiveComplaintStream = () => {
               </AnimatePresence>
 
               {complaints.length === 0 && (
-                <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-dashed border-slate-200 text-center">
+                <div className="bg-white/50 backdrop-blur-sm p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-dashed border-slate-200 text-center">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     Awaiting Uplink...
                   </span>

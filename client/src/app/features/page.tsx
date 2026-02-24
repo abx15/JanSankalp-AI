@@ -200,14 +200,14 @@ const BENEFITS_BY_USER = [
 
 export default function FeaturesPage() {
   return (
-    <main className="min-h-screen bg-background pt-32 pb-20">
+    <main className="min-h-screen bg-background pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-16 sm:pb-18 md:pb-20 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="px-6 mb-32">
+      <section className="px-3 sm:px-4 md:px-6 lg:px-8 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-6"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-semibold mb-4 sm:mb-6"
           >
             <Landmark className="w-4 h-4" />
             Platform Features
@@ -217,7 +217,7 @@ export default function FeaturesPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black mb-8 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight"
           >
             Powerful Features for{" "}
             <span className="text-primary italic">Smart Governance</span>
@@ -227,7 +227,7 @@ export default function FeaturesPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-full sm:max-w-3xl mx-auto leading-relaxed"
           >
             AI-powered tools that make civic engagement faster, smarter, and
             more accessible for everyone.
@@ -236,9 +236,9 @@ export default function FeaturesPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="px-6 mb-32">
+      <section className="px-3 sm:px-4 md:px-6 lg:px-8 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {FEATURES.map((feature, i) => (
               <FeatureCard
                 key={feature.title}
@@ -255,19 +255,19 @@ export default function FeaturesPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="px-6 mb-32 bg-muted/30 py-24">
+      <section className="px-3 sm:px-4 md:px-6 lg:px-8 mb-16 sm:mb-20 md:mb-24 lg:mb-32 bg-muted/30 py-16 sm:py-20 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">
+          <div className="text-center mb-12 sm:mb-14 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
               Real-World Use Cases
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-full sm:max-w-3xl mx-auto">
               See how JanSankalp AI transforms civic engagement in everyday
               scenarios.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {USE_CASES.map((useCase, i) => (
               <motion.div
                 key={useCase.title}
@@ -275,10 +275,10 @@ export default function FeaturesPage() {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-8 rounded-[2rem] bg-card border hover:border-primary/30 transition-all shadow-xl"
+                className="p-4 sm:p-6 md:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-card border hover:border-primary/30 transition-all shadow-xl"
               >
-                <div className="text-5xl mb-4">{useCase.icon}</div>
-                <h3 className="text-2xl font-bold mb-4">{useCase.title}</h3>
+                <div className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4">{useCase.icon}</div>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">{useCase.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {useCase.scenario}
                 </p>
@@ -289,18 +289,18 @@ export default function FeaturesPage() {
       </section>
 
       {/* Benefits by User Type */}
-      <section className="px-6 mb-32">
+      <section className="px-3 sm:px-4 md:px-6 lg:px-8 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">
+          <div className="text-center mb-12 sm:mb-14 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
               Benefits for Everyone
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-full sm:max-w-3xl mx-auto">
               Designed to serve citizens, officers, and administrators equally.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {BENEFITS_BY_USER.map((userType, i) => (
               <motion.div
                 key={userType.role}
@@ -308,12 +308,12 @@ export default function FeaturesPage() {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-8 rounded-[2rem] bg-card border-2 border-primary/20 shadow-xl"
+                className="p-4 sm:p-6 md:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-card border-2 border-primary/20 shadow-xl"
               >
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-                  <userType.icon className="w-8 h-8" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 sm:mb-6">
+                  <userType.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
                 </div>
-                <h3 className="text-2xl font-bold mb-6">{userType.role}</h3>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">{userType.role}</h3>
                 <ul className="space-y-3">
                   {userType.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3">
@@ -329,26 +329,26 @@ export default function FeaturesPage() {
       </section>
 
       {/* Before/After Comparison */}
-      <section className="px-6 mb-20 bg-slate-950 text-white py-24">
+      <section className="px-3 sm:px-4 md:px-6 lg:px-8 mb-16 sm:mb-18 md:mb-20 bg-slate-950 text-white py-16 sm:py-20 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">
+          <div className="text-center mb-12 sm:mb-14 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
               Before vs After JanSankalp AI
             </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-full sm:max-w-3xl mx-auto">
               The transformation in civic complaint resolution.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {/* Before */}
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
-              className="p-8 rounded-2xl bg-slate-900 border border-red-500/30"
+              className="p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl bg-slate-900 border border-red-500/30"
             >
-              <h3 className="text-2xl font-bold mb-6 text-red-400">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-red-400">
                 ✗ Before (Traditional System)
               </h3>
               <ul className="space-y-4">
@@ -377,9 +377,9 @@ export default function FeaturesPage() {
               initial={{ x: 20, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
-              className="p-8 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 border border-green-400/30"
+              className="p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 border border-green-400/30"
             >
-              <h3 className="text-2xl font-bold mb-6 text-white">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-white">
                 ✓ After (JanSankalp AI)
               </h3>
               <ul className="space-y-4">

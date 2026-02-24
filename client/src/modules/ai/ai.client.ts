@@ -7,7 +7,10 @@ export class AIClient {
     private _openai?: OpenAI;
 
     constructor() {
-        this.baseUrl = env.AI_SERVICE_URL;
+        // For Docker: Use internal service name, fallback to localhost for dev
+        this.baseUrl = process.env.NEXT_PUBLIC_AI_ENGINE_URL || 
+                      process.env.AI_SERVICE_URL || 
+                      (process.env.NODE_ENV === 'production' ? 'http://ai-engine:10000' : 'http://localhost:10000');
     }
 
     private getOpenAI() {
