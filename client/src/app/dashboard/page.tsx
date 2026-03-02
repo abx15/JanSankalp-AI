@@ -446,7 +446,8 @@ function AdminDashboard({
         </div>
       </div>
 
-        {/* Priority Triage Feed */}
+      {/* Priority Triage Feed */}
+      <div className="grid gap-8 lg:grid-cols-7">
         <div className="lg:col-span-3">
           <div className="rounded-[2.5rem] bg-card border border-border shadow-soft overflow-hidden h-full flex flex-col">
             <div className="p-8 bg-muted/30 border-b border-border">
