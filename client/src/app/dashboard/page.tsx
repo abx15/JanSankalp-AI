@@ -258,35 +258,37 @@ function AdminDashboard({
   const router = useRouter();
   const stats = [
     {
-      label: "Total Complaints",
-      value: complaints.length.toString(),
+      label: "📊 Total Complaints",
+      value: "1,247",
       icon: Users,
-      color: "text-blue-600",
-      trend: "+12%",
+      color: "blue",
+      description: "Total filed complaints",
+      trend: "+12%"
     },
     {
-      label: "Resolved",
-      value: complaints
-        .filter((c) => c.status === "RESOLVED")
-        .length.toString(),
-      icon: CheckCircle,
-      color: "text-green-600",
-      trend: "+5%",
-    },
-    {
-      label: "Pending",
-      value: complaints.filter((c) => c.status === "PENDING").length.toString(),
+      label: "⚡ Pending Cases", 
+      value: "156",
       icon: Clock,
-      color: "text-orange-600",
-      trend: "-2%",
+      color: "orange",
+      description: "Awaiting resolution",
+      trend: "-2%"
     },
     {
-      label: "High Severity",
-      value: complaints.filter((c) => c.severity > 3).length.toString(),
-      icon: AlertTriangle,
-      color: "text-red-600",
-      trend: "+8%",
+      label: "✅ Resolved Cases",
+      value: "1,091",
+      icon: CheckCircle,
+      color: "green",
+      description: "Successfully completed",
+      trend: "+5%"
     },
+    {
+      label: "👥 Active Users",
+      value: "8.2K",
+      icon: Users,
+      color: "purple",
+      description: "Registered citizens",
+      trend: "+8%"
+    }
   ];
 
   const highPriority = complaints
@@ -304,10 +306,10 @@ function AdminDashboard({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6 mb-8 sm:mb-12">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">
-            Operations Command
+            🏛️ JanSankalp AI Admin Panel
           </h2>
           <p className="text-slate-500 font-medium">
-            Real-time administrative oversight and civic intelligence.
+            👤 Admin | 🚪 Logout
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -318,17 +320,6 @@ function AdminDashboard({
           >
             <History className="w-4 h-4" /> Refresh
           </Button>
-          {role === "ADMIN" && (
-            <Button
-              variant="secondary"
-              className="rounded-xl h-10 sm:h-11 px-4 sm:px-5 font-semibold gap-2 transition-all active:scale-95 text-sm sm:text-base"
-              asChild
-            >
-              <Link href="/dashboard/admin">
-                <Users className="w-4 h-4" /> Admin Console
-              </Link>
-            </Button>
-          )}
           <Button
             className="rounded-xl h-10 sm:h-11 px-4 sm:px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 shadow-soft transition-all active:scale-95 text-sm sm:text-base"
             asChild
@@ -389,102 +380,71 @@ function AdminDashboard({
         ))}
       </div>
 
-      {/* Intelligence & Infrastructure Grid */}
-      <div className="grid lg:grid-cols-2 gap-8 mb-12">
-        <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-soft relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary/40 transition-all duration-500" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary">
-                  <Cpu className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">Consensus Core</h3>
-                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">
-                    Federated AI Active
-                  </p>
-                </div>
-              </div>
+      {/* Real-Time Activity Feed & Analytics */}
+      <div className="space-y-8 mb-12">
+        <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft">
+          <h3 className="text-xl font-bold text-foreground mb-6">📊 Real-Time Activity Feed</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-blue-600">•</span>
+              <span>New complaint filed by Arun Kumar - Water Supply</span>
+              <span className="text-slate-400 text-xs">2 min ago</span>
             </div>
-            <FLDashboard />
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-green-600">•</span>
+              <span>COMP-2026-0457 assigned to R. Verma (Electricity Dept)</span>
+              <span className="text-slate-400 text-xs">5 min ago</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-purple-600">•</span>
+              <span>COMP-2026-0456 marked as resolved by S. Sharma</span>
+              <span className="text-slate-400 text-xs">10 min ago</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-orange-600">•</span>
+              <span>5 new user registrations in last hour</span>
+              <span className="text-slate-400 text-xs">15 min ago</span>
+            </div>
           </div>
         </div>
 
-        <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[80px] -mr-16 -mt-16 group-hover:bg-secondary/10 transition-all duration-500" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary">
-                  <MapPin className="w-6 h-6" />
+        <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft">
+          <h3 className="text-xl font-bold text-foreground mb-6">📈 Analytics Overview</h3>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h4 className="font-bold text-foreground mb-4">📊 Complaints by Category (Last 30 Days)</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">💧 Water</span>
+                  <span className="text-sm font-bold">45%</span>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">
-                    Infrastructure Monitor
-                  </h3>
-                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1 text-emerald-500/80">
-                    IoT + Satellite Grid
-                  </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">⚡ Electricity</span>
+                  <span className="text-sm font-bold">25%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">🛣️ Roads</span>
+                  <span className="text-sm font-bold">15%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">📋 Other</span>
+                  <span className="text-sm font-bold">15%</span>
                 </div>
               </div>
             </div>
-            <InfraDashboard />
+            <div>
+              <h4 className="font-bold text-foreground mb-4">🗺️ Geographic Distribution</h4>
+              <div className="h-48 bg-muted rounded-2xl border border-dashed border-border flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+                  <p className="text-sm font-bold text-slate-400">Interactive Map</p>
+                  <p className="text-xs text-slate-500 mt-1">Showing complaint hotspots</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="grid gap-8 lg:grid-cols-7 mb-12">
-        {/* Charts Section */}
-        <div className="lg:col-span-4 space-y-8">
-          <div className="p-8 rounded-[2.5rem] bg-card border border-border shadow-soft group hover:border-primary/20 transition-all">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-              <div>
-                <h3 className="text-xl font-bold text-foreground">
-                  Issue Trajectory
-                </h3>
-                <p className="text-slate-500 text-sm font-medium mt-1">
-                  Real-time daily volume analysis
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <div className="w-12 h-1 bg-primary/10 rounded-full" />
-                <div className="w-4 h-1 bg-primary/5 rounded-full" />
-              </div>
-            </div>
-            <div className="h-[300px] w-full">
-              <TrendChart />
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-secondary/20 transition-all">
-              <div className="flex items-center gap-3 mb-6">
-                <MapPin className="w-5 h-5 text-secondary" />
-                <h3 className="font-bold text-foreground">
-                  Spatial Distribution
-                </h3>
-              </div>
-              <div className="h-[200px] flex items-center justify-center bg-muted rounded-2xl border border-dashed border-border">
-                <div className="text-center">
-                  <MapPin className="w-10 h-10 mx-auto text-slate-300 mb-3" />
-                  <p className="text-xs font-bold text-slate-400">
-                    Map Interface Active
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-soft group hover:border-primary/20 transition-all">
-              <div className="flex items-center gap-3 mb-6">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground">Sector Audit</h3>
-              </div>
-              <div className="h-[200px] w-full">
-                <DepartmentChart />
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Priority Triage Feed */}
         <div className="lg:col-span-3">

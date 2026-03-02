@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logojansanklp.png" alt="JanSankalp AI Logo" width="180" />
+  <img src="client/public/logojansanklp.png" alt="JanSankalp AI Logo" width="180" />
 
 # 🇮🇳 JanSankalp AI — Smart Civic Governance Platform
 
