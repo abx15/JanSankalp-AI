@@ -75,7 +75,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             <div className="lg:hidden">
               <Sheet>
-                <SheetTrigger asChild>
+                <SheetTrigger>
                   <Button
                     variant="ghost"
                     size="icon"
