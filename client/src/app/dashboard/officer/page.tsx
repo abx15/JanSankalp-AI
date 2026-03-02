@@ -87,7 +87,7 @@ export default function OfficerDashboard() {
               👮‍♂️ Officer Portal - {session?.user?.name || "Officer"}
             </h1>
             <p className="text-slate-500 font-medium mt-2">
-              🏢 {session?.user?.department || "Water Department"} | On Duty
+              🏢 Water Department | On Duty
             </p>
           </div>
           <div className="flex gap-3">
