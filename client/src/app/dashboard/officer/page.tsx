@@ -18,7 +18,8 @@ import {
   Calendar,
   Target,
   Eye,
-  Play
+  Play,
+  History
 } from "lucide-react";
 
 export default function OfficerDashboard() {
@@ -280,7 +281,7 @@ export default function OfficerDashboard() {
           </div>
 
           <div className="p-8 rounded-[2rem] bg-card border border-border shadow-soft">
-            <h3 className="text-xl font-bold text-foreground mb-6">🗺️ Today's Route</h3>
+            <h3 className="text-xl font-bold text-foreground mb-6">🗺️ Today&apos;s Route</h3>
             <div className="h-48 bg-muted rounded-2xl border border-dashed border-border flex items-center justify-center">
               <div className="text-center">
                 <MapPin className="w-12 h-12 mx-auto text-slate-300 mb-3" />

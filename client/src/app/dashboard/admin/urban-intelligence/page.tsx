@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -101,11 +101,7 @@ export default function UrbanIntelligencePage() {
     }
   }, [status, session, router]);
 
-  useEffect(() => {
-    loadAll();
-  }, [horizon]);
-
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     setLoading(true);
     try {
       const [f, h, i, s, d] = await Promise.all([
@@ -117,13 +113,19 @@ export default function UrbanIntelligencePage() {
       ]);
       setFailures(f);
       setHeatmap(Array.isArray(h) ? h : []);
-      setInvestments(Array.isArray(i) ? i : []);
+      setInvestments(i);
       setSustainability(s);
-      setDistricts(Array.isArray(d) ? d : []);
+      setDistricts(d);
+    } catch (error) {
+      console.error("Failed to load urban intelligence data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [horizon]);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   if (status === "loading" || loading) {
     return (
