@@ -59,13 +59,21 @@ export function ChatBot() {
 
     try {
       // Call our FastAPI backend
-      const response = await fetch("http://localhost:8000/chat", {
+      const aiEndpoint =
+        process.env.NEXT_PUBLIC_AI_ENGINE_URL || "http://localhost:10000";
+      const response = await fetch(`${aiEndpoint}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: input,
-          history: messages.filter(m => m.role !== "assistant" || m.content !== "Namaste! I am JanSankalp AI. How can I help you regarding civic issues or governance today?")
-                     .map(m => ({ role: m.role, content: m.content }))
+          history: messages
+            .filter(
+              (m) =>
+                m.role !== "assistant" ||
+                m.content !==
+                  "Namaste! I am JanSankalp AI. How can I help you regarding civic issues or governance today?",
+            )
+            .map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -93,7 +101,8 @@ export function ChatBot() {
         ...prev,
         {
           role: "assistant",
-          content: "I'm having trouble connecting to my AI services. I can still help you with basic information about filing complaints, tracking status, and our services. What would you like to know?",
+          content:
+            "I'm having trouble connecting to my AI services. I can still help you with basic information about filing complaints, tracking status, and our services. What would you like to know?",
         },
       ]);
     } finally {

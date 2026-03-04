@@ -78,6 +78,9 @@ seed.json
 client/src/lib/seed*
 client/src/lib/comprehensive-seed.ts
 client/prisma/*_seed.js
+client/prisma/seed-neon.ts
+client/prisma/seed-neon.js
+client/tsconfig.seed.json
 client/prisma/fix_passwords.js
 client/prisma/verify_users.js
 standalone_seed.js
