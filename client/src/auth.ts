@@ -2,10 +2,11 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { Role } from "@prisma/client"
-import type { NextAuthConfig } from "next-auth"
 import prisma from "@/lib/prisma"
+import { authConfig } from "./auth.config"
 
-const config: NextAuthConfig = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
+    ...authConfig,
     providers: [
         Credentials({
             name: "Credentials",
@@ -48,59 +49,32 @@ const config: NextAuthConfig = {
             },
         }),
     ],
-    session: {
-        strategy: "jwt",
-        maxAge: 24 * 60 * 60,
-    },
     callbacks: {
-        async session({ session, token }) {
-            if (session.user) {
-                session.user.role = token.role as Role;
-                session.user.id = token.id as string;
-                session.user.points = token.points as number;
-                session.user.stateId = token.stateId as string | undefined;
-                session.user.districtId = token.districtId as string | undefined;
-                session.user.cityId = token.cityId as string | undefined;
-                session.user.wardId = token.wardId as string | undefined;
-            }
-            return session;
-        },
-        async jwt({ token, user }) {
-            if (user) {
-                token.role = (user as any).role;
-                token.id = user.id;
-                token.points = (user as any).points;
-                token.stateId = (user as any).stateId;
-                token.districtId = (user as any).districtId;
-                token.cityId = (user as any).cityId;
-                token.wardId = (user as any).wardId;
+        ...authConfig.callbacks,
+        async jwt({ token, user, account, profile, trigger, session }) {
+            let baseToken = token;
+            if (authConfig.callbacks?.jwt) {
+                // @ts-ignore
+                baseToken = await authConfig.callbacks.jwt({ token, user, account, profile, trigger, session });
             }
 
             // Refresh role from DB if missing
-            if (token.id && !token.role) {
+            if (baseToken.id && !baseToken.role) {
                 const dbUser = await prisma.user.findUnique({
-                    where: { id: token.id as string },
+                    where: { id: baseToken.id as string },
                     select: { role: true, points: true, stateId: true, districtId: true, cityId: true, wardId: true },
                 });
                 if (dbUser) {
-                    token.role = dbUser.role as Role;
-                    token.points = dbUser.points as number;
-                    token.stateId = dbUser.stateId;
-                    token.districtId = dbUser.districtId;
-                    token.cityId = dbUser.cityId;
-                    token.wardId = dbUser.wardId;
+                    baseToken.role = dbUser.role as Role;
+                    baseToken.points = dbUser.points as number;
+                    baseToken.stateId = dbUser.stateId;
+                    baseToken.districtId = dbUser.districtId;
+                    baseToken.cityId = dbUser.cityId;
+                    baseToken.wardId = dbUser.wardId;
                 }
             }
 
-            return token;
+            return baseToken;
         },
     },
-    pages: {
-        signIn: "/auth/signin",
-        error: "/auth/error",
-    },
-    secret: process.env.AUTH_SECRET,
-    trustHost: true,
-};
-
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+});

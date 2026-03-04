@@ -94,7 +94,7 @@ export function NotificationCenter({ userId }: { userId?: string }) {
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
+      <SheetTrigger>
         <Button
           variant="ghost"
           size="icon"
