@@ -32,7 +32,7 @@ const NavItem = ({
       "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
       active
         ? "text-primary bg-primary/10 shadow-sm"
-        : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+        : "text-muted-foreground hover:text-primary hover:bg-primary/5",
     )}
   >
     {children}
@@ -61,11 +61,10 @@ export const Navbar = () => {
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full border-b",
         isScrolled
           ? "bg-white dark:bg-neutral-900 py-3 shadow-lg border-border"
-          : "bg-white/95 dark:bg-neutral-900/95 py-4 border-transparent"
+          : "bg-white/95 dark:bg-neutral-900/95 py-4 border-transparent",
       )}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-9 h-9 transition-transform group-hover:scale-105">
@@ -89,10 +88,18 @@ export const Navbar = () => {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-2">
-          <NavItem href="/" active={pathname === "/"}>Home</NavItem>
-          <NavItem href="/about" active={pathname === "/about"}>About</NavItem>
-          <NavItem href="/features" active={pathname === "/features"}>Features</NavItem>
-          <NavItem href="/how-it-works" active={pathname === "/how-it-works"}>How It Works</NavItem>
+          <NavItem href="/" active={pathname === "/"}>
+            Home
+          </NavItem>
+          <NavItem href="/about" active={pathname === "/about"}>
+            About
+          </NavItem>
+          <NavItem href="/features" active={pathname === "/features"}>
+            Features
+          </NavItem>
+          <NavItem href="/how-it-works" active={pathname === "/how-it-works"}>
+            How It Works
+          </NavItem>
           {session && (
             <NavItem href="/dashboard" active={pathname === "/dashboard"}>
               Dashboard
@@ -102,7 +109,6 @@ export const Navbar = () => {
 
         {/* Right Side */}
         <div className="flex items-center gap-3">
-
           <div className="hidden sm:flex items-center gap-3">
             <ThemeToggle />
             <div className="h-6 w-[1px] bg-border" />
@@ -127,7 +133,10 @@ export const Navbar = () => {
               <Button variant="ghost" asChild>
                 <Link href="/auth/signin">Login</Link>
               </Button>
-              <Button className="bg-primary hover:bg-primary/90 text-white" asChild>
+              <Button
+                className="bg-primary hover:bg-primary/90 text-white"
+                asChild
+              >
                 <Link href="/auth/signup">Join Now</Link>
               </Button>
             </div>
@@ -135,7 +144,7 @@ export const Navbar = () => {
 
           {/* Mobile Menu */}
           <Sheet>
-            <SheetTrigger asChild>
+            <SheetTrigger>
               <Button
                 variant="ghost"
                 size="icon"
@@ -184,7 +193,7 @@ export const Navbar = () => {
                       "text-sm font-semibold p-3 rounded-xl transition-colors",
                       pathname === item.href
                         ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-primary/5"
+                        : "text-muted-foreground hover:bg-primary/5",
                     )}
                   >
                     {item.label}
@@ -206,9 +215,7 @@ export const Navbar = () => {
                   <>
                     <div className="flex items-center gap-3 p-4 bg-muted rounded-xl">
                       <User className="w-5 h-5 text-primary" />
-                      <span className="font-semibold">
-                        {session.user.name}
-                      </span>
+                      <span className="font-semibold">{session.user.name}</span>
                     </div>
 
                     <Button
@@ -225,7 +232,10 @@ export const Navbar = () => {
                     <Button variant="outline" asChild>
                       <Link href="/auth/signin">Login</Link>
                     </Button>
-                    <Button className="bg-primary hover:bg-primary/90 text-white" asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90 text-white"
+                      asChild
+                    >
                       <Link href="/auth/signup">Join JanSankalp</Link>
                     </Button>
                   </div>

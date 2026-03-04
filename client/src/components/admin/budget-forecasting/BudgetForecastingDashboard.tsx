@@ -269,11 +269,11 @@ export default function BudgetForecastingDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState("MONTHLY");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchForecastData();
     fetchDemandSurgeData();
     fetchOptimizationData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPeriod, selectedDepartment]);
 
   const fetchForecastData = async () => {
