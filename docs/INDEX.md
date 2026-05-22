@@ -1,217 +1,93 @@
-# 📚 JanSankalp AI - Documentation Index
+# 📚 JanSankalp AI - Documentation Index (दस्तावेज अनुक्रमणिका)
 
 <div align="center">
   <img src="../public/logojansanklp.png" alt="JanSankalp AI Logo" width="100" />
   
-  **Complete Documentation Index**
+  **Complete Bilingual Documentation Index | संपूर्ण द्विभाषी दस्तावेज अनुक्रमणिका**
   
-  _Quick Navigation · All Resources · One Place_
+  _Quick Navigation · All verified resources in one place_
 </div>
 
 ---
 
-## 🚀 Getting Started (नए उपयोगकर्ताओं के लिए)
+## 🚀 Getting Started (शुरुआत करें)
 
-### 📋 Installation & Setup
-- **[📋 Complete Setup Guide](guides/setup.md)** - पूरी installation guide (हिंदी में)
-- **[🔧 Environment Configuration](guides/environment.md)** - Environment variables setup
-- **[📱 Mobile Setup](guides/setup.md#-mobile-development-setup)** - Mobile app development
+### 📋 Installation & Local Setup (स्थापना और लोकल सेटअप)
+* **[📋 Setup Guide / सेटअप गाइड](guides/setup.md)** - complete step-by-step setup in English & Hindi (पूरी सेटअप प्रक्रिया हिंदी में)
+* **[🔧 Environment Variables / एनवायरनमेंट वेरिएबल्स](guides/environment.md)** - full list of backend & frontend environment keys
+* **[🔐 OTP & Resend Setup / ओटीपी ईमेल सेटअप](guides/otp-email-setup.md)** - SMS and email gateway parameters
 
-### 🏃‍♂️ Quick Links
-- **[🏠 Main Project README](../README.md)** - Project overview & quick start
-- **[📊 Project Overview](project-overview.md)** - Detailed project vision
-- **[📞 Contact & Support](contact.md)** - Help and support center
+### 🏃‍♂️ Quick Links (त्वरित लिंक)
+* **[🏠 Project Root README / मुख्य रीडमी](../../README.md)** - system overview & local starting commands
+* **[📊 Product Overview / उत्पाद का अवलोकन](project-overview.md)** - detailed vision, target metrics, and community impact
+* **[📞 Help & Support / सहायता केंद्र](contact.md)** - contact directories and municipal support lines
 
 ---
 
-## 👥 User Guides (सभी उपयोगकर्ताओं के लिए)
+## 👥 User Guides by Role (भूमिका के अनुसार यूजर मैनुअल)
 
 ### 👤 Citizens (नागरिक गाइड)
-- **[👤 Complete Citizen Guide](guides/citizen-guide.md)** - शिकायत दर्ज करने की पूरी प्रक्रिया
-- **📝 How to File Complaint** - Step-by-step complaint filing
-- **📊 Track Your Complaint** - Status tracking
-- **💬 Communicate with Officers** - Officer से बातचीत
+* **[👤 Citizen User Manual / नागरिक गाइड](guides/citizen-guide.md)**:
+  - Filing complaints with photo evidence (शिकायत दर्ज करना)
+  - Live status tracking (शिकायत की स्थिति ट्रैक करना)
+  - Messaging assigned officers (अधिकारी से चैट करना)
 
 ### 👮 Officers (अधिकारी गाइड)
-- **[👮 Complete Officer Guide](guides/officer-guide.md)** - Officer कामकाज गाइड
-- **📋 Case Management** - Complaint management
-- **🔍 Investigation Process** - Investigation और resolution
-- **📊 Performance Metrics** - Performance tracking
+* **[👮 Officer Operations Manual / अधिकारी गाइड](guides/officer-guide.md)**:
+  - Complaint queue management (शिकायत प्रबंधन)
+  - Geographic task clustering (भौगोलिक रूट प्लानिंग)
+  - Before/after photo resolution upload (समाधान फोटो अपलोड करना)
 
 ### 👨‍💼 Administrators (व्यवस्थापक गाइड)
-- **[👨‍💼 Complete Admin Guide](guides/admin-guide.md)** - System administration
-- **👥 User Management** - User और role management
-- **📊 System Analytics** - Analytics और reporting
-- **🔐 Security Management** - Security और compliance
+* **[👨‍💼 Admin Operations Manual / एडमिन गाइड](guides/admin-guide.md)**:
+  - Multi-tenant role assignments (भूमिका असाइनमेंट)
+  - System performance analytics dashboard (सिस्टम एनालिटिक्स)
+  - Audits and GDPR/IT-Act compliance controls (सुरक्षा ऑडिट)
 
 ---
 
-## 🏗️ Technical Documentation (तकनीकी दस्तावेज)
+## 🏗️ Technical & Architecture Docs (तकनीकी एवं आर्किटेक्चर दस्तावेज)
 
-### 🏗️ Technical Documentation
-- **[📊 System Architecture](architecture/system-overview.md)** - Complete technical architecture
-- **[🗄️ Database Schema](architecture/database-schema.md)** - Complete database design & relationships
-- **[🌐 IoT Integration](architecture/IOT_ARCHITECTURE.md)** - IoT sensors & streaming setup
-- **[🔌 API Documentation](api/README.md)** - Complete REST API reference
-- **[🔐 Security Guidelines](architecture/security-guidelines.md)** - Complete security architecture
+### 🏗️ Design & Schema (डिजाइन और डेटाबेस)
+* **[📊 System Architecture / सिस्टम आर्किटेक्चर](architecture/system-overview.md)** - service communication flow
+* **[🧬 Database Schema Fields / डेटाबेस फ़ील्ड](architecture/database-schema.md)** - full PostgreSQL table definitions and foreign keys
+* **[📐 Design Patterns & Core Design / कोर डिजाइन और पैटर्न्स](architecture/system-design.md)** - deep dive into MVDC architecture
 
-### 🔌 API Documentation
-- **[🔌 Complete API Reference](api/README.md)** - REST API documentation
-- **[📝 API Overview](api/overview.md)** - API basics
-- **🔐 Authentication API](api/README.md#-authentication-apis)** - Auth endpoints
-- **📝 Complaint APIs](api/README.md#-complaint-management-apis)** - Complaint management
-
-### 🗄️ Database & Data
-- **[🗄️ Database Schema](../archive/DATABASE_SCHEMA.md)** - Database design
-- **[📊 Data Flow](architecture/system-overview.md#-data-flow-architecture)** - Data pipeline
-- **[🔄 Real-time Streaming](architecture/system-overview.md#-real-time-data-flow)** - Kafka streaming
+### 🧠 Advanced Core Systems (उन्नत प्रणालियां)
+* **[🌐 IoT Ecosystem & Streaming / आईओटी आर्किटेक्चर](architecture/iot-architecture.md)** - telemetry data and real-time Kafka messaging pipelines
+* **[🤖 Federated Learning / गोपनीयता-संरक्षित एआई](architecture/system-design.md#federated-learning-privacy-preserving-ml)** - localized edge training for municipal departments
+* **[🔐 Role-Based Access Control (RBAC) / सुरक्षा दिशानिर्देश](architecture/security-guidelines.md)** - comprehensive platform security checklist
 
 ---
 
-## 🚀 Deployment & Operations (डिप्लॉयमेंट)
+## 🔌 API Documentation (एपिआई दस्तावेज)
 
-#### 🐳 Docker & Containerization
-- **[🚀 Complete Deployment Guide](deployment/complete-guide.md)** - Production deployment guide
-- **[🐳 Docker Setup](guides/setup.md#-docker-setup-recommended)** - Docker deployment
-- **[🌐 Production Deployment](deployment/complete-guide.md#-cloud-deployment)** - Cloud deployment guide
-- **[⚙️ Environment Setup](guides/environment.md)** - Production configuration
+* **[🔌 API Gateway Reference / एपिआई संदर्भ](api/README.md)** - complete backend routing structure (REST & Real-time)
+* **[📝 Core Endpoint Details / एपिआई विवरण](api/overview.md)** - payloads, responses, and token formats
 
-#### 🔄 CI/CD & DevOps
-- **[🔄 CI/CD Pipeline](deployment/complete-guide.md#-cicd-pipeline)** - GitHub Actions
-- **[📊 Monitoring Setup](deployment/complete-guide.md#-monitoring--logging)** - Monitoring
-- **[🔧 Performance Optimization](deployment/complete-guide.md#-performance-optimization)** - Performance
+---
+
+## 🚀 Production Deployments (उत्पादन परिनियोजन)
+
+* **[🚀 Production Deployment Guide / उत्पादन गाइड](deployment/complete-guide.md)** - complete deployment guide for Render and Vercel
+* **[🌐 Deployment Overview / डिप्लॉयमेंट का संक्षिप्त विवरण](deployment/overview.md)** - overview of architecture environments
 
 ---
 
 ## 🔧 Troubleshooting & Support (समस्या निवारण)
 
-### 🔧 Common Issues
-- **[🔧 Troubleshooting Guide](troubleshooting/overview.md)** - Common problems
-- **[📱 Setup Issues](guides/setup.md#-troubleshooting)** - Installation problems
-- **[🔐 Authentication Issues](guides/otp-email-setup.md)** - OTP और login issues
-
-### 📞 Help & Support
-- **[📞 Contact Center](contact.md)** - Complete support directory
-- **[🆘 Emergency Contacts](contact.md#-emergency-support)** - Emergency support
-- **[💬 Community Support](contact.md#-community-engagement)** - Community help
+* **[🔧 FAQ & Troubleshooting Hub / समस्या समाधान](troubleshooting/overview.md)** - instructions for port mismatches, database locks, and setup errors
 
 ---
 
-## 📚 Additional Resources (अतिरिक्त संसाधन)
+## 👨‍💻 Quick Developer Navigation (डेवलपर के लिए त्वरित संदर्भ)
 
-### 📋 Legacy Documentation
-- **[📁 Original Docs](../docs/)** - Purane documentation (archived)
-- **[📊 Archive](archive/)** - Historical documents
-
-### 🌐 External Resources
-- **[🐙 GitHub Repository](https://github.com/abx15/JanSankalp-AI)** - Source code
-- **[📧 Email Support](mailto:support@jansankalp.gov.in)** - Direct support
-- **[📱 WhatsApp Support](contact.md#-digital-support)** - WhatsApp help
-
----
-
-## 🎯 Quick Navigation by Role (भूमिका के अनुसार नेविगेशन)
-
-### 👨‍💼 मैं Administrator हूं
-1. **[👨‍💼 Admin Guide](guides/admin-guide.md)** - Start here
-2. **[👥 User Management](guides/admin-guide.md#-user-management)** - Add users
-3. **[📊 Analytics](guides/admin-guide.md#-analytics-and-reporting)** - View analytics
-4. **[🔐 Security](guides/admin-guide.md#-security-and-compliance)** - Security setup
-
-### 👮 मैं Officer हूं
-1. **[👮 Officer Guide](guides/officer-guide.md)** - Start here
-2. **[📋 Case Management](guides/officer-guide.md#-complaint-management)** - Handle complaints
-3. **[📊 Performance](guides/officer-guide.md#-performance-analytics)** - Track performance
-4. **[💬 Communication](guides/officer-guide.md#-communicating-with-citizens)** - Citizen communication
-
-### 👤 मैं Citizen हूं
-1. **[👤 Citizen Guide](guides/citizen-guide.md)** - Start here
-2. **[📝 File Complaint](guides/citizen-guide.md#-filing-a-complaint)** - Register complaint
-3. **[📊 Track Status](guides/citizen-guide.md#-tracking-your-complaints)** - Track progress
-4. **[📞 Get Help](guides/citizen-guide.md#-help-and-support)** - Need help
-
-### 👨‍💻 मैं Developer हूं
-1. **[📋 Setup Guide](guides/setup.md)** - Development setup
-2. **[🔌 API Documentation](api/README.md)** - API reference
-3. **[📊 Architecture](architecture/system-overview.md)** - System design
-4. **[🚀 Deployment](deployment/overview.md)** - Deployment guide
-
----
-
-## 📖 Documentation in Hindi (हिंदी दस्तावेज)
-
-### 🚀 हिंदी गाइड्स
-- **[📋 हिंदी Setup Guide](guides/setup.md)** - हिंदी में installation
-- **[👤 हिंदी Citizen Guide](guides/citizen-guide.md)** - नागरिक गाइड (हिंदी में)
-- **[👮 हिंदी Officer Guide](guides/officer-guide.md)** - अधिकारी गाइड (हिंदी में)
-
-### 📞 हिंदी सहायता
-- **[📞 हिंदी Contact Center](contact.md)** - हिंदी में संपर्क
-- **[🔧 हिंदी Troubleshooting](troubleshooting/overview.md)** - हिंदी में समाधान
-
----
-
-## 🎯 Featured Documentation (विशेष दस्तावेज)
-
-### 🌟 Most Popular
-1. **[👤 Citizen Guide](guides/citizen-guide.md)** - Most accessed guide
-2. **[📋 Setup Guide](guides/setup.md)** - Installation help
-3. **[🔌 API Documentation](api/README.md)** - Developer reference
-4. **[📞 Contact Center](contact.md)** - Support directory
-
-### 🆕 New & Updated
-- **[👨‍💼 Admin Guide](guides/admin-guide.md)** - Recently updated
-- **[📊 System Architecture](architecture/system-overview.md)** - Enhanced with diagrams
-- **[🌐 Project Overview](project-overview.md)** - Complete rewrite
-
----
-
-## 📊 Documentation Statistics (दस्तावेज आँकड़े)
-
-| Category | Documents | Total Size | Last Updated |
-|----------|------------|------------|--------------|
-| **📚 User Guides** | 4 | 60.8 KB | Feb 21, 2026 |
-| **🏗️ Technical** | 8 | 95.4 KB | Feb 21, 2026 |
-| **🚀 Deployment** | 2 | 45.2 KB | Feb 21, 2026 |
-| **🔧 Support** | 4 | 18.9 KB | Feb 21, 2026 |
-| **📋 Total** | **18** | **220.3 KB** | **Feb 21, 2026** |
-
----
-
-## 🔍 Search Documentation (दस्तावेज खोजें)
-
-### 🎯 By Topic
-- **Complaint Management**: [Citizen Guide](guides/citizen-guide.md#-filing-a-complaint) + [Officer Guide](guides/officer-guide.md#-complaint-management)
-- **Authentication**: [Setup Guide](guides/setup.md#-environment-configuration) + [API Auth](api/README.md#-authentication-apis)
-- **Real-time Updates**: [Architecture](architecture/system-overview.md#-real-time-data-flow) + [API Streaming](api/README.md#-real-time-apis)
-- **AI Features**: [Project Overview](project-overview.md#-ai-powered-features) + [AI Engine](project-overview.md#-ai-engine-architecture)
-
-### 🔍 By Keyword
-- **Login**: [Auth Setup](guides/setup.md#-environment-configuration) + [OTP Guide](guides/otp-email-setup.md)
-- **Database**: [Schema](../archive/DATABASE_SCHEMA.md) + [Architecture](architecture/system-overview.md#-data-architecture)
-- **Docker**: [Docker Setup](guides/setup.md#-docker-setup-recommended) + [Deployment](deployment/overview.md)
-- **Mobile**: [Mobile Setup](guides/setup.md#-mobile-development-setup) + [Citizen Mobile](guides/citizen-guide.md#-mobile-app-guide)
-
----
-
-## 📞 Need Help? (मदद चाहिए?)
-
-### 🆘 Quick Help
-- **📧 Email**: support@jansankalp.gov.in
-- **📞 Phone**: 1800-123-4567 (Toll-free)
-- **💬 WhatsApp**: +91 98765 43210
-- **🌐 Website**: [jansankalp.gov.in](https://jansankalp.gov.in)
-
-### 📚 Documentation Feedback
-- **🐛 Report Issues**: [GitHub Issues](https://github.com/abx15/JanSankalp-AI/issues)
-- **💡 Suggest Improvements**: [GitHub Discussions](https://github.com/abx15/JanSankalp-AI/discussions)
-- **📧 Direct Feedback**: docs@jansankalp.gov.in
+* **[📘 Code Customization & Feature Addition Playbook / नया फ़ीचर जोड़ना](README.md#-how-to-add-a-new-feature-step-by-step)** - step-by-step developer playbook
+* **[🛡️ Code Quality & Verification Checklist / कोड सत्यापन चेकलिस्ट](README.md#-code-quality--verification-checklist)** - code checklist before staging/committing
 
 ---
 
 <div align="center">
-  <p><strong>🇮🇳 JanSankalp AI - Smart Governance for India</strong></p>
-  <p><em>यह documentation लगातार update की जा रही है</em></p>
-  <p><strong>Last Updated: February 21, 2026</strong></p>
-  <p><strong>📞 Need immediate help? Call: 1800-123-4567</strong></p>
+  <p><strong>🇮🇳 JanSankalp AI - Smart Governance for India | जनसंकल्प एआई - स्मार्ट गवर्नेंस</strong></p>
+  <p><em>यह दस्तावेज अनुक्रमणिका लगातार अद्यतित (updated) की जा रही है।</em></p>
 </div>
