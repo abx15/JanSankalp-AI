@@ -1,29 +1,30 @@
 version: '3.8'
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SIMPLE DEVELOPMENT STACK — Kafka aur Weaviate nahi hain, local dev ke liye
-# Chalane ke liye:  docker compose -f docker-compose.dev.yml up --build
+# DEVELOPMENT DOCKER COMPOSE - Complete JanSankalp AI 4-Tier Stack with Hot-Reload
+# Run with: docker compose -f docker-compose.dev.yml up --build
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
-  # ─── Next.js Frontend (Dev Mode) ───────────────────────────────────
-  client:
+  # ─── 1. Next.js Frontend (Dev Mode) ─────────────────────────────────────────
+  frontend:
     build:
-      context: ./client
+      context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: jansankalp-client-dev
+    container_name: jansankalp-frontend-dev
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3003:3000" # Bind to a dedicated dev port directly if bypassed, or via Nginx
     env_file:
-      - ./client/.env
+      - ./frontend/.env
     environment:
-      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
-      - AI_SERVICE_URL=http://server:8000
-      - NEXTAUTH_URL=http://localhost:3000
-      - KAFKA_BROKERS=localhost:9092
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - NEXT_PUBLIC_API_URL=http://localhost/api
+      - NEXT_PUBLIC_AI_URL=http://localhost/ai
+      - NEXT_PUBLIC_UTILS_URL=http://localhost/utils
+      - NODE_ENV=development
     volumes:
-      - ./client:/app
+      - ./frontend:/app
       - /app/node_modules
       - /app/.next
     depends_on:
@@ -34,24 +35,29 @@ services:
     networks:
       - jansankalp-dev-net
 
-  # ─── FastAPI AI Engine (Dev Mode) ──────────────────────────────────
-  server:
+  # ─── 2. NestJS API Gateway (Dev Mode) ───────────────────────────────────────
+  nest-api:
     build:
-      context: ./server
+      context: ./backend/nest-api
       dockerfile: Dockerfile.dev
-    container_name: jansankalp-server-dev
+    container_name: jansankalp-nest-api-dev
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "3000:3000"
     env_file:
-      - ./server/.env
+      - ./backend/nest-api/.env
     environment:
-      - DATABASE_URL=postgresql://user:jansankalp_pass@postgres:5432/jansankalp
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
-      - WEAVIATE_URL=http://localhost:8080
-      - KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
+      - JWT_SECRET=${AUTH_SECRET:-jansankalp-jwt-secret-key-2026-production}
+      - NODE_ENV=development
+      - AI_SERVICE_URL=http://fastapi-ai:10000
+      - NODE_SERVICES_URL=http://node-services:3001
     volumes:
-      - ./server:/app
+      - ./backend/nest-api:/app
+      - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,7 +66,55 @@ services:
     networks:
       - jansankalp-dev-net
 
-  # ─── PostgreSQL ─────────────────────────────────────────────────────
+  # ─── 3. FastAPI AI Engine (Dev Mode) ────────────────────────────────────────
+  fastapi-ai:
+    build:
+      context: ./backend/fastapi-ai
+      dockerfile: Dockerfile.dev
+    container_name: jansankalp-fastapi-ai-dev
+    restart: unless-stopped
+    ports:
+      - "10000:10000"
+    env_file:
+      - ./backend/fastapi-ai/.env
+    environment:
+      - PORT=10000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - REDIS_URL=redis://redis:6379
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
+      - NODE_ENV=development
+    volumes:
+      - ./backend/fastapi-ai:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - jansankalp-dev-net
+
+  # ─── 4. Express Node Services (Dev Mode) ────────────────────────────────────
+  node-services:
+    build:
+      context: ./backend/node-services
+      dockerfile: Dockerfile.dev
+    container_name: jansankalp-node-services-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/node-services/.env
+    environment:
+      - PORT=3001
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
+      - NEST_API_INTERNAL_URL=http://nest-api:3000
+    volumes:
+      - ./backend/node-services:/app
+      - /app/node_modules
+    networks:
+      - jansankalp-dev-net
+
+  # ─── PostgreSQL Database ───────────────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
     container_name: jansankalp-postgres-dev
@@ -81,7 +135,7 @@ services:
     networks:
       - jansankalp-dev-net
 
-  # ─── Redis ──────────────────────────────────────────────────────────
+  # ─── Redis Cache & BullMQ Queue ────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: jansankalp-redis-dev
@@ -93,6 +147,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - jansankalp-dev-net
+
+  # ─── Nginx Reverse Proxy Gateway ───────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: jansankalp-nginx-dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - nest-api
+      - fastapi-ai
+      - node-services
     networks:
       - jansankalp-dev-net
 
