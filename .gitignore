@@ -1,14 +1,26 @@
 # Dependencies
 node_modules/
 client/node_modules/
+frontend/node_modules/
 server/venv/
+backend/venv/
+backend/fastapi-ai/.venv/
+.venv/
+venv/
 server/__pycache__/
+backend/__pycache__/
+__pycache__/
 
 # Build outputs
 client/.next/
+frontend/.next/
+.next/
 client/build/
+frontend/build/
 client/dist/
+frontend/dist/
 client/out/
+frontend/out/
 server/__pycache__/
 *.pyc
 
@@ -19,7 +31,10 @@ server/__pycache__/
 .env.test.local
 .env.production.local
 client/.env
+frontend/.env
 server/.env
+backend/.env
+backend/fastapi-ai/.env
 
 # Logs
 logs/
@@ -32,6 +47,7 @@ pnpm-debug.log*
 # Testing
 coverage/
 client/coverage/
+frontend/coverage/
 server/coverage/
 .nyc_output/
 
@@ -55,12 +71,15 @@ Thumbs.db
 *.sqlite
 *.db
 client/prisma/generated-client/
+frontend/prisma/generated-client/
 
 # Python
 server/venv/
 server/__pycache__/
 server/*.pyc
+backend/*.pyc
 server/app/ml_models/*.pkl
+backend/app/ml_models/*.pkl
 
 # Node.js
 client/.next/
@@ -70,21 +89,32 @@ client/build/
 # Sensitive data
 LOGIN_DETAILS.md
 client/src/lib/seed-admin.ts
+frontend/src/lib/seed-admin.ts
 
 # Seeded data (keep for development)
 client/prisma/seed-data.js
+frontend/prisma/seed-data.js
 seed/
 seed.json
 client/src/lib/seed*
+frontend/src/lib/seed*
 client/src/lib/comprehensive-seed.ts
+frontend/src/lib/comprehensive-seed.ts
 client/prisma/*_seed.js
+frontend/prisma/*_seed.js
 client/prisma/seed-neon.ts
+frontend/prisma/seed-neon.ts
 client/prisma/seed-neon.js
+frontend/prisma/seed-neon.js
 client/tsconfig.seed.json
+frontend/tsconfig.seed.json
 client/prisma/fix_passwords.js
+frontend/prisma/fix_passwords.js
 client/prisma/verify_users.js
+frontend/prisma/verify_users.js
 standalone_seed.js
 client/prisma/large_seed.js
+frontend/prisma/large_seed.js
 
 # Misc
 *.pem
