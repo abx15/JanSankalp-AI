@@ -25,4 +25,4 @@ ENV PORT=8000
 EXPOSE 10000
 
 # Run with uvicorn workers for production
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "4"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "1"]
