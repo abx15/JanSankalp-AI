@@ -1,74 +1,85 @@
 version: '3.8'
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PRODUCTION DOCKER COMPOSE - Complete JanSankalp AI Stack
+# PRODUCTION DOCKER COMPOSE - Complete JanSankalp AI 4-Tier Microservice Stack
 # Run with: docker compose up --build -d
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
-  # ─── Next.js Frontend (Production) ───────────────────────────────────
-  client:
+  # ─── 1. Next.js Frontend ────────────────────────────────────────────────────
+  frontend:
     build:
-      context: ./client
+      context: ./frontend
       dockerfile: Dockerfile
-    container_name: jansankalp-client
+    container_name: jansankalp-frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "80:80" # Exposed through Nginx reverse proxy
     env_file:
-      - ./client/.env
+      - ./frontend/.env
     environment:
-      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
-      - AI_SERVICE_URL=http://server:8000
-      - NEXT_PUBLIC_AI_ENGINE_URL=http://server:8000
-      - NEXTAUTH_URL=http://localhost:3000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - NEXT_PUBLIC_API_URL=http://localhost/api
+      - NEXT_PUBLIC_AI_URL=http://localhost/ai
+      - NEXT_PUBLIC_UTILS_URL=http://localhost/utils
       - NODE_ENV=production
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GROK_API_KEY=${GROK_API_KEY}
-      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
-      - COHERE_API_KEY=${COHERE_API_KEY}
-      - ASSEMBLY_AI_API_KEY=e3fe7351ff8147db88e55dcfab61857e
-      - RESEND_API_KEY=re_2zLjYJDC_D4gKhj1B5fXtgn8VS2MaTwtd
-      - NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=public_81Hn+17o1UB5aotmt+2cQrFX2nE=
-      - IMAGEKIT_PRIVATE_KEY=private_8J3leJCTdTVkTx8KnXSev7EtIQk=
-      - NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/er7lmis3j
-      - NEXT_PUBLIC_PUSHER_APP_ID=2115011
-      - NEXT_PUBLIC_PUSHER_KEY=0c8f153ef838e56b4bfc
-      - PUSHER_SECRET=90e0124f48b1acf9d05b
-      - NEXT_PUBLIC_PUSHER_CLUSTER=ap2
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      server:
+      nest-api:
+        condition: service_started
+      fastapi-ai:
+        condition: service_healthy
+      node-services:
+        condition: service_started
+    networks:
+      - jansankalp-net
+
+  # ─── 2. NestJS API Gateway & Controller ─────────────────────────────────────
+  nest-api:
+    build:
+      context: ./backend/nest-api
+      dockerfile: Dockerfile
+    container_name: jansankalp-nest-api
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - REDIS_URL=redis://redis:6379
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
+      - JWT_SECRET=${AUTH_SECRET:-jansankalp-jwt-secret-key-2026-production}
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - jansankalp-net
 
-  # ─── FastAPI AI Engine (Production) ──────────────────────────────────
-  server:
+  # ─── 3. FastAPI Python AI/ML Engine ────────────────────────────────────────
+  fastapi-ai:
     build:
-      context: ./server
+      context: ./backend/fastapi-ai
       dockerfile: Dockerfile
-    container_name: jansankalp-server
+    container_name: jansankalp-fastapi-ai
     restart: unless-stopped
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./server/.env
     environment:
-      - DATABASE_URL=postgresql://jansankalp:jansankalp_pass@postgres:5432/jansankalp
+      - PORT=10000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
-      - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GROK_API_KEY=${GROK_API_KEY}
       - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
       - COHERE_API_KEY=${COHERE_API_KEY}
-      - ASSEMBLY_AI_API_KEY=e3fe7351ff8147db88e55dcfab61857e
+      - ASSEMBLY_AI_API_KEY=${ASSEMBLY_AI_API_KEY}
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./server/models:/app/server/models:ro  # Mount models directory
+      - ./backend/fastapi-ai/models:/app/models
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,12 +88,35 @@ services:
     networks:
       - jansankalp-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:10000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # ─── PostgreSQL Database ───────────────────────────────────────────────
+  # ─── 4. Express Node Services (Payments, Emails, Uploads) ───────────────────
+  node-services:
+    build:
+      context: ./backend/node-services
+      dockerfile: Dockerfile
+    container_name: jansankalp-node-services
+    restart: unless-stopped
+    environment:
+      - PORT=3001
+      - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
+      - NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=${NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY}
+      - IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY}
+      - NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=${NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+    networks:
+      - jansankalp-net
+
+  # ─── Infrastructure: PostgreSQL Database ───────────────────────────────────
   postgres:
     image: postgres:15-alpine
     container_name: jansankalp-postgres
@@ -104,7 +138,7 @@ services:
     networks:
       - jansankalp-net
 
-  # ─── Redis Cache & Session Store ──────────────────────────────────────
+  # ─── Infrastructure: Redis Cache & BullMQ Queue ────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: jansankalp-redis
@@ -122,7 +156,7 @@ services:
     networks:
       - jansankalp-net
 
-  # ─── Nginx Reverse Proxy (Optional) ───────────────────────────────────
+  # ─── Nginx Reverse Proxy Gateway ───────────────────────────────────────────
   nginx:
     image: nginx:alpine
     container_name: jansankalp-nginx
@@ -131,15 +165,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - client
-      - server
+      - frontend
+      - nest-api
+      - fastapi-ai
+      - node-services
     networks:
       - jansankalp-net
-    profiles:
-      - production
 
   # ─── Prometheus Monitoring ─────────────────────────────────────────────
   prometheus:
@@ -149,14 +182,11 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
     networks:
       - jansankalp-net
     profiles:
@@ -168,14 +198,12 @@ services:
     container_name: jansankalp-grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=jansankalp123
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
       - prometheus
     networks:
