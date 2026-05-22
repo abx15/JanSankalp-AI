@@ -1,0 +1,23 @@
+# ─── Dev Dockerfile for Next.js (hot-reload enabled) ────────────────
+FROM node:18-alpine
+
+RUN apk add --no-cache libc6-compat openssl
+
+WORKDIR /app
+
+ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV development
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm install --legacy-peer-deps
+
+# Copy source (overridden by volume mount in dev)
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
