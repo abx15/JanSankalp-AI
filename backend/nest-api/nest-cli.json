@@ -4,12 +4,5 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true
-  },
-  "assets": [
-    {
-      "watchAssets": true,
-      "glob": "**/*.hbs",
-      "include": ["src/modules/email/templates"]
-    }
-  ]
+  }
 }
