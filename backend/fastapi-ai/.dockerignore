@@ -1,0 +1,53 @@
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv
+env
+.venv
+.env
+.env.*
+!.env.example
+
+# Development artifacts
+*.egg-info
+dist
+build
+*.egg
+
+# Logs
+logs
+*.log
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ML model files (use Docker volumes instead)
+models/
+*.pkl
+*.h5
+*.pt
+*.ckpt

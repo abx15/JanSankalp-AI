@@ -1,0 +1,72 @@
+# FastAPI Core
+fastapi
+uvicorn
+python-dotenv
+pydantic
+httpx
+python-multipart
+loguru
+cors
+
+# AI/ML APIs (cloud-based — no heavy local installs)
+openai
+assemblyai
+cohere
+huggingface_hub
+
+# Data Processing (lightweight)
+scikit-learn
+pandas
+numpy
+scipy
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
+
+# Document Processing
+python-docx
+PyPDF2
+
+# Database & Cache
+weaviate-client
+aiokafka
+
+# Image Processing (headless — no GUI)
+opencv-python-headless
+Pillow>=9.0
+
+# NOTE: torch CPU-only version (much smaller than CUDA version)
+# CUDA version (torch) install NOT karein Docker me — 2GB+ overhead
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+torchaudio
+scikit-image
+
+# Transformers for NLP models
+transformers
+tokenizers
+datasets
+evaluate
+
+# Additional ML dependencies
+xgboost
+lightgbm
+joblib
+imbalanced-learn
+
+# Image processing enhancements
+imageio
+scikit-image
+
+# Text processing
+nltk
+spacy
+textblob
+
+# Additional utilities
+tqdm
+requests
+aiofiles
