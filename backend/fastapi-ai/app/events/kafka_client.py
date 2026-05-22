@@ -27,9 +27,9 @@ class KafkaClient:
             logger.info("Kafka Producer stopped")
 
     async def emit_event(self, topic: str, data: dict):
-        if not self.producer:
-            await self.start_producer()
         try:
+            if not self.producer:
+                await self.start_producer()
             await self.producer.send_and_wait(topic, data)
             logger.info(f"Event emitted to topic {topic}")
         except Exception as e:

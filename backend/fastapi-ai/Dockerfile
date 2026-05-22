@@ -22,7 +22,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
 # Expose port
-EXPOSE 10000
+EXPOSE 8000
 
 # Run with uvicorn workers for production
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "1"]
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

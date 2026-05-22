@@ -151,4 +151,7 @@ async def process_complaint_event(topic, data):
 
 async def start_event_processing():
     topics = ["complaint_submitted", "complaint_resolved", "sensor_telemetry", "vision_event"]
-    await kafka_client.consume_events(topics, process_complaint_event)
+    try:
+        await kafka_client.consume_events(topics, process_complaint_event)
+    except Exception as e:
+        logger.error(f"Kafka processing pipeline failed to start: {e}. Event processing disabled.")
