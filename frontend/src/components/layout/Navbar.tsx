@@ -149,6 +149,7 @@ export const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 className="md:hidden rounded-xl bg-muted border"
+                aria-label="Open Mobile Menu"
               >
                 <Menu className="w-5 h-5" />
               </Button>

@@ -8,20 +8,41 @@ import { Shield, Activity, Globe, ArrowUpRight, Zap, ChevronRight, CheckCircle2,
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ProcessFlow } from "@/components/home/ProcessFlow";
-import { AutomationEngine } from "@/components/home/AutomationEngine";
 import { Footer } from "@/components/layout/Footer";
+import dynamic from "next/dynamic";
 
 // Live Civic OS Components
 import { LiveEventProvider } from "@/context/LiveEventContext";
-import { LiveComplaintStream } from "@/components/home/LiveComplaintStream";
-import { LiveCityMap } from "@/components/home/LiveCityMap";
-import { LiveCounters } from "@/components/home/LiveCounters";
 import { TrustedPartners } from "@/components/home/TrustedPartners";
 import { ImpactStories } from "@/components/home/ImpactStories";
 import { HomeFAQ } from "@/components/home/HomeFAQ";
-import { DashboardSimulation } from "@/components/home/DashboardSimulation";
 import { NetworkSection } from "@/components/home/NetworkSection";
-import { VoicesOfJanSankalp } from "@/components/home/VoicesOfJanSankalp";
+
+// Dynamically imported heavy modules to optimize Lighthouse performance
+const LiveCityMap = dynamic(
+  () => import("@/components/home/LiveCityMap").then((mod) => mod.LiveCityMap),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-[2rem] h-[450px] w-full" /> }
+);
+const AutomationEngine = dynamic(
+  () => import("@/components/home/AutomationEngine").then((mod) => mod.AutomationEngine),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-[2rem] h-[400px] w-full" /> }
+);
+const LiveComplaintStream = dynamic(
+  () => import("@/components/home/LiveComplaintStream").then((mod) => mod.LiveComplaintStream),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-3xl h-24 w-full" /> }
+);
+const LiveCounters = dynamic(
+  () => import("@/components/home/LiveCounters").then((mod) => mod.LiveCounters),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-[2rem] h-40 w-full" /> }
+);
+const VoicesOfJanSankalp = dynamic(
+  () => import("@/components/home/VoicesOfJanSankalp").then((mod) => mod.VoicesOfJanSankalp),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-[2rem] h-[500px] w-full" /> }
+);
+const DashboardSimulation = dynamic(
+  () => import("@/components/home/DashboardSimulation").then((mod) => mod.DashboardSimulation),
+  { ssr: false, loading: () => <div className="animate-pulse bg-slate-100 dark:bg-slate-900 rounded-[2rem] h-[550px] w-full" /> }
+);
 
 const FEATURES = [
   {

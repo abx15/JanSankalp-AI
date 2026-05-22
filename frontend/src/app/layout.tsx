@@ -4,9 +4,13 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://jansanklpai.vercel.app"),
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   title: {
     default: "JanSankalp AI | Smart Governance & Public Grievance Redressal",
     template: "%s | JanSankalp AI",
