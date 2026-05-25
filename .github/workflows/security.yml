@@ -21,6 +21,7 @@ jobs:
 
       - name: Dependency Audit
         run: npm audit --audit-level=high
+        working-directory: frontend
 
       - name: Check for Secrets
         uses: gitleaks/gitleaks-action@v2

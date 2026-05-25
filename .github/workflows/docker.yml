@@ -18,8 +18,8 @@ jobs:
       - name: Build and export
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: docker/Dockerfile
+          context: ./frontend
+          file: ./frontend/Dockerfile
           push: false
           tags: jansankalp-ai:latest
           cache-from: type=gha
