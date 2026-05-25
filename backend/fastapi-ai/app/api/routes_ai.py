@@ -132,6 +132,7 @@ async def federated_analytics_endpoint():
 async def train_round_endpoint():
     """Trigger a simulated federated training round for demonstration."""
     from app.federated.coordinator import federated_coordinator
+    # pyrefly: ignore [missing-import]
     import torch
 
     sim_data = {}
@@ -317,6 +318,7 @@ async def un_global_comparison():
 
 import json
 import asyncio
+# pyrefly: ignore [missing-import]
 from fastapi.responses import StreamingResponse
 
 async def assistant_response_generator(user_id: str, message: str, role: str, context: Any = None):
