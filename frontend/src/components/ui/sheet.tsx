@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface SheetProps {
   children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const SheetContext = React.createContext<{
@@ -14,8 +16,23 @@ const SheetContext = React.createContext<{
   setOpen: (open: boolean) => void;
 } | null>(null);
 
-export function Sheet({ children }: SheetProps) {
-  const [open, setOpen] = React.useState(false);
+export function Sheet({ children, open: controlledOpen, onOpenChange }: SheetProps) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const setOpen = React.useCallback(
+    (value: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(value);
+      }
+      if (onOpenChange) {
+        onOpenChange(value);
+      }
+    },
+    [isControlled, onOpenChange]
+  );
 
   // 🔥 Prevent body scroll when open
   React.useEffect(() => {
@@ -34,7 +51,7 @@ export function Sheet({ children }: SheetProps) {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, []);
+  }, [setOpen]);
 
   return (
     <SheetContext.Provider value={{ open, setOpen }}>

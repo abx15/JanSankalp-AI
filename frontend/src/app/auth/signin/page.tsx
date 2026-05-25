@@ -25,7 +25,8 @@ function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/";
+  const rawCallbackUrl = searchParams?.get("callbackUrl");
+  const callbackUrl = (!rawCallbackUrl || rawCallbackUrl === "/") ? "/dashboard" : rawCallbackUrl;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
