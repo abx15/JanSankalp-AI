@@ -12,13 +12,17 @@ RUN npm ci --legacy-peer-deps
 FROM base AS builder
 WORKDIR /app
 
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma client
 RUN npx prisma generate
+
+# Default dummy variables to satisfy build-time Zod validations
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/jansankalp"
+ENV NEXTAUTH_SECRET="dummy-secret-key-for-building-purposes-only-2026"
 
 # Build Next.js app (standalone output)
 RUN npm run build -- --no-lint
@@ -27,8 +31,8 @@ RUN npm run build -- --no-lint
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN apk add --no-cache openssl
 
@@ -49,7 +53,7 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
