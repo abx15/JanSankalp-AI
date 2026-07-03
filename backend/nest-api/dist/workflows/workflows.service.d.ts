@@ -1,13 +1,21 @@
 import { PrismaService } from '../database/prisma.service';
 import { QueueService } from '../queue/queue.service';
+import { NotificationsGateway, DashboardGateway, IncidentsGateway } from '../socket/socket.gateway';
 export declare class WorkflowsService {
     private prisma;
     private queueService;
-    constructor(prisma: PrismaService, queueService: QueueService);
+    private notificationsGateway;
+    private dashboardGateway;
+    private incidentsGateway;
+    constructor(prisma: PrismaService, queueService: QueueService, notificationsGateway: NotificationsGateway, dashboardGateway: DashboardGateway, incidentsGateway: IncidentsGateway);
     getComplaints(filters: any): Promise<{
         success: boolean;
         data: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string;
+            status: import(".prisma/client").$Enums.ComplaintStatus;
             latitude: number;
             longitude: number;
             tenantId: string | null;
@@ -15,16 +23,12 @@ export declare class WorkflowsService {
             districtId: string | null;
             cityId: string | null;
             wardId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import(".prisma/client").$Enums.ComplaintStatus;
             category: string;
             severity: number;
             authorId: string;
             assignedToId: string | null;
             ticketId: string;
             title: string;
-            description: string;
             originalText: string | null;
             originalLanguage: string | null;
             translatedText: string | null;
@@ -49,32 +53,36 @@ export declare class WorkflowsService {
             department: {
                 name: string;
                 id: string;
-                tenantId: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                tenantId: string | null;
                 headId: string | null;
             };
             author: {
-                email: string;
                 name: string;
                 id: string;
+                email: string;
             };
             assignedTo: {
                 name: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
             remarks: {
                 id: string;
                 createdAt: Date;
-                imageUrl: string | null;
                 text: string;
+                imageUrl: string | null;
                 authorName: string;
                 authorRole: import(".prisma/client").$Enums.Role;
                 complaintId: string;
             }[];
         } & {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string;
+            status: import(".prisma/client").$Enums.ComplaintStatus;
             latitude: number;
             longitude: number;
             tenantId: string | null;
@@ -82,16 +90,12 @@ export declare class WorkflowsService {
             districtId: string | null;
             cityId: string | null;
             wardId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import(".prisma/client").$Enums.ComplaintStatus;
             category: string;
             severity: number;
             authorId: string;
             assignedToId: string | null;
             ticketId: string;
             title: string;
-            description: string;
             originalText: string | null;
             originalLanguage: string | null;
             translatedText: string | null;
@@ -113,6 +117,10 @@ export declare class WorkflowsService {
         success: boolean;
         data: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string;
+            status: import(".prisma/client").$Enums.ComplaintStatus;
             latitude: number;
             longitude: number;
             tenantId: string | null;
@@ -120,16 +128,12 @@ export declare class WorkflowsService {
             districtId: string | null;
             cityId: string | null;
             wardId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import(".prisma/client").$Enums.ComplaintStatus;
             category: string;
             severity: number;
             authorId: string;
             assignedToId: string | null;
             ticketId: string;
             title: string;
-            description: string;
             originalText: string | null;
             originalLanguage: string | null;
             translatedText: string | null;
@@ -151,6 +155,10 @@ export declare class WorkflowsService {
         success: boolean;
         data: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string;
+            status: import(".prisma/client").$Enums.ComplaintStatus;
             latitude: number;
             longitude: number;
             tenantId: string | null;
@@ -158,16 +166,12 @@ export declare class WorkflowsService {
             districtId: string | null;
             cityId: string | null;
             wardId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import(".prisma/client").$Enums.ComplaintStatus;
             category: string;
             severity: number;
             authorId: string;
             assignedToId: string | null;
             ticketId: string;
             title: string;
-            description: string;
             originalText: string | null;
             originalLanguage: string | null;
             translatedText: string | null;
@@ -191,35 +195,39 @@ export declare class WorkflowsService {
             department: {
                 name: string;
                 id: string;
-                tenantId: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                tenantId: string | null;
                 headId: string | null;
             };
             author: {
+                name: string | null;
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                role: import(".prisma/client").$Enums.Role;
+                latitude: number | null;
+                longitude: number | null;
                 email: string;
                 password: string | null;
-                name: string | null;
-                role: import(".prisma/client").$Enums.Role;
-                id: string;
                 emailVerified: Date | null;
                 points: number;
                 phone: string | null;
                 address: string | null;
                 bio: string | null;
-                latitude: number | null;
-                longitude: number | null;
                 avatarUrl: string | null;
                 tenantId: string | null;
                 stateId: string | null;
                 districtId: string | null;
                 cityId: string | null;
                 wardId: string | null;
-                createdAt: Date;
-                updatedAt: Date;
             };
         } & {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string;
+            status: import(".prisma/client").$Enums.ComplaintStatus;
             latitude: number;
             longitude: number;
             tenantId: string | null;
@@ -227,16 +235,12 @@ export declare class WorkflowsService {
             districtId: string | null;
             cityId: string | null;
             wardId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import(".prisma/client").$Enums.ComplaintStatus;
             category: string;
             severity: number;
             authorId: string;
             assignedToId: string | null;
             ticketId: string;
             title: string;
-            description: string;
             originalText: string | null;
             originalLanguage: string | null;
             translatedText: string | null;

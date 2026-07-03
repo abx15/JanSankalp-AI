@@ -43,4 +43,8 @@ export declare class AuthService {
         };
     }>;
     private generateTokens;
+    resendVerification(email: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

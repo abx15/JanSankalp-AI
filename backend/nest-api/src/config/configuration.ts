@@ -3,6 +3,9 @@ export default () => ({
   database: {
     url: process.env.DATABASE_URL,
   },
+  mongodb: {
+    url: process.env.MONGODB_URL || 'mongodb://localhost:27017/jansankalp',
+  },
   redis: {
     url: process.env.REDIS_URL || 'redis://localhost:6379',
   },

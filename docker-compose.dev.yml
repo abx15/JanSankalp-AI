@@ -22,6 +22,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost/api
       - NEXT_PUBLIC_AI_URL=http://localhost/ai
       - NEXT_PUBLIC_UTILS_URL=http://localhost/utils
+      - NEST_API_INTERNAL_URL=http://nest-api:3000
       - NODE_ENV=development
     volumes:
       - ./frontend:/app
@@ -50,8 +51,10 @@ services:
       - PORT=3000
       - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
+      - MONGODB_URL=mongodb://mongodb:27017/jansankalp
       - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
       - JWT_SECRET=${AUTH_SECRET:-jansankalp-jwt-secret-key-2026-production}
+      - AUTH_SECRET=${AUTH_SECRET:-I/9TpoQCI36gforZOYZ2MsOS7MjqWMdPwTBJW1WWQpg=}
       - NODE_ENV=development
       - AI_SERVICE_URL=http://fastapi-ai:10000
       - NODE_SERVICES_URL=http://node-services:3001
@@ -150,6 +153,23 @@ services:
     networks:
       - jansankalp-dev-net
 
+  # ─── Infrastructure: MongoDB (AI Logs, Threats, Audits) ────────────────────
+  mongodb:
+    image: mongo:6-jammy
+    container_name: jansankalp-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-dev-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-dev-net
+
   # ─── Nginx Reverse Proxy Gateway ───────────────────────────────────────────
   nginx:
     image: nginx:alpine
@@ -173,3 +193,4 @@ networks:
 
 volumes:
   postgres-dev-data:
+  mongodb-dev-data:

@@ -46,6 +46,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 const STATE_HEALTH = [
   { state: "California", health: 94, load: "82%", status: "OPTIMAL" },
@@ -96,25 +98,48 @@ const SOVEREIGN_IDENTITY_METRICS = [
 
 export default function NationalCommandCenter() {
   const [activeNode, setActiveNode] = React.useState<string | null>(null);
+  const { data: session } = useSession();
   const [metrics, setMetrics] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch("/api/sovereign/metrics");
+      const data = await response.json();
+      setMetrics(data);
+    } catch (error) {
+      console.error("Failed to fetch national metrics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const response = await fetch("/api/sovereign/metrics");
-        const data = await response.json();
-        setMetrics(data);
-      } catch (error) {
-        console.error("Failed to fetch national metrics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchMetrics();
-    const interval = setInterval(fetchMetrics, 20000); // 20s for National Command
-    return () => clearInterval(interval);
   }, []);
+
+  React.useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleUpdate = () => {
+      console.log("[Socket-NationalCommand] Live national command update triggered. Reloading metrics...");
+      fetchMetrics();
+    };
+
+    socket.on('statsUpdate', handleUpdate);
+    socket.on('complaintUpdate', handleUpdate);
+
+    return () => {
+      socket.off('statsUpdate', handleUpdate);
+      socket.off('complaintUpdate', handleUpdate);
+    };
+  }, [socket, isConnected]);
 
   const infraHealth =
     metrics?.infrastructure?.map((node: any) => ({
@@ -142,6 +167,12 @@ export default function NationalCommandCenter() {
 
   return (
     <div className="p-8 space-y-8 bg-[#020617] text-slate-100 min-h-screen font-mono">
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE NATIONAL COMMAND RADAR...' : 'OFFLINE MODE: REAL-TIME NATIONAL MONITORING IS DEGRADED'}
+        </div>
+      )}
       {/* Header with Pulse */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-slate-900/50 p-6 rounded-[2rem] border border-slate-800 shadow-2xl">
         <div className="flex items-center gap-6">

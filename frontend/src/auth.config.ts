@@ -22,6 +22,8 @@ export const authConfig = {
                 session.user.cityId = token.cityId;
                 // @ts-ignore
                 session.user.wardId = token.wardId;
+                // @ts-ignore
+                session.accessToken = token.accessToken;
             }
             return session;
         },

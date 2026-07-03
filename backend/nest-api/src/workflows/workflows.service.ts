@@ -2,12 +2,16 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../database/prisma.service';
 import { QueueService } from '../queue/queue.service';
 import { Role, ComplaintStatus } from '@prisma/client';
+import { NotificationsGateway, DashboardGateway, IncidentsGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class WorkflowsService {
   constructor(
     private prisma: PrismaService,
     private queueService: QueueService,
+    private notificationsGateway: NotificationsGateway,
+    private dashboardGateway: DashboardGateway,
+    private incidentsGateway: IncidentsGateway,
   ) {}
 
   async getComplaints(filters: any) {
@@ -583,6 +587,7 @@ export class WorkflowsService {
             to: authorEmail,
             subject: emailSubject,
             html: emailHtml,
+            userId: updatedComplaint.authorId,
           }),
         });
 
@@ -605,7 +610,21 @@ export class WorkflowsService {
   }
 
   private triggerRealtimeEvent(channel: string, event: string, payload: any) {
-    // Ported from Pusher trigger mechanism. Can fall back to standard logs or internal WebSockets
     console.log(`[REALTIME-EVENT] Channel: ${channel} | Event: ${event}`, payload);
+    try {
+      if (channel === 'governance-channel') {
+        if (event === 'new-complaint' || event === 'complaint-updated') {
+          this.dashboardGateway.broadcastComplaintUpdate({ event, ...payload });
+          if (event === 'new-complaint') {
+            this.incidentsGateway.dispatchNewIncident(payload.districtId, payload.departmentId, payload);
+          }
+        }
+      } else if (channel.startsWith('user-')) {
+        const userId = channel.replace('user-', '');
+        this.notificationsGateway.sendToUser(userId, 'notification', payload);
+      }
+    } catch (err) {
+      console.error('[REALTIME-EVENT-GATEWAY] Failed to route real-time event to socket gateways:', err);
+    }
   }
 }

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ImageUpload } from "@/components/complaints/ImageUpload";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import {
   ClipboardList,
   CheckCircle,
@@ -149,8 +150,12 @@ export default function OfficerComplaintsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="space-y-6 p-6">
+        <div>
+          <div className="h-9 w-64 bg-muted animate-pulse rounded mb-2" />
+          <div className="h-4 w-96 bg-muted/60 animate-pulse rounded" />
+        </div>
+        <DashboardSkeleton />
       </div>
     );
   }

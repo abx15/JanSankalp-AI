@@ -2,37 +2,53 @@
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { pusherClient } from "@/lib/pusher-client";
+import { useSocket } from "@/lib/api";
 import { toast } from "sonner";
-import { Bell } from "lucide-react";
+import { Bell, WifiOff } from "lucide-react";
 
 export const NotificationListener = () => {
   const { data: session } = useSession();
 
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'notifications',
+  });
+
+  // Reconnection toast alert
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (isReconnecting) {
+      toast.warning("Reconnecting...", {
+        description: "Attempting to reconnect to live server",
+        id: "socket-reconnect",
+        icon: <WifiOff className="w-4 h-4 text-orange-500 animate-pulse" />,
+        duration: Infinity,
+      });
+    } else {
+      toast.dismiss("socket-reconnect");
+    }
+  }, [isReconnecting]);
 
-    const channel = pusherClient.subscribe(`user-${session.user.id}`);
+  useEffect(() => {
+    if (!socket || !isConnected) return;
 
-    channel.bind(
-      "notification",
-      (data: {
-        title: string;
-        message: string;
-        type: string;
-        status?: string;
-      }) => {
-        toast(data.title, {
-          description: data.message,
-          icon: <Bell className="w-4 h-4 text-primary" />,
-        });
-      },
-    );
+    const handleNotification = (data: {
+      title: string;
+      message: string;
+      type: string;
+      status?: string;
+    }) => {
+      toast(data.title, {
+        description: data.message,
+        icon: <Bell className="w-4 h-4 text-blue-500" />,
+      });
+    };
+
+    socket.on('notification', handleNotification);
 
     return () => {
-      pusherClient.unsubscribe(`user-${session.user.id}`);
+      socket.off('notification', handleNotification);
     };
-  }, [session?.user?.id]);
+  }, [socket, isConnected]);
 
   return null;
 };

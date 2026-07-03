@@ -1,59 +1,61 @@
-import { auth } from "@/auth";
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
 
-function isAdmin(session: any) {
-    return session?.user?.role === "ADMIN";
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const session = await auth();
+    if (!session || (session.user as any).role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const body = await request.json();
+    const NEST_API_INTERNAL_URL = process.env.NEST_API_INTERNAL_URL || "http://nest-api:3000";
+    const res = await fetch(`${NEST_API_INTERNAL_URL}/admin/departments/${params.id}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session as any).accessToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return NextResponse.json(err, { status: res.status });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Update department error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
-// PUT — update a department name and/or head
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
     const session = await auth();
-    if (!isAdmin(session)) return new NextResponse("Unauthorized", { status: 401 });
-
-    const { name, headId } = await req.json();
-    if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
-
-    try {
-        // Check name uniqueness (excluding self)
-        const conflict = await prisma.department.findFirst({
-            where: { name: name.trim(), NOT: { id: params.id } },
-        });
-        if (conflict) return NextResponse.json({ error: "A department with this name already exists" }, { status: 400 });
-
-        const dept = await prisma.department.update({
-            where: { id: params.id },
-            data: { name: name.trim(), headId: headId || null },
-            include: { head: { select: { id: true, name: true, email: true } }, _count: { select: { complaints: true } } },
-        });
-        return NextResponse.json(dept);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!session || (session.user as any).role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
-}
 
-// DELETE — delete a department (only if it has no active complaints)
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-    const session = await auth();
-    if (!isAdmin(session)) return new NextResponse("Unauthorized", { status: 401 });
+    const NEST_API_INTERNAL_URL = process.env.NEST_API_INTERNAL_URL || "http://nest-api:3000";
+    const res = await fetch(`${NEST_API_INTERNAL_URL}/admin/departments/${params.id}`, {
+      method: "DELETE",
+      headers: {
+        'Authorization': `Bearer ${(session as any).accessToken}`,
+      },
+    });
 
-    try {
-        const dept = await prisma.department.findUnique({
-            where: { id: params.id },
-            include: { _count: { select: { complaints: true } } },
-        });
-        if (!dept) return NextResponse.json({ error: "Department not found" }, { status: 404 });
-
-        if (dept._count.complaints > 0) {
-            return NextResponse.json(
-                { error: `Cannot delete: ${dept._count.complaints} complaints are linked to this department. Reassign them first.` },
-                { status: 400 }
-            );
-        }
-
-        await prisma.department.delete({ where: { id: params.id } });
-        return NextResponse.json({ success: true, message: "Department deleted" });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!res.ok) {
+      const err = await res.json();
+      return NextResponse.json(err, { status: res.status });
     }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Delete department error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

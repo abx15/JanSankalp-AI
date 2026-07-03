@@ -67,35 +67,73 @@ export async function apiFetch(path: string, options: RequestOptions = {}) {
 /**
  * Premium Socket.IO custom React Hook for real-time microservices gateway connection
  */
-export function useSocket(options: { token?: string; room?: string } = {}) {
+export function useSocket(options: { token?: string; room?: string; namespace?: string } = {}) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
-    // Connect to nest-api WebSocket Gateway
-    const socketClient = io(API_BASE_URL, {
+    const namespace = options.namespace || 'notifications';
+    
+    // Clean up base URL for Socket.io (remove trailing /api)
+    const baseUri = API_BASE_URL.replace(/\/api$/, '');
+    const connectionUrl = `${baseUri}/${namespace}`;
+
+    console.log(`[Socket-${namespace}] Connecting to: ${connectionUrl}`);
+
+    const socketClient = io(connectionUrl, {
       path: '/socket.io',
       auth: {
         token: options.token,
       },
       transports: ['websocket'],
       autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 15,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 8000,
+      randomizationFactor: 0.5,
     });
 
     socketClient.on('connect', () => {
       setIsConnected(true);
-      console.log('[Socket] Connected to NestAPI WebSocket gateway:', socketClient.id);
+      setIsReconnecting(false);
+      console.log(`[Socket-${namespace}] Connected: ${socketClient.id}`);
       
-      // Join specific room if requested (e.g. ward, district, user room)
-      if (options.room) {
-        socketClient.emit('joinRoom', options.room);
+      // Handle subscriptions based on namespace
+      if (namespace === 'incidents' && options.room) {
+        if (options.room.startsWith('district-')) {
+          socketClient.emit('joinDistrict', { districtId: options.room.replace('district-', '') });
+        } else if (options.room.startsWith('dept-')) {
+          socketClient.emit('joinDepartment', { departmentId: options.room.replace('dept-', '') });
+        }
+      } else if (namespace === 'dashboard') {
+        socketClient.emit('subscribeStats');
       }
     });
 
-    socketClient.on('disconnect', () => {
+    socketClient.on('disconnect', (reason) => {
       setIsConnected(false);
-      console.log('[Socket] Disconnected from WebSocket gateway');
+      console.log(`[Socket-${namespace}] Disconnected due to: ${reason}`);
+      if (reason === 'io server disconnect' || reason === 'transport close') {
+        setIsReconnecting(true);
+      }
+    });
+
+    socketClient.on('connect_error', (err) => {
+      console.error(`[Socket-${namespace}] Connection Error:`, err.message);
+      setIsReconnecting(true);
+    });
+
+    socketClient.on('reconnect_attempt', (attempt) => {
+      console.log(`[Socket-${namespace}] Reconnection attempt #${attempt}...`);
+      setIsReconnecting(true);
+    });
+
+    socketClient.on('reconnect_failed', () => {
+      console.error(`[Socket-${namespace}] All reconnection attempts failed`);
+      setIsReconnecting(false);
     });
 
     socketClient.on('notification', (payload: any) => {
@@ -107,19 +145,20 @@ export function useSocket(options: { token?: string; room?: string } = {}) {
     return () => {
       socketClient.disconnect();
     };
-  }, [options.token, options.room]);
+  }, [options.token, options.room, options.namespace]);
 
   const emitEvent = (eventName: string, data: any) => {
     if (socket && isConnected) {
       socket.emit(eventName, data);
     } else {
-      console.warn('[Socket] Attempted to emit event but socket is not connected');
+      console.warn(`[Socket] Cannot emit event "${eventName}": Socket not connected`);
     }
   };
 
   return {
     socket,
     isConnected,
+    isReconnecting,
     messages,
     emitEvent,
   };

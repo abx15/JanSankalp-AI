@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
     try {
@@ -14,50 +11,27 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email },
+        const NEST_API_INTERNAL_URL = process.env.NEST_API_INTERNAL_URL || "http://nest-api:3000";
+        const res = await fetch(`${NEST_API_INTERNAL_URL}/auth/resend-verification`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
         });
 
-        if (!user) {
-            return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
-            );
+        if (!res.ok) {
+            const err = await res.json();
+            return NextResponse.json(err, { status: res.status });
         }
 
-        if (user.emailVerified) {
-            return NextResponse.json(
-                { error: "Email is already verified" },
-                { status: 400 }
-            );
-        }
-
-        // Generate new OTP
-        const { token } = await generateVerificationToken(email);
-
-        // Send email
-        const emailResult = await sendVerificationEmail(email, token);
-
-        if (!emailResult.success) {
-            console.error("❌ Failed to resend verification email:", emailResult.error);
-            return NextResponse.json({
-                success: false,
-                error: "Failed to send verification email",
-                debug: process.env.NODE_ENV === 'development' ? { token } : undefined
-            }, { status: 500 });
-        }
-
+        const data = await res.json();
+        return NextResponse.json(data);
+    } catch (error: any) {
+        console.error("❌ Failed to resend verification email:", error);
         return NextResponse.json({
-            success: true,
-            message: "Verification email sent successfully",
-            debug: process.env.NODE_ENV === 'development' ? { token } : undefined
-        });
-
-    } catch (error) {
-        console.error("Resend verification error:", error);
-        return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
-        );
+            success: false,
+            error: error.message || "Failed to send verification email",
+        }, { status: 500 });
     }
 }

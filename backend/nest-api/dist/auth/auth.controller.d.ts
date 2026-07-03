@@ -46,5 +46,9 @@ export declare class AuthController {
         success: boolean;
         user: any;
     }>;
+    resendVerification(email: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     private setCookies;
 }

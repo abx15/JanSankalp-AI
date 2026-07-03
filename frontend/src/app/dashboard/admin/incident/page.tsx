@@ -35,6 +35,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 const MOCK_THREATS = [
   {
@@ -73,32 +75,60 @@ const TRAFFIC_DATA = [
 ];
 
 export default function IncidentCommandDashboard() {
+  const { data: session } = useSession();
   const [criticalMode, setCriticalMode] = useState(false);
   const [telemetry, setTelemetry] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchTelemetry = async () => {
-      try {
-        const res = await fetch(
-          "/api/admin/governance?type=security-telemetry",
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setTelemetry(data.data);
-        }
-      } catch (e) {
-        console.error("Telemetry fetch error:", e);
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'incidents',
+  });
+
+  const fetchTelemetry = async () => {
+    try {
+      const res = await fetch(
+        "/api/admin/governance?type=security-telemetry",
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setTelemetry(data.data);
       }
-    };
+    } catch (e) {
+      console.error("Telemetry fetch error:", e);
+    }
+  };
+
+  useEffect(() => {
     fetchTelemetry();
-    const interval = setInterval(fetchTelemetry, 10000);
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleIncidentUpdate = () => {
+      console.log("[Socket] Received live incident telemetry update. Reloading...");
+      fetchTelemetry();
+    };
+
+    socket.on('incidentUpdate', handleIncidentUpdate);
+    socket.on('newIncident', handleIncidentUpdate);
+
+    return () => {
+      socket.off('incidentUpdate', handleIncidentUpdate);
+      socket.off('newIncident', handleIncidentUpdate);
+    };
+  }, [socket, isConnected]);
 
   return (
     <div
       className={`min-h-screen p-8 space-y-8 transition-colors duration-500 ${criticalMode ? "bg-red-950 text-white" : "bg-slate-50"}`}
     >
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE INCIDENT TELEMETRY SERVER...' : 'OFFLINE MODE: REAL-TIME SYNC DISABLED'}
+        </div>
+      )}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">

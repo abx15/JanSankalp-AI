@@ -24,21 +24,47 @@ import {
   Cell,
 } from "recharts";
 import { getInfrastructureAnalytics } from "@/lib/ai-service";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
+import { Radio } from "lucide-react";
 
 const InfraDashboard = () => {
+  const { data: session } = useSession();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
+
+  const fetchData = async () => {
+    const result = await getInfrastructureAnalytics();
+    if (result) setData(result);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await getInfrastructureAnalytics();
-      if (result) setData(result);
-      setLoading(false);
-    };
     fetchData();
-    const interval = setInterval(fetchData, 15000); // Live updates every 15s
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleUpdate = () => {
+      console.log("[Socket-Dashboard] Live dashboard update triggered. Reloading analytics...");
+      fetchData();
+    };
+
+    socket.on('statsUpdate', handleUpdate);
+    socket.on('complaintUpdate', handleUpdate);
+
+    return () => {
+      socket.off('statsUpdate', handleUpdate);
+      socket.off('complaintUpdate', handleUpdate);
+    };
+  }, [socket, isConnected]);
 
   if (loading)
     return (
@@ -49,6 +75,12 @@ const InfraDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE IOT TELEMETRY SERVER...' : 'OFFLINE MODE: REAL-TIME IOT DATA DEGRADED'}
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Real-time Map Overlay (Simulated with Heatmap list) */}
         <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden min-h-[400px]">

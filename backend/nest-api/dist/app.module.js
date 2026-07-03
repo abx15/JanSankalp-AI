@@ -17,6 +17,8 @@ const workflows_module_1 = require("./workflows/workflows.module");
 const agents_module_1 = require("./agents/agents.module");
 const queue_module_1 = require("./queue/queue.module");
 const health_controller_1 = require("./health.controller");
+const socket_module_1 = require("./socket/socket.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,6 +38,8 @@ exports.AppModule = AppModule = __decorate([
             workflows_module_1.WorkflowsModule,
             agents_module_1.AgentsModule,
             queue_module_1.QueueModule,
+            socket_module_1.SocketModule,
+            admin_module_1.AdminModule,
         ],
         controllers: [health_controller_1.HealthController],
     })

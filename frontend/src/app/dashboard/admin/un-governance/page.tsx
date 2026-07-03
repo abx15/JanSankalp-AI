@@ -41,6 +41,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
+import { Radio } from "lucide-react";
 
 const SDG_DATA = [
   {
@@ -113,26 +116,49 @@ const SUSTAINABILITY_TREND = [
 ];
 
 export default function UNGovernanceDashboard() {
+  const { data: session } = useSession();
   const [activeSDG, setActiveSDG] = React.useState<any>(null);
   const [metrics, setMetrics] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch("/api/sovereign/metrics");
+      const data = await response.json();
+      setMetrics(data);
+    } catch (error) {
+      console.error("Failed to fetch metrics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const response = await fetch("/api/sovereign/metrics");
-        const data = await response.json();
-        setMetrics(data);
-      } catch (error) {
-        console.error("Failed to fetch metrics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchMetrics();
-    const interval = setInterval(fetchMetrics, 30000); // Update every 30s
-    return () => clearInterval(interval);
   }, []);
+
+  React.useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleUpdate = () => {
+      console.log("[Socket-UNGovernance] Live UN update triggered. Reloading metrics...");
+      fetchMetrics();
+    };
+
+    socket.on('statsUpdate', handleUpdate);
+    socket.on('complaintUpdate', handleUpdate);
+
+    return () => {
+      socket.off('statsUpdate', handleUpdate);
+      socket.off('complaintUpdate', handleUpdate);
+    };
+  }, [socket, isConnected]);
 
   const getSDGIcon = (goalNumber: number) => {
     switch (goalNumber) {
@@ -182,6 +208,12 @@ export default function UNGovernanceDashboard() {
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE UN GOVERNANCE DATA STREAM...' : 'OFFLINE MODE: SDG ALIGNMENT METRICS ARE STALE'}
+        </div>
+      )}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-4">

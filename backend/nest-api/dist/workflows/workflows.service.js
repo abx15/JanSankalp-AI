@@ -14,10 +14,14 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../database/prisma.service");
 const queue_service_1 = require("../queue/queue.service");
 const client_1 = require("@prisma/client");
+const socket_gateway_1 = require("../socket/socket.gateway");
 let WorkflowsService = class WorkflowsService {
-    constructor(prisma, queueService) {
+    constructor(prisma, queueService, notificationsGateway, dashboardGateway, incidentsGateway) {
         this.prisma = prisma;
         this.queueService = queueService;
+        this.notificationsGateway = notificationsGateway;
+        this.dashboardGateway = dashboardGateway;
+        this.incidentsGateway = incidentsGateway;
     }
     async getComplaints(filters) {
         const { status, category, severity, authorId, assignedToId, districtId, limit = 50, cursor } = filters;
@@ -550,6 +554,7 @@ let WorkflowsService = class WorkflowsService {
                         to: authorEmail,
                         subject: emailSubject,
                         html: emailHtml,
+                        userId: updatedComplaint.authorId,
                     }),
                 });
                 if (emailResponse.ok) {
@@ -572,12 +577,32 @@ let WorkflowsService = class WorkflowsService {
     }
     triggerRealtimeEvent(channel, event, payload) {
         console.log(`[REALTIME-EVENT] Channel: ${channel} | Event: ${event}`, payload);
+        try {
+            if (channel === 'governance-channel') {
+                if (event === 'new-complaint' || event === 'complaint-updated') {
+                    this.dashboardGateway.broadcastComplaintUpdate({ event, ...payload });
+                    if (event === 'new-complaint') {
+                        this.incidentsGateway.dispatchNewIncident(payload.districtId, payload.departmentId, payload);
+                    }
+                }
+            }
+            else if (channel.startsWith('user-')) {
+                const userId = channel.replace('user-', '');
+                this.notificationsGateway.sendToUser(userId, 'notification', payload);
+            }
+        }
+        catch (err) {
+            console.error('[REALTIME-EVENT-GATEWAY] Failed to route real-time event to socket gateways:', err);
+        }
     }
 };
 exports.WorkflowsService = WorkflowsService;
 exports.WorkflowsService = WorkflowsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        queue_service_1.QueueService])
+        queue_service_1.QueueService,
+        socket_gateway_1.NotificationsGateway,
+        socket_gateway_1.DashboardGateway,
+        socket_gateway_1.IncidentsGateway])
 ], WorkflowsService);
 //# sourceMappingURL=workflows.service.js.map

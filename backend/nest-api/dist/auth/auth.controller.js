@@ -68,6 +68,9 @@ let AuthController = class AuthController {
             user: req.user,
         };
     }
+    async resendVerification(email) {
+        return this.authService.resendVerification(email);
+    }
     setCookies(res, token) {
         res.cookie('refreshToken', token, {
             httpOnly: true,
@@ -117,6 +120,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getSession", null);
+__decorate([
+    (0, common_1.Post)('resend-verification'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resendVerification", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

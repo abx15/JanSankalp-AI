@@ -27,7 +27,16 @@ app.use((0, morgan_1.default)(':method :url :status :res[content-length] - :resp
 app.get('/health', (_req, res) => {
     res.status(200).json({
         status: 'online',
+        message: 'API is live',
         service: '@jansankalp/node-services',
+        timestamp: new Date().toISOString(),
+    });
+});
+app.get('/utils/health', (_req, res) => {
+    res.status(200).json({
+        status: 'online',
+        message: 'API is live',
+        service: '@jansankalp/node-services (via /utils/health)',
         timestamp: new Date().toISOString(),
     });
 });

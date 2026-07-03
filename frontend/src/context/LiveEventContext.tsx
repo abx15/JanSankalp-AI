@@ -59,7 +59,8 @@ const LOCATIONS = [
   { name: "Patna, BR", lat: 25.5941, lng: 85.1376 },
 ];
 
-import { pusherClient } from "@/lib/pusher-client";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 export const LiveEventProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -71,6 +72,13 @@ export const LiveEventProvider: React.FC<{ children: React.ReactNode }> = ({
     activeDepartments: 0,
   });
   const [latestEvent, setLatestEvent] = useState<LiveComplaint | null>(null);
+
+  const { data: session } = useSession();
+  const { socket, isConnected } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
 
   const fetchRealData = useCallback(async () => {
     try {
@@ -119,38 +127,40 @@ export const LiveEventProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Real-time Pusher Integration
+  // Real-time Socket.IO Integration
   useEffect(() => {
     fetchRealData();
 
-    const channel = pusherClient.subscribe("governance-channel");
+    if (!socket || !isConnected) return;
 
-    channel.bind("new-complaint", (data: any) => {
-      const newEvent: LiveComplaint = {
-        id: data.ticketId || data.id,
-        category: data.category,
-        location: data.location?.lat
-          ? `${data.location.lat.toFixed(2)}, ${data.location.lng.toFixed(2)}`
-          : "City Center",
-        lat: data.location?.lat || 20.5937,
-        lng: data.location?.lng || 78.9629,
-        timestamp: new Date(),
-        status: "Registered",
-      };
+    const handleComplaintUpdate = (data: any) => {
+      if (data.event === 'new-complaint') {
+        const newEvent: LiveComplaint = {
+          id: data.ticketId || data.id,
+          category: data.category,
+          location: data.location?.lat
+            ? `${data.location.lat.toFixed(2)}, ${data.location.lng.toFixed(2)}`
+            : "City Center",
+          lat: data.location?.lat || 20.5937,
+          lng: data.location?.lng || 78.9629,
+          timestamp: new Date(),
+          status: "Registered",
+        };
 
-      setComplaints((prev) => [newEvent, ...prev].slice(0, 15));
-      setLatestEvent(newEvent);
-      setStats((prev) => ({ ...prev, totalToday: prev.totalToday + 1 }));
-    });
+        setComplaints((prev) => [newEvent, ...prev].slice(0, 15));
+        setLatestEvent(newEvent);
+        setStats((prev) => ({ ...prev, totalToday: prev.totalToday + 1 }));
+      } else if (data.event === 'complaint-updated') {
+        fetchRealData();
+      }
+    };
 
-    channel.bind("complaint-updated", () => {
-      fetchRealData(); // Refetch all on update to keep status in sync
-    });
+    socket.on('complaintUpdate', handleComplaintUpdate);
 
     return () => {
-      pusherClient.unsubscribe("governance-channel");
+      socket.off('complaintUpdate', handleComplaintUpdate);
     };
-  }, [fetchRealData]);
+  }, [socket, isConnected, fetchRealData]);
 
   return (
     <LiveEventContext.Provider value={{ complaints, stats, latestEvent }}>

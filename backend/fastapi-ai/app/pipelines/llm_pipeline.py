@@ -28,6 +28,28 @@ class LLMPipeline:
         try:
             response = await coordinator_agent.run(request)
             logger.info(f"[Pipeline] Multi-agent orchestration complete for complaint {request.complaint_id}.")
+            
+            # Publish completion event to Redis Pub/Sub so NestJS can broadcast via WebSockets
+            try:
+                from app.utils.redis_client import publish_event
+                publish_event(
+                    channel="governance-channel",
+                    event="complaint-updated",
+                    payload={
+                        "id": request.complaint_id,
+                        "event": "complaint-updated",
+                        "status": "PROCESSED_AI",
+                        "is_spam": response.is_spam,
+                        "is_duplicate": response.is_duplicate,
+                        "category": response.analysis.category if response.analysis else "Others",
+                        "severity": response.analysis.severity if response.analysis else "Medium",
+                        "assigned_department": response.assigned_department,
+                        "assigned_officer": response.assigned_officer,
+                    }
+                )
+            except Exception as redis_err:
+                logger.error(f"[Pipeline] Failed to publish completion event to Redis: {redis_err}")
+                
             return response
         except Exception as e:
             logger.error(f"[Pipeline] Error in Multi-Agent Pipeline: {e}", exc_info=True)

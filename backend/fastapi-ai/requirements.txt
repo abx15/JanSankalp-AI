@@ -30,3 +30,4 @@ cryptography
 opencv-python-headless
 Pillow>=9.0
 scikit-image
+redis

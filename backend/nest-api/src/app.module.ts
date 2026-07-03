@@ -8,6 +8,8 @@ import { WorkflowsModule } from './workflows/workflows.module';
 import { AgentsModule } from './agents/agents.module';
 import { QueueModule } from './queue/queue.module';
 import { HealthController } from './health.controller';
+import { SocketModule } from './socket/socket.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { HealthController } from './health.controller';
     WorkflowsModule,
     AgentsModule,
     QueueModule,
+    SocketModule,
+    AdminModule,
   ],
   controllers: [HealthController],
 })

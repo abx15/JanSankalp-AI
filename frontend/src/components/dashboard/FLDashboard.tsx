@@ -28,11 +28,21 @@ import {
 } from "recharts";
 import { getFederatedMetrics, triggerTrainRound } from "@/lib/ai-service";
 import { toast } from "sonner";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
+import { Radio } from "lucide-react";
 
 const FLDashboard = () => {
+  const { data: session } = useSession();
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [training, setTraining] = useState(false);
+
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
 
   const fetchMetrics = async () => {
     const data = await getFederatedMetrics();
@@ -42,9 +52,24 @@ const FLDashboard = () => {
 
   useEffect(() => {
     fetchMetrics();
-    const interval = setInterval(fetchMetrics, 30000); // Poll every 30s
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleUpdate = () => {
+      console.log("[Socket-FL] Live FL update triggered. Reloading metrics...");
+      fetchMetrics();
+    };
+
+    socket.on('statsUpdate', handleUpdate);
+    socket.on('complaintUpdate', handleUpdate);
+
+    return () => {
+      socket.off('statsUpdate', handleUpdate);
+      socket.off('complaintUpdate', handleUpdate);
+    };
+  }, [socket, isConnected]);
 
   const handleTrainRound = async () => {
     setTraining(true);
@@ -69,6 +94,12 @@ const FLDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE FEDERATED LEARNING COORDINATOR...' : 'OFFLINE MODE: REAL-TIME EDGE UPDATE SYNC DISABLED'}
+        </div>
+      )}
       {/* Header & Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard

@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const workflows_service_1 = require("./workflows.service");
 const workflows_controller_1 = require("./workflows.controller");
 const auth_module_1 = require("../auth/auth.module");
+const socket_module_1 = require("../socket/socket.module");
 let WorkflowsModule = class WorkflowsModule {
 };
 exports.WorkflowsModule = WorkflowsModule;
 exports.WorkflowsModule = WorkflowsModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule],
+        imports: [auth_module_1.AuthModule, socket_module_1.SocketModule],
         controllers: [workflows_controller_1.WorkflowsController],
         providers: [workflows_service_1.WorkflowsService],
         exports: [workflows_service_1.WorkflowsService],

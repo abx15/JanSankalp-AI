@@ -1,45 +1,60 @@
-import { auth } from "@/auth";
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
 
-function isAdmin(session: any) {
-    return session?.user?.role === "ADMIN";
-}
-
-// GET — list all departments with officer count and complaint count
-export async function GET() {
-    try {
-        const departments = await prisma.department.findMany({
-            include: {
-                head: { select: { id: true, name: true, email: true } },
-                _count: { select: { complaints: true } },
-            },
-            orderBy: { name: "asc" },
-        });
-        return NextResponse.json(departments);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-// POST — create a new department
-export async function POST(req: Request) {
+export async function GET(request: NextRequest) {
+  try {
     const session = await auth();
-    if (!isAdmin(session)) return new NextResponse("Unauthorized", { status: 401 });
-
-    const { name, headId } = await req.json();
-    if (!name?.trim()) return NextResponse.json({ error: "Department name is required" }, { status: 400 });
-
-    try {
-        const existing = await prisma.department.findUnique({ where: { name: name.trim() } });
-        if (existing) return NextResponse.json({ error: "Department already exists" }, { status: 400 });
-
-        const dept = await prisma.department.create({
-            data: { name: name.trim(), headId: headId || null },
-            include: { head: { select: { id: true, name: true, email: true } }, _count: { select: { complaints: true } } },
-        });
-        return NextResponse.json(dept, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    const NEST_API_INTERNAL_URL = process.env.NEST_API_INTERNAL_URL || "http://nest-api:3000";
+    const res = await fetch(`${NEST_API_INTERNAL_URL}/admin/departments`, {
+      headers: {
+        'Authorization': `Bearer ${(session as any).accessToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return NextResponse.json(err, { status: res.status });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Fetch departments error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session || (session.user as any).role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const body = await request.json();
+    const NEST_API_INTERNAL_URL = process.env.NEST_API_INTERNAL_URL || "http://nest-api:3000";
+    const res = await fetch(`${NEST_API_INTERNAL_URL}/admin/departments`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session as any).accessToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return NextResponse.json(err, { status: res.status });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data, { status: 201 });
+  } catch (error: any) {
+    console.error("Create department error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

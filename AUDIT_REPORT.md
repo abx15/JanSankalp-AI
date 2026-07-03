@@ -1,186 +1,198 @@
-# JanSankalp AI — Full Codebase Audit & Architectural Mapping
+# JanSankalp AI Platform — Comprehensive Codebase Audit Report (Phase 0)
 
-This document details the comprehensive audit of the **JanSankalp AI Smart Civic Governance Platform** prior to restructuring into a 4-tier production-ready enterprise microservice architecture.
-
----
-
-## 1. Directory Tree Analysis & Module Mappings
-
-### `/client` (Frontend & Serverless API Routes)
-The frontend is a **Next.js 14** application with App Router support. It is highly modularized, with domain business logic currently residing under `client/src/modules/` and exposed via API routes under `client/src/app/api/`.
-
-*   **`src/app`**: Renders all visual pages (Citizen dashboards, Admin management, Officer workspaces, authentication portals, transparency ledger, sitemap, etc.).
-*   **`src/modules`**: Encapsulates core business domains:
-    *   `auth`: Authentication flow backed by NextAuth with Credentials provider, password hashing using `bcryptjs`, and tenancy/role checks.
-    *   `user`: Profiles, regional mappings, points/gamification.
-    *   `complaints`: Repository-service-controller pattern mapping complaint creation, updates, assigning officers, and integrating real-time events.
-    *   `budget`: Operations for fiscal forecasting, actual logs, cost optimizations, and demand surges.
-    *   `sovereign`: Complex SDG goals tracking, national twin node syncing, and crisis reallocation simulators.
-    *   `notifications`: Real-time state synchronizations using Pusher and automated mail notifications (SMTP/Resend).
-    *   `ai`: Connection shims to dynamic API engines (FastAPI & Grok fallbacks).
-*   **`src/data` & `src/lib`**: Contains Prisma client singletons (`prisma.ts`), Pusher configurations, Kafka client shims, and core error wrappers.
-
-### `/server` (Autonomous AI Engine)
-A high-performance **FastAPI** Python application that houses heavy statistical computations, computer vision systems, Reinforcement Learning (RL), federated training processes, and the Multi-Agent RAG Orchestrator.
-
-*   **`app/agents`**: Specialized LLM-powered nodes (`spam_agent.py`, `classification_agent.py`, `duplicate_rag_agent.py`, `routing_agent.py`, `eta_policy_agent.py`) coordinated by `coordinator_agent.py` to automate 95%+ of civic operations.
-*   **`app/api`**: Exposes REST interfaces (`routes_ai.py`, `models_status.py`) for AI pipelines.
-*   **`app/pipelines`**: Contains `llm_pipeline.py` which aggregates the coordinator agent workflows.
-*   **`app/services`**: A rich layer of 24 domain-specific services spanning computer vision (Hugging Face pipelines), audio STT (AssemblyAI), text translation (Cohere), analytics engines, policy outcomes, bias trackers, and the local semantic RAG embedding processor.
-*   **`app/rl`**: Implements a Q-learning Reinforcement Learning agent (`rl_agent.py`) to optimize complaint routing priorities dynamically based on feedback loops.
-*   **`app/federated`**: Manages simulations of federated ML model updates across independent local districts to aggregate national intelligence without centralizing raw civic data.
-*   **`app/events`**: Handles streaming data ingestion pipelines utilizing Apache Kafka.
-
-### `/prisma`
-Maintains seed scripts for comprehensive civic regional datasets, user credentials, and mock budget forecast statistics (`comprehensive_seed.js`).
-
-### `/infrastructure`
-Stores dev & prod multi-service configuration files including Nginx configuration, Dockerfiles, and Kubernetes manifests.
-
-### `/scripts`
-Provides DevOps shell scripts for database teardown (`clean.sh`), hot-reloading (`dev.sh`), initial provisioning (`setup.sh`), and administrative database seeding.
+This report details the current architecture, dependencies, endpoints, database schemas, and data flows of the JanSankalp AI platform. It maps out existing redundancies and outlines architectural bottlenecks before migration.
 
 ---
 
-## 2. API Routes Matrix
+## 1. Complete Directory Structures & Component Mappings
 
-### Next.js Internal API Endpoints (To Migrate to NestJS `nest-api`)
+### `backend/fastapi-ai` (Python AI/ML Engine)
+Exposes analytical models and coordinates multi-agent LLM pipelines.
+*   **`app/main.py`**: Entry point registering routers, internal token validation middleware, request logger, and startup events (loading models, initializing background Kafka processors).
+*   **`app/api/`**: 
+    *   `routes_ai.py`: API route handlers for chat, classifications, routing, voice STT, compliance, and national twin command.
+    *   `models_status.py`: Health checkpoints and dynamic reloads of local NLP/Vision models.
+*   **`app/agents/`**: Core LLM nodes (`spam_agent.py`, `classification_agent.py`, `routing_agent.py`, etc.) managed by `coordinator_agent.py`.
+*   **`app/services/`**: Concrete service modules implementing specific APIs (AssemblyAI voice STT, Hugging Face CCTV analysis, Q-learning RL, Weaviate RAG embedders).
+*   **`app/rl/` & `app/federated/`**: Local learning agents (Q-table optimization, local decentralized federated training).
+*   **`app/events/`**: Kafka stream processing processor.
 
-| Route Path | Method | Purpose | Source Module |
+### `backend/nest-api` (TypeScript NestJS Gateway)
+Coordinates core database transactions and manages background queues.
+*   **`src/main.ts`**: Express bootstrapper configuring CORS, Validation Pipes, Swagger docs, Helmet security headers, compression, and request correlation IDs.
+*   **`src/app.module.ts`**: Imports core modules: Config, Throttler, Database, Auth, Workflows, Agents, Queue.
+*   **`src/database/`**: `prisma.service.ts` connecting to PostgreSQL using a local Prisma client.
+*   **`src/auth/`**: Custom passport-jwt handlers exposing authentication endpoints.
+*   **`src/workflows/`**: Handles CRUD requests on complaints.
+*   **`src/agents/`**: Implements WebSocket gateway `/agents` to stream LLM responses from FastAPI `/chat` via SSE, alongside proxy REST routes.
+*   **`src/queue/`**: Configures BullMQ `workflow-queue` (`queue.service.ts`) and launches `WorkflowProcessor` worker (`processors/workflow.processor.ts`).
+
+### `backend/node-services` (Express Utilities)
+Handles heavy external library integrations (Stripe, Resend email dispatch, ImageKit upload signatures).
+*   **`src/index.ts`**: Main script initializing Express, CORS headers, Helmet, and global exception middlewares.
+*   **`src/routes/`**: Handles Express routing. Includes `email.routes.ts`, `payment.routes.ts`, and `upload.routes.ts`.
+*   **`src/controllers/`**: Controller endpoints for email notification dispatches, Stripe webhooks, and ImageKit credentials signatures.
+*   **`src/services/`**: Underlying service modules wrapping Stripe SDK, ImageKit API, Resend, and Nodemailer SMTP transporter.
+
+### `frontend` (Next.js 14 Client App)
+Houses UI elements, handles NextAuth authentication, and queries Prisma directly.
+*   **`src/app/api/`**: Local Next.js API routes duplicating data controllers for users, complaints, budget forecasts, notifications, sovereign twin data, etc.
+*   **`src/modules/`**: Contains client-side forms, schemas, state queries, and repository modules (e.g. `complaints.service.ts`, `budget.repository.ts`) containing direct SQL/Prisma operations.
+*   **`src/lib/`**: Singletons like `prisma.ts`, `pusher.ts`, `pusher-client.ts`, and helper functions.
+*   **`src/components/`**: Dashboards, maps, chat assistants, and notification hubs.
+
+---
+
+## 2. Deep Dive: The True Role of `node-services`
+
+**Yes, `node-services` is a separate utility microservice.** It is *not* legacy code, nor does it represent direct duplication of business logic. Its purpose is to isolate heavy external SDKs and specific body-parsing rules:
+1.  **Stripe Webhook Parsing**: Stripe signatures must be checked against raw requests (`express.raw({ type: 'application/json' })`). Implementing this in NestJS often conflicts with global JSON body parser configurations. `node-services` receives the raw body, verifies the signature, and forwards the parsed event to `nest-api/api/payments/webhook`.
+2.  **Notification Dispatches**: Isolates email dependencies (`resend`, `nodemailer`) from the core gateway, preserving its execution thread and footprint.
+3.  **Media Uploads Signatures**: Generates ImageKit client-side signatures to allow direct uploads from browsers without overloading server bandwidth.
+
+**Recommendation**: Keep `node-services` as a separate utility service to isolate third-party libraries. However, it should only be accessible internally via the Nginx API gateway or internal service-to-service networks.
+
+---
+
+## 3. Endpoints Matrix
+
+### `backend/nest-api` Endpoints
+
+| HTTP Method | Route | Purpose | Request Body / Response Shape |
 | :--- | :--- | :--- | :--- |
-| `/api/auth/*` | ALL | NextAuth authentication handler | `src/modules/auth` |
-| `/api/complaints` | GET/POST | Fetch user complaints / File a new civic grievance | `src/modules/complaints` |
-| `/api/complaints/[id]` | GET/PUT | Read complaint details / Update status & notes | `src/modules/complaints` |
-| `/api/complaints/assign` | POST | Assign a complaint to an officer | `src/modules/complaints` |
-| `/api/budget/forecast` | GET/POST | Generate & query municipal budget forecasts | `src/modules/budget` |
-| `/api/budget/actuals` | GET/POST | Record actual expenditures | `src/modules/budget` |
-| `/api/budget/optimizations`| GET/PUT | Retrieve or execute cost optimization strategies | `src/modules/budget` |
-| `/api/budget/surges` | GET | Track AI-predicted civic demand surges | `src/modules/budget` |
-| `/api/sovereign/nodes` | GET/POST | Fetch geopolitical nodes hierarchy | `src/modules/sovereign` |
-| `/api/sovereign/sdg` | GET/PUT | Track SDG Goals & indicators | `src/modules/sovereign` |
-| `/api/sovereign/sim` | POST | Simulate local legislative policy trade-offs | `src/modules/sovereign` |
-| `/api/sovereign/twin` | GET/POST | Real-time digital twin twin health-grid sync | `src/modules/sovereign` |
-| `/api/sovereign/crisis` | POST | Deploy emergency resources during national crises | `src/modules/sovereign` |
-| `/api/user/profile` | GET/PUT | Manage user metadata & profiles | `src/modules/user` |
-| `/api/notifications` | GET/PUT | Retrieve user alerts & mark as read | `src/modules/notifications` |
-| `/api/admin/tenants` | GET/POST | Tenancy management for municipal instances | `src/modules/user` |
-| `/api/imagekit/auth` | GET | Generate secure tokens for image uploads | `src/modules/complaints` |
+| **POST** | `/auth/register` | User registration | **Req**: `{ email, password, name, role, ... }`<br>**Res**: `{ success: true, user, accessToken }` |
+| **POST** | `/auth/login` | User login (returns JWT) | **Req**: `{ email, password }`<br>**Res**: `{ success: true, user, accessToken }` |
+| **POST** | `/auth/refresh` | Obtains new JWT using Refresh Cookie | **Req**: `Cookie: refreshToken`<br>**Res**: `{ success: true, user, accessToken }` |
+| **POST** | `/auth/logout` | Clears refresh cookie | **Req**: `None`<br>**Res**: `{ success: true, message }` |
+| **GET** | `/auth/session` | Fetches active session info | **Req**: `Bearer JWT`<br>**Res**: `{ success: true, user }` |
+| **GET** | `/workflows/complaints` | Paginated complaint filters (Cursor-based) | **Req**: `Query params (status, category, limit, cursor)` <br>**Res**: `{ success: true, data: Complaint[], nextCursor }` |
+| **GET** | `/workflows/complaints/:id` | Fetches a single complaint by ID | **Req**: `None`<br>**Res**: `{ success: true, data: Complaint }` |
+| **POST** | `/workflows/complaints` | Files complaint & enqueues BullMQ pipeline | **Req**: `{ title, description, category, severity, lat, lng }`<br>**Res**: `{ success: true, data: Complaint }` |
+| **POST** | `/workflows/complaints/assign` | Assigns complaint to officer | **Req**: `{ complaintId, officerId }`<br>**Res**: `{ success: true, ... }` |
+| **PUT** | `/workflows/complaints/:id` | Updates complaint status or details | **Req**: `{ status, category, ... }`<br>**Res**: `{ success: true, data: Complaint }` |
+| **POST** | `/agents/chat` | Proxies chat message to FastAPI | **Req**: `{ message, history }`<br>**Res**: `{ response: string }` |
+| **POST** | `/agents/classify` | Proxies category classification to FastAPI | **Req**: `{ text }`<br>**Res**: `{ category, severity, confidence, reasoning }` |
+| **POST** | `/agents/duplicate-check` | Proxies duplicate checks to FastAPI | **Req**: `{ text, latitude, longitude }`<br>**Res**: `{ is_duplicate, duplicate_of }` |
+| **POST** | `/agents/spam-check` | Proxies spam detection to FastAPI | **Req**: `{ text }`<br>**Res**: `{ is_spam, confidence }` |
+| **POST** | `/agents/process-workflow` | Triggers FastAPI RAG/ML pipelines | **Req**: `{ complaintId, text, latitude, longitude }`<br>**Res**: `{ ...aiResult }` |
+| **POST** | `/agents/assistant/chat` | Proxies conversational queries | **Req**: `{ message, context }`<br>**Res**: `{ text, assistant_name, intent, ... }` |
+| **GET** | `/health` | Core microservice health check | **Res**: `{ status: "online", service: "nest-api" }` |
 
-### FastAPI Engine Endpoints (To Modernize under `fastapi-ai`)
+### `backend/node-services` Endpoints
 
-| Route Path | Method | Purpose | Engine Handler |
+| HTTP Method | Route | Purpose | Request Body / Response Shape |
 | :--- | :--- | :--- | :--- |
-| `/chat` | POST | Direct LLM smart chat interface | `chat_service.py` |
-| `/classify` | POST | Single-request category/severity scoring | `classification_service.py` |
-| `/duplicate-check` | POST | Vector semantic duplicate checking | `duplicate_service.py` |
-| `/route` | POST | Optimal officer matching service | `routing_service.py` |
-| `/spam-check` | POST | Autonomous bot/gibberish filter | `spam_service.py` |
-| `/verify-resolution` | POST | Computer vision validation of resolved complaints | `verification_service.py` |
-| `/process-workflow` | POST | Autonomous multi-agent pipeline orchestrator | `llm_pipeline.py` |
-| `/analytics/rl` | GET | Check Reinforcement Learning Q-table metrics | `rl_agent.py` |
-| `/analytics/federated`| GET | Fetch aggregated multi-district ML training rates | `analytics_service.py` |
-| `/federated/train-round`| POST | Simulate localized decentralized training round | `federated/coordinator.py` |
-| `/iot/ingest` | POST | Ingest IoT civic sensors telemetry | `iot_service.py` |
-| `/vision/analyze` | POST | Process camera/satellite streams using HF models | `vision_service.py` |
-| `/analytics/infrastructure`| GET | Predictive civil infrastructure failure dashboard | `risk_service.py` |
-| `/voice-to-text` | POST | Transcribe voice reports using AssemblyAI | `voice_service.py` |
-| `/translate` | POST | Dynamic multilingual translation fallbacks | `translation_service.py` |
-| `/predict-eta` | POST | Feedforward ML network ETA predictions | `ml_model_service.py` |
-| `/compliance/bias-report`| GET | Monitor LLM routing and language fairness | `compliance_service.py` |
-| `/compliance/audit-summary`| GET | Municipal compliance ledger summary | `compliance_service.py` |
-| `/urban/risk-heatmap` | GET | Predict high-risk zones (infrastructure/floods) | `urban_intelligence_service.py` |
-| `/mayor/simulate` | POST | Predict voter approval & policy outcome impacts | `ai_mayor_service.py` |
-| `/un/sdg-status` | GET | Evaluate local alignment with standard UN SDGs | `un_governance_service.py` |
-| `/security/check` | POST | Safeguard against prompt injection & bots | `threat_service.py` |
-| `/governance/optimize-routing`| POST | Recalculate RL routing weights based on history | `governance_engine.py` |
+| **POST** | `/utils/payment/webhook` | Stripe webhook parser and verifier | **Req**: `Raw Stripe signature headers` + body<br>**Res**: `{ received: true }` |
+| **POST** | `/utils/email/send` | Dispatches emails (Internally authenticated) | **Req**: `{ to, subject, html }`<br>**Res**: `{ success: true, id }` |
+| **GET** | `/utils/upload/imagekit-auth` | Client ImageKit signature generator | **Req**: `None`<br>**Res**: `{ token, signature, expire }` |
+| **GET** | `/health` | Public microservice health check | **Res**: `{ status: "online", service: "node-services" }` |
+| **GET** | `/utils/health` | Alternate health endpoint | **Res**: `{ status: "online", service: "node-services (via utils)" }` |
 
----
+### `backend/fastapi-ai` Endpoints
 
-## 3. Database Schema Models
+*Note: All endpoints except `/health`, `/docs`, and `/openapi.json` require an `INTERNAL_SERVICE_TOKEN` authorization header.*
 
-The Prisma schema defines a highly integrated multi-tenant relational system with **24 tables**:
-
-1.  **`User`**: Accounts mapping to multi-tenant structures with granular RBAC permissions (`Role` enum: Citizen, Officer, State/District/City Admin, Global Admin), points, and coordinate telemetry.
-2.  **`Tenant`**: Tenant boundary parameters supporting SaaS white-label deployments.
-3.  **`Subscription`**: Stripe-linked subscription details, usage quotas, and tier limits.
-4.  **`State`**, **`District`**, **`City`**, **`Ward`**: Nested geographical tenancy parameters mapping users and complaints to local administrative boundaries.
-5.  **`VerificationToken`**, **`PasswordResetToken`**: Authorization utility tables.
-6.  **`Complaint`**: Central grievance record. Links to categories, severity, geo-telemetry, and hosts complex AI analysis JSON blocks, spam scores, duplicate identifiers, security hashing signatures, and blockchain transaction keys.
-7.  **`Department`**: Municipal branch records (e.g., Road Safety, Waste Management) linking heads and budgets.
-8.  **`Remark`**: Multi-role execution logs appended by citizens, officers, or the AI verifier.
-9.  **`Notification`**: Audit alerts triggered via real-time connections or emails.
-10. **`AuditLog`**: Tamper-proof administrative logs.
-11. **`ThreatLog`**: Tracks security incidents (Prompt Injection, SQL Injection, Bot Spam) logged by the threat service.
-12. **`Conversation`**, **`UserConversation`**, **`Message`**: Real-time conversational AI system logs, featuring bot flags, audio attachments, and message sentiments.
-13. **`BudgetForecast`**, **`BudgetActual`**: Dynamic multi-tenant budget records. Integrates actual expenditure vs. AI forecast breakdowns.
-14. **`CostOptimization`**: Cost saving recommendations produced by the policy analysis services.
-15. **`DemandSurge`**: AI-predicted infrastructure overload warning triggers.
-16. **`SovereignNode`**: Tree hierarchical node structures tracking geopolitical units (Global down to City).
-17. **`SDGTarget`**: Dynamic metrics mapping localized actions to UN Sustainable Development Goals.
-18. **`PolicySimulation`**: Evaluates prospective laws against historical citizen sentiment using LLM routing.
-19. **`DigitalTwinNode`**: Models physical civic infrastructure elements (grids, bridges, pipes) reporting real-time telemetry.
-20. **`NationalCrisis`**: Governs coordination during emergency alerts.
-
----
-
-## 4. Key AI / ML Integration Channels
-
-The core intelligence of JanSankalp is split across several third-party and local models:
-1.  **OpenAI API (`sk-proj-...`)**:
-    *   Powers the **Multi-Agent Orchestrator** for spam filtering, semantic taxonomy categorizations, departmental routing, policy evaluations, and conversational assistants.
-    *   Generates embeddings (`text-embedding-3-small`) to enable standalone local numpy vector searches when Weaviate is offline.
-2.  **xAI Grok API (`xai-...`)**:
-    *   Serves as the high-availability failover layer for chat and classification pipelines when OpenAI API hits rate-limits.
-3.  **Hugging Face Transformers (`hf_...`)**:
-    *   Runs Computer Vision models (e.g., YOLO, ViT) for infrastructure deterioration detection and pothole/garbage validation from CCTV snapshot inputs.
-4.  **Cohere Multi-lingual API (`PKE...`)**:
-    *   Supports translation routing, standardizing multi-lingual localized complaints (Hindi, Tamil, Marathi, etc.) into English analysis models and back.
-5.  **AssemblyAI (`e3f...`)**:
-    *   Converts user-recorded voice reports into clean text feeds.
-6.  **Reinforcement Learning Module (`Q-Learning`)**:
-    *   A custom Python agent calculating dynamic routing penalties based on officer ticket turnaround performance.
-7.  **Federated Learning System**:
-    *   A localized simulation pipeline using PyTorch matrices (`torch.randn`) mapping weight distributions across districts.
-
----
-
-## 5. Master Environment Variable Map
-
-The unified `.env` will categorize settings so each service imports strictly what it needs:
-
-| Env Key | Used By Service | Classification | Purpose |
+| HTTP Method | Route | Purpose | Request Body / Response Shape |
 | :--- | :--- | :--- | :--- |
-| `DATABASE_URL` | `nest-api`, `fastapi-ai` | Database Credentials | Neon cloud PostgreSQL connection URI |
-| `REDIS_URL` | `nest-api`, `fastapi-ai` | Cache & Queues | Redis caching and BullMQ connection |
-| `AUTH_SECRET`, `NEXTAUTH_SECRET` | `nest-api`, `frontend` | Core Security | Authentication token hashing |
-| `NEXTAUTH_URL` | `frontend` | Route Mappings | NextAuth local / production callback |
-| `OPENAI_API_KEY`, `OPENAI_ORG_ID` | `fastapi-ai` | LLM Key | OpenAI GPT-4o, Embeddings models |
-| `GROK_API_KEY` | `fastapi-ai` | LLM Key | xAI Grok high-availability failover |
-| `HUGGINGFACE_API_KEY` | `fastapi-ai` | Vision Key | CCTV, Satellite & Infrastructure CV models |
-| `COHERE_API_KEY` | `fastapi-ai` | NLP Translation | Multi-lingual translation pipeline |
-| `ASSEMBLY_AI_API_KEY` | `fastapi-ai` | Voice STT | Speech transcription endpoint |
-| `SATELLITE_API_KEY` | `fastapi-ai` | Remote Sensing | Planet Labs / Google Earth tile API |
-| `NEXT_PUBLIC_PUSHER_KEY` | `frontend` | WebSockets Client | Real-time channel key |
-| `PUSHER_SECRET`, `PUSHER_APP_ID` | `nest-api`, `node-services` | WebSockets Server | Pusher trigger credential |
-| `NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY`| `frontend`, `node-services` | Media Uploads | Secure asset upload client key |
-| `IMAGEKIT_PRIVATE_KEY` | `node-services` | Media Uploads | Secure asset signing |
-| `SMTP_EMAIL`, `SMTP_PASSWORD` | `node-services` | SMTP Gateway | Resend fallback email transporter |
-| `RESEND_API_KEY` | `node-services` | Notifications | Resend transactional mail gateway |
-| `STRIPE_SECRET_KEY` | `node-services`, `nest-api` | Billing Gateway | Stripe subscriptions payments |
-| `STRIPE_WEBHOOK_SECRET` | `node-services` | Webhooks Router | Stripe payment events callback |
-| `NEXT_PUBLIC_MAPBOX_TOKEN` | `frontend` | Map Services | Geographical layers |
+| **POST** | `/chat` | Generates direct LLM chatbot response | **Req**: `{ message, history }`<br>**Res**: `{ response }` |
+| **POST** | `/classify` | Infers category, severity, and department | **Req**: `{ text }`<br>**Res**: `{ category, severity, confidence, reasoning }` |
+| **POST** | `/duplicate-check` | Performs local vector search to find duplicates | **Req**: `{ text, latitude, longitude }`<br>**Res**: `{ is_duplicate, duplicate_of }` |
+| **POST** | `/route` | Custom RL-based optimal officer/department route | **Req**: `{ category, severity }`<br>**Res**: `{ department_id, officer_id }` |
+| **POST** | `/spam-check` | Filters out spam/gibberish reports | **Req**: `{ text }`<br>**Res**: `{ is_spam, confidence }` |
+| **POST** | `/verify-resolution` | Validates completion using text/evidence image | **Req**: `{ complaint_text, resolution_text, evidence_image_url }`<br>**Res**: `{ resolution_verified, reasoning }` |
+| **POST** | `/process-workflow` | Coordinates classification → dedup → route → ETA | **Req**: `{ complaint_id, text, latitude, longitude }`<br>**Res**: `{ is_spam, is_duplicate, assigned_department, analysis, ... }` |
+| **GET** | `/analytics/rl` | Returns Q-table dimensions and training stats | **Res**: `{ policy_size, epsilon, efficiency_gain, reward_trend }` |
+| **POST** | `/analytics` | Summarizes civic data forecasting indicators | **Res**: `{ ...aggregatedData }` |
+| **GET** | `/analytics/federated` | Returns status of local district models | **Res**: `{ status, district_updates }` |
+| **POST** | `/federated/train-round` | Simulates a decentralized district PyTorch train round | **Res**: `{ success: true, updated_weights }` |
+| **POST** | `/iot/ingest` | Receives sensor data and updates health status | **Req**: `{ sensor_id, sensor_type, value, unit, lat, lng }`<br>**Res**: `{ success: true }` |
+| **POST** | `/vision/analyze` | Evaluates raw camera snapshots using HF models | **Req**: `{ source_type, image_url, lat, lng }`<br>**Res**: `{ anomaly_detected, severity }` |
+| **GET** | `/analytics/infrastructure`| Generates city risks and active sensors lists | **Res**: `{ health_map, active_sensors, flood_risk, alert_count }` |
+| **POST** | `/voice-to-text` | transcribes voice uploads using AssemblyAI | **Req**: `{ audio_url }`<br>**Res**: `{ text }` |
+| **POST** | `/translate` | Translates text between regional languages | **Req**: `{ text, target }`<br>**Res**: `{ translated_text }` |
+| **POST** | `/predict-eta` | Forecasts ticket resolution time | **Req**: `{ category, severity, location_density }`<br>**Res**: `{ predicted_eta_hours }` |
+| **GET** | `/compliance/audit-summary`| Lists blockchain hash keys and audit statistics | **Res**: `{ block_count, integrity_checked }` |
+| **GET** | `/compliance/bias-report` | Evaluates demographics routing fairness | **Res**: `{ fairness_index }` |
+| **GET** | `/urban/risk-heatmap` | Generates location coordinates for heatmaps | **Res**: `{ heatpoints: [] }` |
+| **POST** | `/mayor/simulate` | Predicts approval ratings for policy parameters | **Req**: `{ params }`<br>**Res**: `{ predicted_ratings }` |
+| **GET** | `/un/sdg-status` | Evaluates alignment indexes against UN SDGs | **Res**: `{ sdg_index }` |
+| **POST** | `/security/check` | Evaluates threat flags (SQLi, Prompt injections) | **Req**: `{ payload }`<br>**Res**: `{ threat_detected, confidence }` |
+| **POST** | `/governance/optimize-routing`| Recalculates reinforcement learning parameters | **Res**: `{ success: true, updated_policy }` |
+| **POST** | `/assistant/chat` | Sync chat response generator | **Req**: `{ user_id, message, role, context }`<br>**Res**: `{ text, ... }` |
+| **POST** | `/assistant/stream` | Streams assistant response via SSE | **Req**: `{ user_id, message, role, context }`<br>**Res**: `SSE chunks event-stream` |
+| **GET** | `/health` | Core microservice health check | **Res**: `{ status: "online", service: "fastapi-ai" }` |
+| **GET** | `/models/status` | Reports configuration status of models | **Res**: `{ success, data }` |
+| **GET** | `/models/health` | Validates models execution status | **Res**: `{ status, models, device }` |
+| **POST** | `/models/reload` | Flushes models and triggers reload | **Res**: `{ success, message }` |
+
+### Redundancies & Mappings Analysis
+*   **Duplicate Endpoints**: `/api/complaints`, `/api/budget/*`, and `/api/notifications` routes are defined *both* in Next.js internal Serverless API routes (`frontend/src/app/api/...`) and NestJS (`backend/nest-api`). Currently, the frontend UI components call relative Next.js paths (e.g. `fetch("/api/complaints")`), completely bypassing `nest-api`.
+*   **Real-time Logic**: The frontend uses `Pusher` inside components (`RealTimeNotifications.tsx`) and contexts (`LiveEventContext.tsx`) for real-time notifications. The NestJS WebSocket Gateway `/agents` is unutilized on the frontend.
 
 ---
 
-## 6. Structural Improvements & Cleanup Checklist
+## 4. Current Frontend Integration Model
 
-1.  **Decouple Next.js Serverless API**: Migrate database access logic, controller schemas, Pusher triggers, and Kafka pipeline events from `client/src/modules/` into the new **NestJS application** (`backend/nest-api`).
-2.  **Move Schema to Root**: Place the `prisma` folder at the root `/prisma`, allowing easy schema changes. Generate Prisma clients in `backend/nest-api/` and `backend/fastapi-ai/` directly.
-3.  **Service Isolation**:
-    *   `fastapi-ai` handles strictly AI: SSE streams, agents orchestrations, embeddings generation, RL training, CV pipelines.
-    *   `node-services` handles utilities: webhooks, file uploads (ImageKit/S3/R2), Resend/SMTP transactional mail notifications.
-4.  **Inter-Service Auth**: Secure internal communication between `nest-api` and `fastapi-ai` using service token authentication.
-5.  **State Management & SSE**: Implement SWR/React Query on the frontend pointing to the new NestJS backend API gateway, and configure custom SSE event hooks to handle streaming responses from FastAPI.
+The frontend uses `fetch` to make HTTP requests:
+1.  **Relative Internal Calls**: Component and page modules call internal Next.js routes (e.g., `fetch("/api/complaints")`). These serverless routes then perform database transactions directly via a local Prisma Client instance.
+2.  **Unused API client**: `frontend/src/lib/api.ts` contains `apiFetch`, which intercepts path prefixes (`/ai/` and `/utils/`) and routes them to `NEXT_PUBLIC_AI_URL` and `NEXT_PUBLIC_UTILS_URL` respectively. However, `apiFetch` is never imported or called in the codebase.
+3.  **Real-Time Data**: Subscribes directly to `Pusher` channels (`governance-channel` and user-specific rooms) rather than opening connections to the NestJS Gateway.
 
 ---
-*Audit completed by Senior Software Architect Antigravity on May 21, 2026.*
+
+## 5. Check on Frontend `prisma/` Folder & Database Access
+
+*   **Database Target**: The frontend's `prisma/schema.prisma` is identical to root and `nest-api` schemas. It points to a Neon cloud PostgreSQL instance using `DATABASE_URL`.
+*   **Direct Database Access**: Next.js uses server-side Prisma adapter calls within `src/modules/` repositories (e.g., `user.repository.ts`, `complaint.repository.ts`, `budget.service.ts`). When Next.js routes are executed on the server, they query PostgreSQL directly.
+*   **Issues**: This setup violates microservices boundary practices. The frontend should query database resources only via the central gateway (`nest-api`). Sharing database access credentials across multiple services invites write conflicts, schema drift, and transaction deadlocks.
+
+---
+
+## 6. Database Systems & Driver Mappings
+
+| Service | Database Connected | Driver / ORM Tool | Active Models / Schemas |
+| :--- | :--- | :--- | :--- |
+| **`frontend`** | PostgreSQL (Neon) | Prisma Client (`@prisma/client`) | Full schema (20+ entities: Users, Wards, Complaints, Budgets, etc.) |
+| **`nest-api`** | PostgreSQL (Neon) | Prisma Client (`@prisma/client`) | Full schema (20+ entities: Users, Wards, Complaints, Budgets, etc.) |
+| **`fastapi-ai`** | None (Stateless) | None | Uses internal vectors (Weaviate) for semantic duplicate checking. |
+| **`node-services`** | None (Stateless) | None | None |
+
+### Key Issues:
+1.  **Overlapping Schema Control**: Both `frontend` and `nest-api` share the Postgres connection and generate their own Prisma clients. `nest-api` should be the sole service communicating with Postgres.
+2.  **Missing MongoDB Layer**: Although MongoDB is defined in `docker-compose.yml`, no service currently initiates database connections or defines Mongoose models.
+
+---
+
+## 7. Authentication Setup & Tenancy Validation
+
+Currently, authentication is duplicated across services:
+1.  **Next.js Frontend (NextAuth v5)**: NextAuth validates email and credentials on the server side using the database adapter, generating a session token stored in cookie headers. NextAuth callbacks inject custom user fields (role, tenantId, stateId, districtId, etc.) into the JWT session.
+2.  **NestJS Backend (`passport-jwt`)**: `nest-api` implements a separate JWT strategy (`src/auth/guards/jwt-auth.guard.ts`) and rolls its own login/registration flows. The JWT secret is shared via environmental configs.
+3.  **Authentication Gaps**: Because Next.js doesn't call NestJS, NextJS's validation filters are bypassed. The frontend and NestJS are isolated auth islands.
+
+---
+
+## 8. Real-Time Setup Gaps (Stale Data & Polling)
+
+The codebase has several polling loops that retrieve data via `setInterval`. Under 100k+ concurrent users, this polling behavior will overload database connections:
+
+*   **Infrastructure Dashboard** (`InfraDashboard.tsx`): Polling every 15 seconds (`fetchData`).
+*   **Federated Learning** (`FLDashboard.tsx`): Polling every 30 seconds (`fetchMetrics`).
+*   **AI Processing Center** (`AIProcessingCenter.tsx`): Polling every 60 seconds (`fetchAll`).
+*   **UN Governance** (`un-governance/page.tsx`): Polling every 30 seconds (`fetchMetrics`).
+*   **National Command** (`national-command/page.tsx`): Polling every 20 seconds (`fetchMetrics`).
+*   **Incident Telemetry** (`incident/page.tsx`): Polling every 10 seconds (`fetchTelemetry`).
+*   **User Sessions** (`SessionGuard.tsx`): Polling session refresh endpoints.
+
+All these pollers must be replaced by WebSocket listeners bound to namespaces (e.g. `/dashboard`, `/infrastructure`, `/national-command`) managed by NestJS.
+
+---
+
+## 9. Key Code Smells & Scalability Bottlenecks
+
+1.  **Direct Database Queries in Next.js Server**: Prevents horizontal scaling of business logic and creates connection spikes on the PostgreSQL pool.
+2.  **Unbounded Database Fetches**: Several frontend and NestJS repositories run queries without pagination or page-limit logic. For example, `complaint.repository.ts` runs `prisma.complaint.findMany({ where: ... })` which will break when complaints scale.
+3.  **Next.js Docker Port Conflict**: The production `docker-compose.yml` binds the frontend container directly to host port `80:80`. Because the Nginx gateway is also bound to host port `80:80`, this setup will crash on launch due to port binding conflicts. Next.js port binding in Compose should be removed, leaving Nginx as the single entry point.
+4.  **No Connection Pooling**: Prisma is initialized without connection pooling parameters. Under high load, connection pools will exhaust, dropping database requests.
+5.  **Direct Client-to-FastAPI Calls**: The design requires all requests to pass through the API gateway. Direct frontend calls to FastAPI violate security policies and bypass authentication.
+6.  **Missing Circuit Breakers**: If the python AI engine fails or becomes slow, NestJS HTTP calls will block, consuming container threads and leading to a cascading failure.

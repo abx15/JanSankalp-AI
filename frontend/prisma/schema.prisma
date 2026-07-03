@@ -59,8 +59,6 @@ model User {
   assignedTasks Complaint[] @relation("AssignedTo")
   managedDept   Department? @relation("DeptHead")
   notifications Notification[]
-  conversations UserConversation[]
-  threatLogs    ThreatLog[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -80,7 +78,6 @@ model Tenant {
   departments   Department[]
   budgetForecasts BudgetForecast[]
   costOptimizations CostOptimization[]
-  threatLogs    ThreatLog[]
   
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -264,61 +261,6 @@ model Notification {
   createdAt   DateTime @default(now())
 }
 
-model AuditLog {
-  id        String   @id @default(cuid())
-  action    String
-  userId    String
-  details   String?
-  createdAt DateTime @default(now())
-}
-
-// Security & Threat Detection
-model ThreatLog {
-  id          String   @id @default(cuid())
-  type        String   // "BOT_SPAM", "SQL_INJECTION", "PROMPT_INJECTION", "ANOMALY"
-  severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
-  payload     Json?    // Request details
-  sourceIp    String?
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  tenantId    String?
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
-  actionTaken String   // "BLOCKED", "FLAGGED", "CHALLENGED"
-  createdAt   DateTime @default(now())
-}
-
-// Conversational AI Assistant
-model Conversation {
-  id          String   @id @default(cuid())
-  title       String?
-  participants UserConversation[]
-  messages    Message[]
-  summary     String?  // AI-generated long-term summary
-  metadata    Json?    // Tone, preferences, etc.
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model UserConversation {
-  userId         String
-  user           User         @relation(fields: [userId], references: [id])
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-
-  @@id([userId, conversationId])
-}
-
-model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  senderId       String?      // Null if sent by System AI
-  text           String
-  isBot          Boolean      @default(false)
-  audioUrl       String?      // For voice follow-ups
-  sentiment      String?
-  createdAt      DateTime     @default(now())
-}
 
 // Budget Forecasting Models
 model BudgetForecast {

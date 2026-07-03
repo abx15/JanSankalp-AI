@@ -46,6 +46,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSocket } from "@/lib/api";
+import { useSession } from "next-auth/react";
+import { Radio } from "lucide-react";
 
 const COLORS = [
   "#3b82f6",
@@ -57,6 +60,7 @@ const COLORS = [
 ];
 
 export function AIProcessingCenter() {
+  const { data: session } = useSession();
   const [stats, setStats] = useState<any>(null);
   const [telemetry, setTelemetry] = useState<any>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -68,6 +72,12 @@ export function AIProcessingCenter() {
     intensity: 0.1,
   });
   const [simResult, setSimResult] = useState<any>(null);
+
+  const { socket, isConnected, isReconnecting } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
 
   const fetchAll = async () => {
     try {
@@ -91,9 +101,24 @@ export function AIProcessingCenter() {
 
   useEffect(() => {
     fetchAll();
-    const interval = setInterval(fetchAll, 60000);
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleUpdate = () => {
+      console.log("[Socket-AIProcessing] Live AI update triggered. Reloading governance metrics...");
+      fetchAll();
+    };
+
+    socket.on('statsUpdate', handleUpdate);
+    socket.on('complaintUpdate', handleUpdate);
+
+    return () => {
+      socket.off('statsUpdate', handleUpdate);
+      socket.off('complaintUpdate', handleUpdate);
+    };
+  }, [socket, isConnected]);
 
   const handleOptimize = async () => {
     setOptimizing(true);
@@ -162,6 +187,12 @@ export function AIProcessingCenter() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
+      {!isConnected && (
+        <div className={`p-3 rounded-2xl text-center text-xs font-black tracking-wider flex items-center justify-center gap-2 transition-all ${isReconnecting ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse' : 'bg-red-500/20 text-red-500 border border-red-500/30'}`}>
+          <Radio className={`w-4 h-4 ${isReconnecting ? 'animate-ping' : ''}`} />
+          {isReconnecting ? 'CONNECTIVITY LOSS: RECONNECTING TO LIVE SOVEREIGN AI CORE GATEWAY...' : 'OFFLINE MODE: REAL-TIME DECISION TELEMETRY DEGRADED'}
+        </div>
+      )}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">

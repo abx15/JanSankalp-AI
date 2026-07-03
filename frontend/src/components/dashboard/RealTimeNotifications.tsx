@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Pusher from "pusher-js";
-import { toast } from "sonner"; // Assuming sonner for toasts
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useSocket } from "@/lib/api";
+import { toast } from "sonner";
 import { BellRing } from "lucide-react";
 
 export function RealTimeNotifications({
@@ -12,52 +13,36 @@ export function RealTimeNotifications({
   userId?: string;
   onNewComplaint?: () => void;
 }) {
+  const { data: session } = useSession();
+
+  // Connect to the dashboard Socket.io namespace
+  const { socket, isConnected } = useSocket({
+    token: (session as any)?.accessToken,
+    namespace: 'dashboard',
+    room: 'dashboard-stats',
+  });
+
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_PUSHER_KEY) return;
+    if (!socket || !isConnected) return;
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
-
-    // 1. Listen for system-wide events (for admins/officers)
-    const governanceChannel = pusher.subscribe("governance-channel");
-    governanceChannel.bind("new-complaint", (data: any) => {
-      toast.info(`SYSTEM ALERT: New ${data.category}`, {
-        description: `${data.ticketId} reported at ${data.location.lat.toFixed(2)}, ${data.location.lng.toFixed(2)}`,
-        duration: 8000,
-        icon: <BellRing className="w-4 h-4 text-primary" />,
-      });
-
-      if (onNewComplaint) onNewComplaint();
-    });
-
-    governanceChannel.bind("complaint-updated", (data: any) => {
-      if (onNewComplaint) onNewComplaint();
-    });
-
-    // 2. Listen for personal events (for citizens)
-    if (userId) {
-      const userChannel = pusher.subscribe(`user-${userId}`);
-      userChannel.bind("notification", (data: any) => {
-        toast.success(data.title || "Status Updated", {
-          description: data.message,
-          duration: 10000,
-          action: {
-            label: "View Report",
-            onClick: () => (window.location.href = "/dashboard/my-reports"),
-          },
+    const handleComplaintUpdate = (data: any) => {
+      if (data.event === 'new-complaint') {
+        toast.info(`SYSTEM ALERT: New ${data.category}`, {
+          description: `${data.ticketId} reported at ${data.location?.lat?.toFixed(2) || 0}, ${data.location?.lng?.toFixed(2) || 0}`,
+          duration: 8000,
+          icon: <BellRing className="w-4 h-4 text-blue-600" />,
         });
+      }
 
-        if (onNewComplaint) onNewComplaint();
-      });
-    }
+      if (onNewComplaint) onNewComplaint();
+    };
+
+    socket.on('complaintUpdate', handleComplaintUpdate);
 
     return () => {
-      pusher.unsubscribe("governance-channel");
-      if (userId) pusher.unsubscribe(`user-${userId}`);
-      pusher.disconnect();
+      socket.off('complaintUpdate', handleComplaintUpdate);
     };
-  }, [onNewComplaint, userId]);
+  }, [socket, isConnected, onNewComplaint]);
 
   return null;
 }

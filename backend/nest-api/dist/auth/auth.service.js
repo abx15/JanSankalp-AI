@@ -124,6 +124,54 @@ let AuthService = class AuthService {
             refreshToken,
         };
     }
+    async resendVerification(email) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        if (user.emailVerified) {
+            throw new common_1.BadRequestException('Email is already verified');
+        }
+        const token = Math.floor(100000 + Math.random() * 900000).toString();
+        const expires = new Date(Date.now() + 3600 * 1000);
+        await this.prisma.verificationToken.deleteMany({
+            where: { email },
+        });
+        await this.prisma.verificationToken.create({
+            data: { email, token, expires },
+        });
+        const nodeServicesUrl = process.env.NODE_SERVICES_URL || 'http://node-services:3001';
+        const emailSubject = 'Verify your email - JanSankalp AI';
+        const emailHtml = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <h2 style="color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: -0.025em;">Verify your email</h2>
+        <p style="color: #64748b;">Welcome to JanSankalp AI. Please use the following One-Time Password (OTP) to verify your email address. This code is valid for 1 hour.</p>
+        <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; text-align: center; margin: 24px 0;">
+          <span style="font-size: 32px; font-weight: 800; letter-spacing: 0.25em; color: #3b82f6;">${token}</span>
+        </div>
+        <p style="color: #94a3b8; font-size: 12px;">If you didn't request this code, you can safely ignore this email.</p>
+      </div>
+    `;
+        console.log(`[AUTH-VERIFICATION] Dispatching verification OTP ${token} to ${email} via node-services...`);
+        try {
+            await fetch(`${nodeServicesUrl}/utils/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: email,
+                    subject: emailSubject,
+                    html: emailHtml,
+                    userId: user.id,
+                }),
+            });
+        }
+        catch (err) {
+            console.error('[AUTH-VERIFICATION] Failed to dispatch email via node-services:', err.message);
+        }
+        return { success: true, message: 'Verification email resent successfully' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

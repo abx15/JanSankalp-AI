@@ -7,8 +7,12 @@ const swagger_1 = require("@nestjs/swagger");
 const helmet_1 = require("helmet");
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
+const redis_io_adapter_1 = require("./socket/redis-io.adapter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const redisIoAdapter = new redis_io_adapter_1.RedisIoAdapter(app);
+    await redisIoAdapter.connectToRedis();
+    app.useWebSocketAdapter(redisIoAdapter);
     app.use((0, helmet_1.default)());
     app.use(compression());
     app.use(cookieParser());

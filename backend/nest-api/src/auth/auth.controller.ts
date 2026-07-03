@@ -68,6 +68,11 @@ export class AuthController {
     };
   }
 
+  @Post('resend-verification')
+  async resendVerification(@Body('email') email: string) {
+    return this.authService.resendVerification(email);
+  }
+
   private setCookies(res: Response, token: string) {
     res.cookie('refreshToken', token, {
       httpOnly: true,

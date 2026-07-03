@@ -13,8 +13,6 @@ services:
       dockerfile: Dockerfile
     container_name: jansankalp-frontend
     restart: unless-stopped
-    ports:
-      - "80:80" # Exposed through Nginx reverse proxy
     env_file:
       - ./frontend/.env
     environment:
@@ -22,6 +20,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost/api
       - NEXT_PUBLIC_AI_URL=http://localhost/ai
       - NEXT_PUBLIC_UTILS_URL=http://localhost/utils
+      - NEST_API_INTERNAL_URL=http://nest-api:3000
       - NODE_ENV=production
     depends_on:
       postgres:
@@ -48,8 +47,10 @@ services:
       - PORT=3000
       - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
+      - MONGODB_URL=mongodb://mongodb:27017/jansankalp
       - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
       - JWT_SECRET=${AUTH_SECRET:-jansankalp-jwt-secret-key-2026-production}
+      - AUTH_SECRET=${AUTH_SECRET:-I/9TpoQCI36gforZOYZ2MsOS7MjqWMdPwTBJW1WWQpg=}
       - NODE_ENV=production
     depends_on:
       postgres:
@@ -156,6 +157,23 @@ services:
     networks:
       - jansankalp-net
 
+  # ─── Infrastructure: MongoDB (AI Logs, Threats, Audits) ────────────────────
+  mongodb:
+    image: mongo:6-jammy
+    container_name: jansankalp-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jansankalp-net
+
   # ─── Nginx Reverse Proxy Gateway ───────────────────────────────────────────
   nginx:
     image: nginx:alpine
@@ -222,6 +240,8 @@ volumes:
   postgres-data:
     driver: local
   redis-data:
+    driver: local
+  mongodb-data:
     driver: local
   prometheus-data:
     driver: local
