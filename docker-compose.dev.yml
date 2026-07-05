@@ -18,7 +18,7 @@ services:
     env_file:
       - ./frontend/.env
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_oQdPbl9KTaB0@ep-lucky-sun-ate12qrs-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - NEXT_PUBLIC_API_URL=http://localhost/api
       - NEXT_PUBLIC_AI_URL=http://localhost/ai
       - NEXT_PUBLIC_UTILS_URL=http://localhost/utils
@@ -49,7 +49,7 @@ services:
       - ./backend/nest-api/.env
     environment:
       - PORT=3000
-      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_oQdPbl9KTaB0@ep-lucky-sun-ate12qrs-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
       - MONGODB_URL=mongodb://mongodb:27017/jansankalp
       - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
@@ -82,7 +82,7 @@ services:
       - ./backend/fastapi-ai/.env
     environment:
       - PORT=10000
-      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_BPaT1IF0mdor@ep-withered-frost-aqctzr1z-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://neondb_owner:npg_oQdPbl9KTaB0@ep-lucky-sun-ate12qrs-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
       - REDIS_URL=redis://redis:6379
       - INTERNAL_SERVICE_TOKEN=${INTERNAL_SERVICE_TOKEN:-jansankalp-internal-secret-service-token-2026}
       - NODE_ENV=development
