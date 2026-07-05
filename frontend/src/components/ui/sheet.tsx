@@ -4,6 +4,7 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 interface SheetProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ const SheetContext = React.createContext<{
 
 export function Sheet({ children, open: controlledOpen, onOpenChange }: SheetProps) {
   const [internalOpen, setInternalOpen] = React.useState(false);
+  const pathname = usePathname();
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -34,13 +36,21 @@ export function Sheet({ children, open: controlledOpen, onOpenChange }: SheetPro
     [isControlled, onOpenChange]
   );
 
-  // 🔥 Prevent body scroll when open
+  // Auto-close sheet when pathname (route) changes
+  React.useEffect(() => {
+    setOpen(false);
+  }, [pathname, setOpen]);
+
+  // 🔥 Prevent body scroll when open, and clean up on unmount or close
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   // 🔥 ESC key close

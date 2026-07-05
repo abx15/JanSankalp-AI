@@ -606,8 +606,12 @@ async function main() {
             createdAt: randomDate(90),
         });
     }
-    await prisma.auditLog.createMany({ data: auditBatch });
-    console.log(`   ✅ 500 audit log entries seeded`);
+    if (prisma.auditLog) {
+        await prisma.auditLog.createMany({ data: auditBatch });
+        console.log(`   ✅ 500 audit log entries seeded`);
+    } else {
+        console.log(`   ⚠️ Skipping audit log seeding (model not in schema)`);
+    }
 
     // ─── 11. Budget Forecasts ───────────────────────────────────────────────────
     console.log('💰 Seeding budget forecasts...');
