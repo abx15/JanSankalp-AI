@@ -3,8 +3,11 @@
 import React from "react";
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { usePathname } from "next/navigation";
-
 import { ChatBot } from "@/components/ai/ChatBot";
+import { PWAInstallBanner } from "@/components/pwa/PWAInstallBanner";
+import dynamic from "next/dynamic";
+
+
 
 export default function ClientEntry({
   children,
@@ -21,7 +24,7 @@ export default function ClientEntry({
         navigator.serviceWorker
           .register("/sw.js")
           .then((reg) => {
-            console.log("[PWA] Service Worker registered successfully:", reg.scope);
+            console.log("[PWA] Service Worker registered:", reg.scope);
           })
           .catch((err) => {
             console.error("[PWA] Service Worker registration failed:", err);
@@ -29,21 +32,17 @@ export default function ClientEntry({
       });
     }
 
-    // Check if splash screen was already shown in this session
-    // Or if user prefers not to see it (optional logic)
-    // For now, we show it on every full reload or initial visit
-    // To make it show ONLY once per user lifetime/session, uncomment below:
-    /*
-    const hasSeenSplash = sessionStorage.getItem("janSankalp_hasSeenSplash");
+    // Show splash only once per browser SESSION (not on every navigation)
+    const hasSeenSplash = sessionStorage.getItem("jansankalp_splash_shown");
     if (hasSeenSplash) {
       setIsLoading(false);
     }
-    */
+    // If not seen, the SplashScreen component handles the timeout + calls onFinish
   }, []);
 
   const handleFinish = () => {
     setIsLoading(false);
-    // sessionStorage.setItem("janSankalp_hasSeenSplash", "true");
+    sessionStorage.setItem("jansankalp_splash_shown", "true");
   };
 
   return (
@@ -52,12 +51,13 @@ export default function ClientEntry({
       <div
         className={
           isLoading
-            ? "opacity-0"
-            : "opacity-100 transition-opacity duration-700"
+            ? "opacity-0 pointer-events-none"
+            : "opacity-100 transition-opacity duration-500"
         }
       >
         {children}
         <ChatBot />
+        <PWAInstallBanner />
       </div>
     </>
   );

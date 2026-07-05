@@ -1,12 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -39,9 +45,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Arun Kumar Bind", url: "https://github.com/abx15" }],
   creator: "Arun Kumar Bind",
   publisher: "JanSankalp AI",
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -67,10 +71,25 @@ export const metadata: Metadata = {
     images: ["/twitter-image"],
   },
   icons: {
-    icon: "/faviconjan.png",
-    apple: "/faviconjan.png",
+    icon: [
+      { url: "/faviconjan.png", sizes: "any" },
+      { url: "/logo.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/faviconjan.png", sizes: "180x180" }],
+    shortcut: "/faviconjan.png",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "JanSankalp AI",
+  },
+  formatDetection: {
+    telephone: false,
+    date: false,
+    email: false,
+    address: false,
+  },
   robots: {
     index: true,
     follow: true,
@@ -87,11 +106,9 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Navbar } from "@/components/layout/Navbar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { Toaster } from "sonner";
 import { NotificationListener } from "@/components/providers/NotificationListener";
-import dynamic from "next/dynamic";
-const SessionDebugger = dynamic(() => import("@/components/debug/SessionDebugger"), { ssr: false });
-
 import ClientEntry from "@/components/layout/ClientEntry";
 
 export default function RootLayout({
@@ -101,6 +118,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* Apple PWA meta tags */}
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="JanSankalp AI" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="JanSankalp AI" />
+        <link rel="apple-touch-icon" href="/faviconjan.png" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider
@@ -110,11 +136,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ClientEntry>
-              <Toaster position="top-right" richColors />
+              <Toaster position="top-right" richColors closeButton />
               <NotificationListener />
               <Navbar />
               {children}
-              <SessionDebugger />
+              <BottomNav />
             </ClientEntry>
           </ThemeProvider>
         </AuthProvider>

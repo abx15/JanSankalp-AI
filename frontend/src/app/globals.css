@@ -56,53 +56,87 @@
 
   * {
     @apply border-border;
+    /* Remove tap highlight on iOS for app-like feel */
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Prevent rubber-band overscroll on iOS (app-like) */
+    overscroll-behavior: none;
+    /* Better text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Add padding for fixed navbar */
+  /* Desktop: padding-top for fixed navbar */
   body {
     padding-top: 80px;
+    /* Bottom padding for mobile BottomNav (68px) */
+    padding-bottom: 0;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 767px) {
     body {
       padding-top: 70px;
+      padding-bottom: 68px; /* space for BottomNav */
+    }
+    /* In PWA standalone mode, add extra bottom padding for safe area */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      body {
+        padding-bottom: calc(68px + env(safe-area-inset-bottom));
+      }
     }
   }
 
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-muted;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/30;
-  }
-
-  html {
     @apply overflow-x-hidden;
+  }
+
+  /* Custom scrollbar (desktop only) */
+  @media (min-width: 768px) {
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      @apply bg-muted;
+    }
+    ::-webkit-scrollbar-thumb {
+      @apply bg-muted-foreground/20 rounded-full;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      @apply bg-muted-foreground/30;
+    }
+  }
+
+  /* Hide mobile scrollbar for cleaner app-like look */
+  @media (max-width: 767px) {
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    * {
+      scrollbar-width: none;
+    }
   }
 
   #__next {
     @apply overflow-x-hidden;
+  }
+
+  /* PWA standalone: adjust top bar spacing */
+  @media (display-mode: standalone) {
+    body {
+      padding-top: calc(80px + env(safe-area-inset-top, 0px));
+    }
+    @media (max-width: 767px) {
+      body {
+        padding-top: calc(60px + env(safe-area-inset-top, 0px));
+      }
+    }
   }
 }
 

@@ -14,9 +14,9 @@ export const NotificationListener = () => {
     namespace: 'notifications',
   });
 
-  // Reconnection toast alert
+  // Reconnection toast alert — only show for authenticated users (backend may not be running locally)
   useEffect(() => {
-    if (isReconnecting) {
+    if (isReconnecting && session) {
       toast.warning("Reconnecting...", {
         description: "Attempting to reconnect to live server",
         id: "socket-reconnect",
@@ -26,7 +26,7 @@ export const NotificationListener = () => {
     } else {
       toast.dismiss("socket-reconnect");
     }
-  }, [isReconnecting]);
+  }, [isReconnecting, session]);
 
   useEffect(() => {
     if (!socket || !isConnected) return;
